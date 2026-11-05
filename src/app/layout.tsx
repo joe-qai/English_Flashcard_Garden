@@ -3,11 +3,11 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: {
-    default: '新应用 | 扣子编程',
-    template: '%s | 扣子编程',
+    default: '英文闪卡园 | 常见单词中英对照',
+    template: '%s | 英文闪卡园',
   },
   description:
-    '扣子编程是一款一站式云端 Vibe Coding 开发平台。通过对话轻松构建智能体、工作流和网站，实现从创意到上线的无缝衔接。',
+    '按生活场景分类的常见英文单词闪卡，配图（图标）、国际音标与中文释义。覆盖水果、颜色、食物、动物、文具、家具、厨具等类别，轻松学习英语基础词汇。',
   keywords: [
     '扣子编程',
     'Coze Code',

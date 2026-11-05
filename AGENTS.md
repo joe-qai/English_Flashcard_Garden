@@ -8,6 +8,17 @@
 - **UI 组件**: shadcn/ui (基于 Radix UI)
 - **Styling**: Tailwind CSS 4
 
+## 项目概述
+
+「英文闪卡园」—— 常见单词中英对照学习工具。按生活场景分类（水果/颜色/食物/动物/文具/家具/厨具），每张卡片展示图标（emoji 作图像）、英文、国际音标、中文释义。支持分类切换与关键词搜索。
+
+## 关键入口 / 核心模块
+
+- `src/app/page.tsx`：首页（client 组件），分类导航 + 单词卡片网格 + 搜索
+- `src/lib/words.ts`：全部单词数据源。`Word` = { en, ipa, zh, icon }，`WordCategory` = { id, en, zh, icon, color, words }
+- `src/app/globals.css`：全局样式，`:root` 的 background 已改为奶白纸色
+- 产品设计风格见 `DESIGN.md`
+
 ## 目录结构
 
 ```
@@ -22,7 +33,8 @@
 │   ├── components/ui/      # Shadcn UI 组件库
 │   ├── hooks/              # 自定义 Hooks
 │   ├── lib/                # 工具库
-│   │   └── utils.ts        # 通用工具函数 (cn)
+│   │   ├── utils.ts        # 通用工具函数 (cn)
+│   │   └── words.ts        # 单词分类数据源
 │   └── server.ts           # 自定义服务端入口
 ├── next.config.ts          # Next.js 配置
 ├── package.json            # 项目依赖管理
@@ -30,6 +42,9 @@
 ```
 
 - 项目文件（如 app 目录、pages 目录、components 等）默认初始化到 `src/` 目录下。
+- `.coze`：`project_type=web`，`preview_enable=enabled`，`[dev]` 走 `scripts/prepare.sh`+`dev.sh`，`[deploy]` 走 `scripts/build.sh`+`start.sh`（Next.js+tsup 自定义服务器，固定端口 5000）。
+- `.preview`：`expose_port = 5000`，已加入 `.gitignore`。
+- 本项目为纯静态展示，无后端 API，交付验收走 `test_run` 空数组（lint + ts-check + 服务探活）。
 
 ## 包管理规范
 

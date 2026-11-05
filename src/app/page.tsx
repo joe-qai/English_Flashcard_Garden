@@ -4,9 +4,24 @@ import { useMemo, useState } from 'react';
 import { categories } from '@/lib/words';
 import type { Word } from '@/lib/words';
 
+function speak(text: string) {
+  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = 'en-US';
+  utterance.rate = 0.85;
+  window.speechSynthesis.speak(utterance);
+}
+
 function WordCard({ word, accent }: { word: Word; accent: string }) {
   return (
-    <div className="group flex flex-col overflow-hidden rounded-2xl border border-black/5 bg-card p-4 shadow-sm transition-all duration-200 ease-out hover:-translate-y-1 hover:shadow-md">
+    <button
+      type="button"
+      onClick={() => speak(word.en)}
+      className="group flex cursor-pointer flex-col overflow-hidden rounded-2xl border border-black/5 bg-card p-4 text-left shadow-sm transition-all duration-200 ease-out hover:-translate-y-1 hover:shadow-md"
+      title={`点击播放发音：${word.en}`}
+      aria-label={`播放 ${word.en} 的发音`}
+    >
       <div
         className="mb-3 flex h-20 w-full items-center justify-center rounded-xl"
         style={{ backgroundColor: `${accent}22` }}
@@ -24,7 +39,7 @@ function WordCard({ word, accent }: { word: Word; accent: string }) {
           {word.zh}
         </div>
       </div>
-    </div>
+    </button>
   );
 }
 
@@ -59,8 +74,8 @@ export default function Home() {
           英文闪卡园
         </h1>
         <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-muted-foreground">
-          按生活场景挑选常见英文单词，配图、音标与中文释义。点击分类，轻松学习。
-        </p>
+        按生活场景挑选常见英文单词，配图、音标与中文释义。点击任意卡片即可播放发音，分类切换轻松学习。
+      </p>
       </header>
 
       {/* 分类导航 */}

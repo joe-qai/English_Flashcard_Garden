@@ -1,4 +1,4 @@
-# DESIGN.md — 英文单词闪卡 (English Fashcard Garden)
+# DESIGN.md — 英文闪卡园 (English Flashcard Garden)
 
 一款"常见事物中英对照闪卡"学习工具，覆盖水果、颜色、食物、动物、文具、
 家具、厨具，以及侏罗纪、海洋生物、植物、军事武器等主题分类。

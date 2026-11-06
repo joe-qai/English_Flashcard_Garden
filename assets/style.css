@@ -211,6 +211,15 @@ body {
   line-height: 1.7;
 }
 
+.hero-en {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
 /* ---------- 分类导航 ---------- */
 
 .nav {

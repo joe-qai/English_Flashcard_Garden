@@ -216,6 +216,7 @@
     rootEl.style.setProperty('--cat', cat.color);
     rootEl.style.setProperty('--ring', cat.color);
     gridEl.textContent = '';
+    gridEl.classList.toggle('hide-zh', hideZh);
     if (!words.length) {
       gridEl.hidden = true;
       emptyEl.hidden = false;
@@ -327,7 +328,7 @@
 
   /* ============ Common player factory ============ */
   var PLAYERS = [];
-  var hideZh = readStore(KEY_HIDE_ZH) === '1';
+  var hideZh = readStore(KEY_HIDE_ZH) !== '0';
 
   function createPlayer(config) {
     var list = Array.isArray(config.items) ? config.items : [];
@@ -868,6 +869,7 @@
 
       var panel = storyPanelEl;
       panel.textContent = '';
+      panel.classList.toggle('hide-zh', hideZh);
       panel.style.setProperty('--cat', item.color);
 
       var top = document.createElement('div'); top.className = 'scene-top';
@@ -969,7 +971,7 @@
       playNextSentence(0);
     }
 
-    var api = { buildTabs: buildTabs, render: renderStory, syncZh: function(){}, stop: stopStory };
+    var api = { buildTabs: buildTabs, render: renderStory, syncZh: syncZh, stop: stopStory };
     storyPlayers.push(api);
     return api;
   }
@@ -1155,6 +1157,20 @@
     initScenePlayer();
     initSongPlayer();
     initStories();
+    // Sync word zh toggle
+    var wordZhBtn = document.getElementById('word-zh-toggle');
+    if (wordZhBtn) {
+      wordZhBtn.textContent = hideZh ? '显示中文' : '隐藏中文';
+      wordZhBtn.setAttribute('aria-pressed', String(hideZh));
+      wordZhBtn.addEventListener('click', function () {
+        hideZh = !hideZh;
+        writeStore(KEY_HIDE_ZH, hideZh ? '1' : '0');
+        wordZhBtn.textContent = hideZh ? '显示中文' : '隐藏中文';
+        wordZhBtn.setAttribute('aria-pressed', String(hideZh));
+        gridEl.classList.toggle('hide-zh', hideZh);
+        syncZhEverywhere();
+      });
+    }
     window.addEventListener('hashchange', function () {
       var cat = findCategory(hash);
       if (cat && cat.id !== state.activeId) {

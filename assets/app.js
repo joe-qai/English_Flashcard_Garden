@@ -2,6 +2,7 @@
  * 英文闪卡园 · 交互逻辑（无依赖、无构建）
  * - 分类切换 + 站内搜索 + hash 深链
  * - 点击卡片调用浏览器语音合成朗读
+ * - 场景对话 / 英文歌谣共用一套播放器（连读、单句朗读、隐藏中文）
  * - 深浅色主题，记忆在 localStorage
  */
 (function () {
@@ -17,6 +18,7 @@
 
   var KEY_THEME = 'flashcard:theme';
   var KEY_CATEGORY = 'flashcard:category';
+  var KEY_HIDE_ZH = 'flashcard:hideZh';
 
   var rootEl = document.documentElement;
   var navEl = document.getElementById('category-nav');
@@ -33,7 +35,11 @@
   var sceneTabsEl = document.getElementById('scene-tabs');
   var scenePanelEl = document.getElementById('scene-panel');
   var sceneTotalEl = document.getElementById('scene-total');
+  var songTabsEl = document.getElementById('song-tabs');
+  var songPanelEl = document.getElementById('song-panel');
+  var songTotalEl = document.getElementById('song-total');
   var jumpScenesBtn = document.getElementById('jump-scenes');
+  var jumpSongsBtn = document.getElementById('jump-songs');
   var carouselBarEl = document.getElementById('carousel-bar');
   var carCountEl = document.getElementById('car-count');
   var carPrevBtn = document.getElementById('car-prev');
@@ -51,6 +57,8 @@
   var carIndex = 0;
   var carScrollTimer = null;
   var resizeTimer = null;
+  var PLAYERS = [];
+  var hideZh = readStore(KEY_HIDE_ZH) === '1';
 
   /* ---------------- 存储 ---------------- */
 
@@ -269,9 +277,7 @@
   /* ---------------- 发音 ---------------- */
 
   function speak(text, btn) {
-    if (sceneState.playing) {
-      stopPlayback();
-    }
+    stopAllPlayback();
 
     if (!supportsSpeech) {
       btn.classList.add('is-speaking');
@@ -487,316 +493,414 @@
     resizeTimer = window.setTimeout(syncCarousel, 150);
   });
 
-  /* ---------------- 场景对话 ---------------- */
+  /* ---------------- 播放器：场景对话 / 英文歌谣 ---------------- */
 
-  var SCENES = Array.isArray(window.DIALOGUE_SCENES) ? window.DIALOGUE_SCENES : [];
-  var KEY_HIDE_ZH = 'flashcard:hideZh';
-  var sceneTabs = {};
-  var sceneState = {
-    id: '',
-    hideZh: readStore(KEY_HIDE_ZH) === '1',
-    playing: false,
-    token: 0,
-    lines: [],
-    lineEls: [],
-    playBtn: null,
-    zhBtn: null,
-  };
-
-  function findScene(id) {
-    for (var i = 0; i < SCENES.length; i += 1) {
-      if (SCENES[i].id === id) {
-        return SCENES[i];
+  function findItem(list, id) {
+    for (var i = 0; i < list.length; i += 1) {
+      if (list[i].id === id) {
+        return list[i];
       }
     }
     return null;
   }
 
-  function buildSceneTabs() {
-    if (!sceneTabsEl) {
+  /**
+   * 把带音标的词渲染成「词 /音标/」的内联组合。
+   * 同一个词在句子里只标首次出现，避免整行过于花哨。
+   */
+  function appendWithNotes(container, text, notes) {
+    var words = notes ? Object.keys(notes) : [];
+    if (!words.length) {
+      container.textContent = text;
       return;
     }
 
-    var frag = document.createDocumentFragment();
-
-    SCENES.forEach(function (scene) {
-      var btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'pill';
-      btn.dataset.scene = scene.id;
-      btn.style.setProperty('--cat', scene.color);
-      btn.setAttribute('role', 'tab');
-      btn.setAttribute('aria-selected', 'false');
-      btn.setAttribute('aria-controls', 'scene-panel');
-
-      var icon = document.createElement('span');
-      icon.className = 'pill-icon';
-      icon.setAttribute('aria-hidden', 'true');
-      icon.textContent = scene.icon;
-
-      var zh = document.createElement('span');
-      zh.textContent = scene.zh;
-
-      var en = document.createElement('span');
-      en.className = 'pill-en';
-      en.textContent = scene.en;
-
-      btn.appendChild(icon);
-      btn.appendChild(zh);
-      btn.appendChild(en);
-      btn.addEventListener('click', function () {
-        if (sceneState.id === scene.id) {
-          return;
-        }
-        stopPlayback();
-        renderScene(scene.id);
-      });
-
-      frag.appendChild(btn);
-      sceneTabs[scene.id] = btn;
+    var values = {};
+    words.forEach(function (word) {
+      values[word.toLowerCase()] = notes[word];
     });
 
-    sceneTabsEl.appendChild(frag);
-  }
+    var pattern = words
+      .map(function (word) {
+        return word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      })
+      .join('|');
+    var re = new RegExp('\\b(' + pattern + ')\\b', 'gi');
+    var used = {};
+    var last = 0;
+    var match;
 
-  function syncSceneTabs() {
-    Object.keys(sceneTabs).forEach(function (id) {
-      var isActive = id === sceneState.id;
-      sceneTabs[id].classList.toggle('is-active', isActive);
-      sceneTabs[id].setAttribute('aria-selected', isActive ? 'true' : 'false');
-    });
-  }
+    while ((match = re.exec(text)) !== null) {
+      var lower = match[0].toLowerCase();
+      if (used[lower] || !values[lower]) {
+        continue;
+      }
+      if (match.index > last) {
+        container.appendChild(
+          document.createTextNode(text.slice(last, match.index)),
+        );
+      }
+      used[lower] = true;
 
-  function renderScene(id) {
-    var scene = findScene(id) || SCENES[0];
-    if (!scene || !scenePanelEl) {
-      return;
+      var wrap = document.createElement('span');
+      wrap.className = 'word-note';
+      wrap.appendChild(document.createTextNode(match[0] + ' '));
+
+      var ipa = document.createElement('span');
+      ipa.className = 'word-ipa';
+      ipa.lang = 'en';
+      ipa.textContent = values[lower];
+      wrap.appendChild(ipa);
+
+      container.appendChild(wrap);
+      last = match.index + match[0].length;
     }
 
-    sceneState.id = scene.id;
-    sceneState.lines = scene.lines;
-    sceneState.lineEls = [];
-    sceneState.playing = false;
-    sceneState.token += 1;
+    if (last < text.length) {
+      container.appendChild(document.createTextNode(text.slice(last)));
+    }
+  }
 
-    scenePanelEl.textContent = '';
-    scenePanelEl.style.setProperty('--cat', scene.color);
-    scenePanelEl.classList.toggle('hide-zh', sceneState.hideZh);
-
-    var top = document.createElement('div');
-    top.className = 'scene-top';
-
-    var icon = document.createElement('span');
-    icon.className = 'scene-icon';
-    icon.setAttribute('aria-hidden', 'true');
-    icon.textContent = scene.icon;
-
-    var meta = document.createElement('div');
-    meta.className = 'scene-meta';
-
-    var title = document.createElement('h3');
-    title.className = 'scene-title';
-    title.textContent = scene.zh + ' · ' + scene.en;
-
-    var desc = document.createElement('p');
-    desc.className = 'scene-desc';
-    desc.textContent = scene.desc;
-
-    meta.appendChild(title);
-    meta.appendChild(desc);
-
-    var actions = document.createElement('div');
-    actions.className = 'scene-actions';
-
-    var zhBtn = document.createElement('button');
-    zhBtn.type = 'button';
-    zhBtn.className = 'ghost-btn';
-    zhBtn.textContent = sceneState.hideZh ? '显示中文' : '隐藏中文';
-    zhBtn.setAttribute('aria-pressed', sceneState.hideZh ? 'true' : 'false');
-    zhBtn.addEventListener('click', toggleZh);
-
-    var playBtn = document.createElement('button');
-    playBtn.type = 'button';
-    playBtn.className = 'play-btn';
-    playBtn.textContent = '▶ 播放全部';
-    playBtn.addEventListener('click', togglePlayback);
-
-    actions.appendChild(zhBtn);
-    actions.appendChild(playBtn);
-
-    top.appendChild(icon);
-    top.appendChild(meta);
-    top.appendChild(actions);
-
-    var list = document.createElement('ol');
-    list.className = 'dialog';
-
-    scene.lines.forEach(function (line) {
-      var li = document.createElement('li');
-      var btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'line';
-      btn.setAttribute('aria-label', '播放 ' + line.who + '：' + line.en);
-
-      var who = document.createElement('span');
-      who.className = 'line-who';
-      who.textContent = line.who;
-
-      var en = document.createElement('span');
-      en.className = 'line-en';
-      en.lang = 'en';
-      en.textContent = line.en;
-
-      var zh = document.createElement('span');
-      zh.className = 'line-zh';
-      zh.textContent = line.zh;
-
-      btn.appendChild(who);
-      btn.appendChild(en);
-      btn.appendChild(zh);
-      btn.addEventListener('click', function () {
-        if (sceneState.playing) {
-          stopPlayback();
-        }
-        speak(line.en, btn);
-      });
-
-      li.appendChild(btn);
-      list.appendChild(li);
-      sceneState.lineEls.push(btn);
+  function stopAllPlayback() {
+    PLAYERS.forEach(function (player) {
+      player.stop();
     });
+  }
 
-    sceneState.zhBtn = zhBtn;
-    sceneState.playBtn = playBtn;
-
-    scenePanelEl.appendChild(top);
-    scenePanelEl.appendChild(list);
-
-    syncSceneTabs();
+  function syncZhEverywhere() {
+    PLAYERS.forEach(function (player) {
+      player.syncZh();
+    });
   }
 
   function toggleZh() {
-    sceneState.hideZh = !sceneState.hideZh;
-    scenePanelEl.classList.toggle('hide-zh', sceneState.hideZh);
-    writeStore(KEY_HIDE_ZH, sceneState.hideZh ? '1' : '0');
-
-    if (sceneState.zhBtn) {
-      sceneState.zhBtn.textContent = sceneState.hideZh ? '显示中文' : '隐藏中文';
-      sceneState.zhBtn.setAttribute(
-        'aria-pressed',
-        sceneState.hideZh ? 'true' : 'false',
-      );
-    }
+    hideZh = !hideZh;
+    writeStore(KEY_HIDE_ZH, hideZh ? '1' : '0');
+    syncZhEverywhere();
   }
 
-  function clearLineHighlight() {
-    sceneState.lineEls.forEach(function (el) {
-      el.classList.remove('is-speaking');
-    });
-  }
-
-  function updatePlayBtn() {
-    var btn = sceneState.playBtn;
-    if (!btn) {
-      return;
+  function createPlayer(config) {
+    var list = Array.isArray(config.items) ? config.items : [];
+    if (!list.length || !config.tabsEl || !config.panelEl) {
+      return null;
     }
-    btn.textContent = sceneState.playing ? '■ 停止' : '▶ 播放全部';
-    btn.classList.toggle('is-playing', sceneState.playing);
-  }
 
-  function stopPlayback() {
-    sceneState.playing = false;
-    sceneState.token += 1;
-    clearLineHighlight();
+    var tabs = {};
+    var state2 = {
+      id: '',
+      item: null,
+      playing: false,
+      token: 0,
+      lines: [],
+      lineEls: [],
+      playBtn: null,
+    };
 
-    if (speakTimer) {
-      window.clearTimeout(speakTimer);
-      speakTimer = null;
+    function buildTabs() {
+      var frag = document.createDocumentFragment();
+
+      list.forEach(function (item) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'pill';
+        btn.dataset[config.tabData] = item.id;
+        btn.style.setProperty('--cat', item.color);
+        btn.setAttribute('role', 'tab');
+        btn.setAttribute('aria-selected', 'false');
+        btn.setAttribute('aria-controls', config.panelEl.id);
+
+        var icon = document.createElement('span');
+        icon.className = 'pill-icon';
+        icon.setAttribute('aria-hidden', 'true');
+        icon.textContent = item.icon;
+
+        var zh = document.createElement('span');
+        zh.textContent = item.zh;
+
+        var en = document.createElement('span');
+        en.className = 'pill-en';
+        en.textContent = item.en;
+
+        btn.appendChild(icon);
+        btn.appendChild(zh);
+        btn.appendChild(en);
+        btn.addEventListener('click', function () {
+          if (state2.id === item.id) {
+            return;
+          }
+          stop();
+          render(item.id);
+        });
+
+        frag.appendChild(btn);
+        tabs[item.id] = btn;
+      });
+
+      config.tabsEl.appendChild(frag);
     }
-    if (synth) {
-      try {
-        synth.cancel();
-      } catch (e) {
-        /* 忽略 */
+
+    function syncTabs() {
+      Object.keys(tabs).forEach(function (id) {
+        var isActive = id === state2.id;
+        tabs[id].classList.toggle('is-active', isActive);
+        tabs[id].setAttribute('aria-selected', isActive ? 'true' : 'false');
+      });
+    }
+
+    function syncZh() {
+      config.panelEl.classList.toggle('hide-zh', hideZh);
+      var zhBtn = config.panelEl.querySelector('.ghost-btn');
+      if (zhBtn) {
+        zhBtn.textContent = hideZh ? '显示中文' : '隐藏中文';
+        zhBtn.setAttribute('aria-pressed', hideZh ? 'true' : 'false');
       }
     }
-    if (speakingBtn) {
-      speakingBtn.classList.remove('is-speaking');
-      speakingBtn = null;
-    }
 
-    updatePlayBtn();
-  }
-
-  function finishPlayback() {
-    sceneState.playing = false;
-    sceneState.token += 1;
-    clearLineHighlight();
-    updatePlayBtn();
-  }
-
-  function togglePlayback() {
-    if (sceneState.playing) {
-      stopPlayback();
-      return;
-    }
-    if (!supportsSpeech) {
-      return;
-    }
-    startPlayback();
-  }
-
-  function startPlayback() {
-    var lines = sceneState.lines;
-    var els = sceneState.lineEls;
-    if (!lines.length) {
-      return;
-    }
-
-    sceneState.playing = true;
-    var token = (sceneState.token += 1);
-    var index = 0;
-    updatePlayBtn();
-
-    function next() {
-      if (token !== sceneState.token || !sceneState.playing) {
-        return;
-      }
-      if (index >= lines.length) {
-        finishPlayback();
+    function render(id) {
+      var item = findItem(list, id) || list[0];
+      if (!item) {
         return;
       }
 
-      var current = index;
-      index += 1;
+      state2.id = item.id;
+      state2.item = item;
+      state2.lines = item.lines;
+      state2.lineEls = [];
+      state2.playing = false;
+      state2.token += 1;
 
+      var panel = config.panelEl;
+      panel.textContent = '';
+      panel.style.setProperty('--cat', item.color);
+      panel.classList.toggle('hide-zh', hideZh);
+
+      var top = document.createElement('div');
+      top.className = 'scene-top';
+
+      var icon = document.createElement('span');
+      icon.className = 'scene-icon';
+      icon.setAttribute('aria-hidden', 'true');
+      icon.textContent = item.icon;
+
+      var meta = document.createElement('div');
+      meta.className = 'scene-meta';
+
+      var title = document.createElement('h3');
+      title.className = 'scene-title';
+      title.textContent = item.zh + ' · ' + item.en;
+
+      var desc = document.createElement('p');
+      desc.className = 'scene-desc';
+      desc.textContent = item.desc;
+
+      meta.appendChild(title);
+      meta.appendChild(desc);
+
+      var actions = document.createElement('div');
+      actions.className = 'scene-actions';
+
+      var zhBtn = document.createElement('button');
+      zhBtn.type = 'button';
+      zhBtn.className = 'ghost-btn';
+      zhBtn.textContent = hideZh ? '显示中文' : '隐藏中文';
+      zhBtn.setAttribute('aria-pressed', hideZh ? 'true' : 'false');
+      zhBtn.addEventListener('click', toggleZh);
+
+      var playBtn = document.createElement('button');
+      playBtn.type = 'button';
+      playBtn.className = 'play-btn';
+      playBtn.textContent = config.playLabel;
+      playBtn.addEventListener('click', togglePlayback);
+
+      actions.appendChild(zhBtn);
+      actions.appendChild(playBtn);
+
+      top.appendChild(icon);
+      top.appendChild(meta);
+      top.appendChild(actions);
+
+      var listEl = document.createElement('ol');
+      listEl.className = 'dialog';
+
+      item.lines.forEach(function (line) {
+        var li = document.createElement('li');
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'line';
+        btn.setAttribute(
+          'aria-label',
+          '播放 ' + (line.who ? line.who + '：' : '') + line.en,
+        );
+
+        if (line.who) {
+          var who = document.createElement('span');
+          who.className = 'line-who';
+          who.textContent = line.who;
+          btn.appendChild(who);
+        }
+
+        var en = document.createElement('span');
+        en.className = 'line-en';
+        en.lang = 'en';
+        appendWithNotes(en, line.en, line.notes);
+
+        var zh = document.createElement('span');
+        zh.className = 'line-zh';
+        zh.textContent = line.zh;
+
+        btn.appendChild(en);
+        btn.appendChild(zh);
+        btn.addEventListener('click', function () {
+          if (state2.playing) {
+            stop();
+          }
+          speak(line.en, btn);
+        });
+
+        li.appendChild(btn);
+        listEl.appendChild(li);
+        state2.lineEls.push(btn);
+      });
+
+      state2.playBtn = playBtn;
+
+      panel.appendChild(top);
+      panel.appendChild(listEl);
+
+      syncTabs();
+    }
+
+    function clearLineHighlight() {
+      state2.lineEls.forEach(function (el) {
+        el.classList.remove('is-speaking');
+      });
+    }
+
+    function updatePlayBtn() {
+      if (!state2.playBtn) {
+        return;
+      }
+      state2.playBtn.textContent = state2.playing ? '■ 停止' : config.playLabel;
+      state2.playBtn.classList.toggle('is-playing', state2.playing);
+    }
+
+    function stop() {
+      var wasPlaying = state2.playing;
+      state2.playing = false;
+      state2.token += 1;
       clearLineHighlight();
-      els[current].classList.add('is-speaking');
+      updatePlayBtn();
 
-      var utter = new window.SpeechSynthesisUtterance(lines[current].en);
-      utter.lang = 'en-US';
-      utter.rate = 0.85;
-      utter.onend = function () {
-        if (token !== sceneState.token) {
-          return;
+      if (!wasPlaying) {
+        return;
+      }
+      if (speakTimer) {
+        window.clearTimeout(speakTimer);
+        speakTimer = null;
+      }
+      if (synth) {
+        try {
+          synth.cancel();
+        } catch (e) {
+          /* 忽略 */
         }
-        window.setTimeout(next, 260);
-      };
-      utter.onerror = function () {
-        if (token !== sceneState.token) {
-          return;
-        }
-        finishPlayback();
-      };
-
-      try {
-        synth.speak(utter);
-      } catch (e) {
-        finishPlayback();
+      }
+      if (speakingBtn) {
+        speakingBtn.classList.remove('is-speaking');
+        speakingBtn = null;
       }
     }
 
-    window.setTimeout(next, 120);
+    function finishPlayback() {
+      state2.playing = false;
+      state2.token += 1;
+      clearLineHighlight();
+      updatePlayBtn();
+    }
+
+    function togglePlayback() {
+      if (state2.playing) {
+        stop();
+        return;
+      }
+      if (!supportsSpeech) {
+        return;
+      }
+      // 另一块（歌谣 / 对话）先静音，避免两条声音叠在一起
+      PLAYERS.forEach(function (player) {
+        if (player !== api) {
+          player.stop();
+        }
+      });
+      startPlayback();
+    }
+
+    function startPlayback() {
+      var lines = state2.lines;
+      var els = state2.lineEls;
+      if (!lines.length) {
+        return;
+      }
+
+      state2.playing = true;
+      var token = (state2.token += 1);
+      var index = 0;
+      var rate =
+        state2.item && state2.item.rate ? state2.item.rate : config.rate;
+      updatePlayBtn();
+
+      function next() {
+        if (token !== state2.token || !state2.playing) {
+          return;
+        }
+        if (index >= lines.length) {
+          finishPlayback();
+          return;
+        }
+
+        var current = index;
+        index += 1;
+
+        clearLineHighlight();
+        if (els[current]) {
+          els[current].classList.add('is-speaking');
+        }
+
+        var utter = new window.SpeechSynthesisUtterance(lines[current].en);
+        utter.lang = 'en-US';
+        utter.rate = rate;
+        utter.onend = function () {
+          if (token !== state2.token) {
+            return;
+          }
+          window.setTimeout(next, config.gap);
+        };
+        utter.onerror = function () {
+          if (token !== state2.token) {
+            return;
+          }
+          finishPlayback();
+        };
+
+        try {
+          synth.speak(utter);
+        } catch (e) {
+          finishPlayback();
+        }
+      }
+
+      window.setTimeout(next, 120);
+    }
+
+    var api = {
+      buildTabs: buildTabs,
+      render: render,
+      syncZh: syncZh,
+      stop: stop,
+    };
+
+    PLAYERS.push(api);
+    return api;
   }
 
   /* ---------------- 主题 ---------------- */
@@ -826,9 +930,27 @@
 
   /* ---------------- 初始化 ---------------- */
 
+  function bindJump(btn, targetId) {
+    if (!btn) {
+      return;
+    }
+    btn.addEventListener('click', function () {
+      var target = document.getElementById(targetId);
+      if (!target) {
+        return;
+      }
+      var reduceMotion = window.matchMedia(
+        '(prefers-reduced-motion: reduce)',
+      ).matches;
+      target.scrollIntoView({
+        behavior: reduceMotion ? 'auto' : 'smooth',
+        block: 'start',
+      });
+    });
+  }
+
   function init() {
     buildNav();
-    buildSceneTabs();
 
     totalEl.textContent = String(
       CATEGORIES.reduce(function (sum, cat) {
@@ -836,14 +958,51 @@
       }, 0),
     );
 
-    if (SCENES.length) {
-      if (sceneTotalEl) {
-        sceneTotalEl.textContent = String(SCENES.length);
-      }
-      renderScene(SCENES[0].id);
+    var scenes = Array.isArray(window.DIALOGUE_SCENES)
+      ? window.DIALOGUE_SCENES
+      : [];
+    var songs = Array.isArray(window.SONG_LIBRARY) ? window.SONG_LIBRARY : [];
+
+    var scenePlayer = createPlayer({
+      items: scenes,
+      tabsEl: sceneTabsEl,
+      panelEl: scenePanelEl,
+      tabData: 'scene',
+      playLabel: '▶ 播放全部',
+      rate: 0.85,
+      gap: 260,
+    });
+
+    var songPlayer = createPlayer({
+      items: songs,
+      tabsEl: songTabsEl,
+      panelEl: songPanelEl,
+      tabData: 'song',
+      playLabel: '▶ 播放整首',
+      rate: 0.78,
+      gap: 420,
+    });
+
+    if (scenePlayer) {
+      scenePlayer.buildTabs();
+      scenePlayer.render(scenes[0].id);
+    }
+    if (sceneTotalEl) {
+      sceneTotalEl.textContent = String(scenes.length);
     }
 
-    var initial = findCategory(hashId()) || findCategory(readStore(KEY_CATEGORY)) || CATEGORIES[0];
+    if (songPlayer) {
+      songPlayer.buildTabs();
+      songPlayer.render(songs[0].id);
+    }
+    if (songTotalEl) {
+      songTotalEl.textContent = String(songs.length);
+    }
+
+    var initial =
+      findCategory(hashId()) ||
+      findCategory(readStore(KEY_CATEGORY)) ||
+      CATEGORIES[0];
     state.activeId = initial.id;
     updateHash(initial.id);
 
@@ -859,21 +1018,8 @@
       }
     });
 
-    if (jumpScenesBtn) {
-      jumpScenesBtn.addEventListener('click', function () {
-        var scenesEl = document.getElementById('scenes');
-        if (!scenesEl) {
-          return;
-        }
-        var reduceMotion = window.matchMedia(
-          '(prefers-reduced-motion: reduce)',
-        ).matches;
-        scenesEl.scrollIntoView({
-          behavior: reduceMotion ? 'auto' : 'smooth',
-          block: 'start',
-        });
-      });
-    }
+    bindJump(jumpScenesBtn, 'scenes');
+    bindJump(jumpSongsBtn, 'songs');
 
     window.addEventListener('pagehide', function () {
       if (synth && synth.speaking) {

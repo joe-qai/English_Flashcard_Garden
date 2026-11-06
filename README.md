@@ -1,15 +1,19 @@
 # 英文闪卡园 · Flashcard Garden · 纯静态版
 
-按主题分类的常见英文单词闪卡：实物图 + 英文 + 国际音标 + 中文释义，点击卡片即可听发音；另附 28 个场景对话、24 首英文歌曲、24 篇英文故事与互动小游戏。中文默认隐藏，右上角 `CN` 开关一键切换。
+按主题分类的常见英文单词闪卡，词表对齐**沪教牛津版（深圳用）小学 1–6 年级教材单元**：实物图 + 英文 + 中文释义，点击卡片即可听发音；音标默认隐藏，生词高亮，点开卡片才显示音标。另附 28 个场景对话、24 首英文歌曲、33 篇中外故事与互动小游戏。中文默认显示，右上角 `CN` 开关一键切换。
 
 **纯 HTML / CSS / JavaScript，无框架、无构建、无后端、无外部依赖**。双击 `index.html` 就能用，也可以直接托管到 GitHub Pages。
 
 ## 功能
 
-- **27 个主题分类**：水果、颜色、食物、动物、文具、家具、厨具、侏罗纪、海洋生物、植物、军事武器、二十四节气、四季、天气、穿着、身体部位、健康看病、购物付款、交通出行、职业工作、房间家居、工具维修、时间概念、爱好休闲、数字计量、运动综合、节日庆典，共 648 个单词
+- **31 个可见主题 / 770 个单词**：300 个教材核心词（标年级、学期、单元）+ 470 个拓展词。核心主题覆盖家庭、情绪、校园、日常、中国节日，以及水果、颜色、食物、动物、文具、家具、厨具、侏罗纪、海洋生物、植物、二十四节气、四季、天气、穿着、身体部位、健康看病、购物付款、交通出行、职业工作、房间家居、工具维修、时间概念、爱好休闲、数字计量、运动综合、节日庆典；军事武器分类保留 23 个词在数据中但默认隐藏
+- **教材单元对齐**：按「全部 / 一~六年级 / 拓展」筛选；卡片底部标注 `三年级上 · U5` 之类的教材位置，核心词与拓展词分层
+- **英式发音与拼写**：统一 `en-GB` 朗读，拼写采用英式（grey、pyjamas、trainers、biscuit、chips、underground、fridge、rubber、school bag 等）
+- **生词与音标**：没点开过的词右上角有小圆点；音标默认隐藏，点击卡片显示音标并朗读，已读状态记在 `localStorage`
+- **中文释义唯一**：同一中文释义不会对应多个英文单词（如 `gift` = 赠品、`present` = 礼物），避免歧义
 - **28 个场景对话**：洗漱、早上、中午、晚上、吃饭、上厕所、上课、运动（足球）、徒步、睡觉、问时间、问路、认一认、问问题、心情，以及侏罗纪、海洋生物、动物园、历史、军事、在商店、在餐厅、看医生、坐公交、过生日、周末计划、修理东西、寄快递
 - **24 首英文歌曲**：童谣 9 首（小星星、划小船、玛丽的小羊羔、伦敦桥、公交车上的轮子、老麦克唐纳、咩咩黑羊、蛋头先生、杰克和吉尔）、动画金曲 7 首（Nobody Like U、Peaches、Surface Pressure、We Don't Talk About Bruno、Sunflower、Enemy、Dance the Night Away）、流行金曲 8 首（500 Miles、Big Big World、Count On Me、Proud of You、Seasons in the Sun、Yesterday Once More、You Are My Sunshine、Let It Be Me）；音频统一放在根目录 `music/`。9 首公版童谣配**完整歌词**并可逐句跟读；其余 15 首为版权曲目，只提供音频（纯享版），不摘录歌词。一首播完自动接下一首，最后一首回到第一首，切到其他页签也不中断
-- **24 篇英文故事**：安徒生 5 篇（丑小鸭、拇指姑娘、皇帝的新装、卖火柴的小女孩、海的女儿）、伊索寓言 10 篇（龟兔赛跑、狮子与老鼠、狐狸与葡萄、狼来了、蚂蚁与蚱蜢、乌鸦喝水、狐狸和乌鸦、城市老鼠和乡下老鼠、金鹅、风和太阳）、格林童话 9 篇（小红帽、糖果屋、白雪公主、长发公主、灰姑娘、侏儒怪、青蛙王子、不来梅的音乐家、小精灵和鞋匠）；全部为公有领域作品，用 A1~A2 短句改写，逐句中英对照。朗读时先读标题再逐句读正文，一篇读完自动接下一篇，最后一篇回到第一篇；生词会在词后标注音标
+- **33 篇双语故事**：安徒生 5 篇（丑小鸭、拇指姑娘、皇帝的新装、卖火柴的小女孩、海的女儿）、伊索寓言 10 篇、格林童话 9 篇，以及中国故事 9 篇（司马光砸缸、孔融让梨、曹冲称象、守株待兔、拔苗助长、亡羊补牢、花木兰、年的传说、嫦娥奔月）；全部用 A1~A2 短句改写，逐句中英对照。朗读时先读标题再逐句读正文，一篇读完自动接下一篇，最后一篇回到第一篇；生词会在词后标注音标
 - **全局中文开关**：右上角 `CN` 开关，**高亮（橙色）= 显示中文，置灰 = 隐藏中文**，一键隐藏卡片释义、对话译文、歌词译文与标题，英文与音标始终保留，状态记忆在 `localStorage`
 - **图物一致**：能对上实物的一律用 emoji；emoji 里没有的实物（火龙果、柚子、冰箱、洗衣机、衣柜、抽屉、水壶、护膝等）配 `assets/icons/` 下的手绘 SVG，画的就是那个东西；颜色类直接用真实色块，杜绝「火龙果配一条龙」这类错配
 - **互动小游戏**：英文→中文、中文→英文两种题型，20 题一轮，记录正确率与最长连对
@@ -25,19 +29,21 @@
 
 ```
 index.html              # 页面骨架（可直接双击打开）
+server.cjs              # 零依赖静态服务器（部署 / 本地预览）
 favicon.svg             # 站点图标（叠放闪卡 + Aa，同时用于顶栏 logo）
 assets/style.css        # 全部样式（设计基调见 DESIGN.md）
-assets/words.js         # 单词数据源（27 分类 × 24 词）
-assets/icons/*.svg      # 手绘实物图标（emoji 画不对或没有的 270 个词）
+assets/words.js         # 单词数据源（由 scripts/build_words.mjs 生成，勿手改）
+assets/icons/*.svg      # 手绘实物图标（emoji 画不对或没有的词）
 assets/scenes.js        # 场景对话数据源
 assets/songs.js         # 歌曲数据源（24 首，歌词 + 音频路径）
-assets/stories.js       # 故事会数据源（24 篇：安徒生 5 + 伊索 10 + 格林 9）
+assets/stories.js       # 故事会数据源（33 篇：安徒生 5 + 伊索 10 + 格林 9 + 中国故事 9）
+data/words.base.js      # 648 词历史底稿（生成器的输入快照）
+data/textbook-index.json# 沪教牛津版（深圳用）1–6 年级单元词表索引
+data/word-additions.json# 新增分类、补词、英式拼写与释义修正
+scripts/build_words.mjs # 生成 assets/words.js，并校验英文 / 中文释义唯一
+scripts/build_textbook_index.mjs # 抓取公开词表生成 data/textbook-index.json
 music/*.mp3             # 24 首歌曲音频（文件名即曲目名）
-scripts/make_icons.py   # 生成 assets/icons/ 下的基础 SVG
-scripts/make_icons_extra.py # 生成去重用的补充 SVG
-scripts/make_icons_fix.py   # 生成图物不匹配的修正版 SVG（身体部位同一套小人）
-scripts/patch_words.py  # 把图标 / 色块写回 assets/words.js（可重复运行）
-assets/app.js           # 页签 / 发音 / 播放 / 中文开关 / 游戏 / 主题
+assets/app.js           # 页签 / 年级筛选 / 发音 / 播放 / 中文开关 / 游戏 / 主题
 .nojekyll               # 告诉 GitHub Pages 跳过 Jekyll 处理
 ```
 
@@ -46,9 +52,12 @@ assets/app.js           # 页签 / 发音 / 播放 / 中文开关 / 游戏 / 主
 ```bash
 # 方式一：直接双击 index.html
 
-# 方式二：起一个本地静态服务
+# 方式二：用内置零依赖静态服务器
+node server.cjs
+# 打开 http://localhost:5000
+
+# 方式三：任意静态服务器
 python -m http.server 8080
-# 打开 http://localhost:8080
 ```
 
 ## 发布到 GitHub Pages
@@ -65,24 +74,32 @@ python -m http.server 8080
 
 ## 维护单词
 
-只改 `assets/words.js`：
+`assets/words.js` 是生成产物，**不要手改**。词库由三份输入合成：
+
+| 文件 | 作用 |
+|---|---|
+| `data/words.base.js` | 648 词历史底稿 |
+| `data/word-additions.json` | 新增分类、补词、英式拼写映射（`rename`）、释义修正（`glossFix`）、隐藏分类 |
+| `data/textbook-index.json` | 沪教牛津版（深圳用）1–6 年级单元词表，用于打 `grade / term / unit` 标签 |
+
+改完输入后运行：
+
+```bash
+node scripts/build_words.mjs
+```
+
+生成器会同步做两件校验：**英文单词不重复**、**中文释义不重复**；发现重复会打印告警并自动给释义加分类后缀。
+
+词条结构：
 
 ```js
-window.WORD_CATEGORIES = [
-  {
-    id: 'fruits',      // URL hash，保持唯一
-    en: 'Fruits',
-    zh: '水果',
-    icon: '🍎',        // 导航按钮图标
-    color: '#F6A94D',  // 分类主题色，卡片与按钮自动跟随
-    words: [
-      { en: 'apple', ipa: '/ˈæpl/', zh: '苹果', icon: '🍎' },
-      { en: 'dragon fruit', ipa: '/ˈdræɡən fruːt/', zh: '火龙果', icon: 'assets/icons/dragon-fruit.svg' },
-      { en: 'red', ipa: '/red/', zh: '红色', swatch: '#E23B3B' },
-    ],
-  },
-];
+{ en: 'apple', ipa: '/ˈæpl/', zh: '苹果', icon: '🍎', pos: 'n.',
+  grade: 1, term: 1, unit: 3, unitTitle: 'What do you take to school?', level: 'core' }
 ```
+
+- `level: 'core'` 表示教材核心词，带 `grade / term / unit`；`extension` 表示拓展词，默认只在「拓展」筛选里出现
+- 分类级字段：`group`（school / life / fun）、`defaultGrade`（新增核心主题未匹配教材时落到的年级）、`hidden`（隐藏分类，如 military）
+- 音标统一英式；卡片默认不展示音标，点击后显示
 
 `icon` 的三种写法，按「图物一致」优先选：
 
@@ -198,4 +215,4 @@ window.STORY_GLOSSARY = {
 
 - 发音依赖系统语音包，Chrome / Edge / Safari 均可；离线状态下音色取决于本地 TTS。
 - 页面无任何网络请求（字体使用系统栈，图像用 emoji 与本地 SVG），断网或国内环境都能正常打开。
-- 仓库内的 `src/`、`package.json` 等是早期 Next.js 版本的实现，仅作对照保留，静态站点完全不依赖它们；如需精简仓库，可以直接删除 `src/`、`scripts/`、`public/`、`package.json`、`pnpm-lock.yaml` 及各类构建配置。旧版说明见 [README.nextjs.md](./README.nextjs.md)。
+- 仓库内的 `src/`、`package.json`、`public/` 等是早期 Next.js 版本的实现，静态站点完全不依赖它们；如需精简仓库，可以删除 `src/`、`public/`、`package.json`、`pnpm-lock.yaml` 及 Next.js 构建配置，但请保留 `assets/`、`data/`、`scripts/` 和 `server.cjs`。旧版说明见 [README.nextjs.md](./README.nextjs.md)。

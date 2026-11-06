@@ -263,6 +263,7 @@ input { font-family: inherit; }
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  position: relative;
   border-radius: var(--radius);
   border: 1.5px solid var(--border);
   background: var(--bg-card);
@@ -306,10 +307,66 @@ input { font-family: inherit; }
   transition: transform 0.2s;
 }
 .card:hover .card-swatch { transform: scale(1.1); }
-.card-body { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-.card-en { font-size: 0.95rem; font-weight: 700; line-height: 1.2; }
-.card-ipa { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted); }
-.card-zh { font-size: 0.82rem; color: var(--text-muted); margin-top: 2px; }
+.card-body { display: flex; flex-direction: column; align-items: center; gap: 2px; max-width: 100%; }
+.card-en { font-size: 0.95rem; font-weight: 700; line-height: 1.2; text-align: center; word-break: break-word; }
+.card-ipa { display: none; font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted); text-align: center; }
+.card.is-revealed .card-ipa { display: inline; }
+.card-ipa-hint {
+  font-size: 0.64rem;
+  line-height: 1.4;
+  color: color-mix(in srgb, var(--cat) 62%, var(--text-muted));
+  letter-spacing: 0.02em;
+}
+.card.is-revealed .card-ipa-hint { display: none; }
+.card-zh { font-size: 0.82rem; color: var(--text-muted); margin-top: 2px; text-align: center; }
+.card-meta {
+  margin-top: 5px;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.62rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+  padding: 0 7px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+}
+.card-meta.is-core {
+  color: color-mix(in srgb, var(--cat) 68%, var(--text));
+  border-color: color-mix(in srgb, var(--cat) 42%, var(--border));
+}
+.card-letter {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--cat) 22%, var(--bg-card));
+  color: color-mix(in srgb, var(--cat) 72%, var(--text));
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+/* 未点开过的生词：右上角小圆点 */
+.card.is-new::after {
+  content: '';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--cat);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cat) 16%, transparent);
+}
+
+/* ---------- Grade filter (second row of sub-nav) ---------- */
+.grade-nav {
+  padding-bottom: 8px;
+  border-bottom: 1px dashed var(--border);
+}
+.grade-pill { font-size: 0.78rem; padding: 5px 12px; }
 
 /* ---------- Empty State ---------- */
 .empty {

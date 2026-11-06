@@ -1,0 +1,5830 @@
+[
+  {
+    "grade": 1,
+    "term": 1,
+    "source": "https://yyld.51jiaoxi.com/yishang/hjbsz_danci.html",
+    "units": [
+      {
+        "unit": 1,
+        "title": "unit 1 What is your family like?",
+        "words": [
+          {
+            "en": "grandma",
+            "zh": "n.（外）祖母；奶奶；外婆"
+          },
+          {
+            "en": "dad",
+            "zh": "n.爸爸"
+          },
+          {
+            "en": "grandpa",
+            "zh": "n.（外）祖父；爷爷；外公"
+          },
+          {
+            "en": "mum",
+            "zh": "n.妈妈"
+          },
+          {
+            "en": "brother",
+            "zh": "n.哥哥；弟弟"
+          },
+          {
+            "en": "sister",
+            "zh": "n.姐姐；妹妹"
+          }
+        ]
+      },
+      {
+        "unit": 2,
+        "title": "unit 2 How are you today?",
+        "words": [
+          {
+            "en": "cold",
+            "zh": "adj.冷的"
+          },
+          {
+            "en": "hot",
+            "zh": "adj.热的"
+          },
+          {
+            "en": "thirsty",
+            "zh": "adj.口渴的"
+          },
+          {
+            "en": "hungry",
+            "zh": "adj.饿的"
+          }
+        ]
+      },
+      {
+        "unit": 3,
+        "title": "unit 3 What do you take to school?",
+        "words": [
+          {
+            "en": "one",
+            "zh": "num.一"
+          },
+          {
+            "en": "pencil case",
+            "zh": "n.铅笔盒；铅笔袋"
+          },
+          {
+            "en": "two",
+            "zh": "num.二"
+          },
+          {
+            "en": "eraser",
+            "zh": "n.橡皮"
+          },
+          {
+            "en": "three",
+            "zh": "num.三"
+          },
+          {
+            "en": "pencil",
+            "zh": "n.铅笔"
+          },
+          {
+            "en": "four",
+            "zh": "num.四"
+          },
+          {
+            "en": "ruler",
+            "zh": "n.直尺"
+          }
+        ]
+      },
+      {
+        "unit": 4,
+        "title": "unit 4 What can you do?",
+        "words": [
+          {
+            "en": "draw",
+            "zh": "v.画"
+          },
+          {
+            "en": "write",
+            "zh": "v.写字；书写"
+          },
+          {
+            "en": "read",
+            "zh": "v.阅读"
+          },
+          {
+            "en": "sing",
+            "zh": "v.唱（歌）"
+          },
+          {
+            "en": "dance",
+            "zh": "v.跳舞"
+          }
+        ]
+      },
+      {
+        "unit": 5,
+        "title": "unit 5 What is your favourite animal?",
+        "words": [
+          {
+            "en": "dog",
+            "zh": "n.狗"
+          },
+          {
+            "en": "cat",
+            "zh": "n.猫"
+          },
+          {
+            "en": "fish",
+            "zh": "n.鱼"
+          },
+          {
+            "en": "bird",
+            "zh": "n.鸟"
+          },
+          {
+            "en": "hamster",
+            "zh": "n.仓鼠"
+          },
+          {
+            "en": "tortoise",
+            "zh": "n.龟"
+          }
+        ]
+      },
+      {
+        "unit": 6,
+        "title": "unit 6 What colours can you see?",
+        "words": [
+          {
+            "en": "red",
+            "zh": "adj./n.红色的；红色"
+          },
+          {
+            "en": "white",
+            "zh": "adj./n.白色的；白色"
+          },
+          {
+            "en": "yellow",
+            "zh": "adj./n.黄色的；黄色"
+          },
+          {
+            "en": "green",
+            "zh": "adj./n.绿色的；绿色"
+          },
+          {
+            "en": "blue",
+            "zh": "adj./n.蓝色的；蓝色"
+          },
+          {
+            "en": "black",
+            "zh": "adj./n.黑色的；黑色"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 1,
+    "term": 2,
+    "source": "https://yyld.51jiaoxi.com/yixia/hjbsz_danci.html",
+    "units": [
+      {
+        "unit": 1,
+        "title": "Unit 1 What food do you like?",
+        "words": [
+          {
+            "en": "noodles",
+            "zh": "n.（复数）面条"
+          },
+          {
+            "en": "baozi",
+            "zh": "n.包子"
+          },
+          {
+            "en": "rice",
+            "zh": "n.米饭"
+          },
+          {
+            "en": "carrot",
+            "zh": "n.胡萝卜"
+          },
+          {
+            "en": "tomato",
+            "zh": "n.西红柿"
+          },
+          {
+            "en": "bread",
+            "zh": "n.面包"
+          },
+          {
+            "en": "egg",
+            "zh": "n.鸡蛋"
+          },
+          {
+            "en": "milk",
+            "zh": "n.牛奶"
+          }
+        ]
+      },
+      {
+        "unit": 2,
+        "title": "Unit 2 What do we do in the classroom?",
+        "words": [
+          {
+            "en": "window",
+            "zh": "n.窗户"
+          },
+          {
+            "en": "blackboard",
+            "zh": "n.黑板"
+          },
+          {
+            "en": "door",
+            "zh": "n.门"
+          },
+          {
+            "en": "desk",
+            "zh": "n.书桌"
+          },
+          {
+            "en": "chair",
+            "zh": "n.椅子"
+          },
+          {
+            "en": "schoolbag",
+            "zh": "n.书包"
+          }
+        ]
+      },
+      {
+        "unit": 3,
+        "title": "Unit 3 How do we play?",
+        "words": [
+          {
+            "en": "ride a bike",
+            "zh": "v. phr.骑自行车"
+          },
+          {
+            "en": "ride a scooter",
+            "zh": "v. phr.骑滑板车"
+          },
+          {
+            "en": "rollerblade",
+            "zh": "v.滑轮滑"
+          },
+          {
+            "en": "play football",
+            "zh": "v. phr.踢足球"
+          },
+          {
+            "en": "skateboard",
+            "zh": "v.滑滑板"
+          }
+        ]
+      },
+      {
+        "unit": 4,
+        "title": "Unit 4 Which season do you like?",
+        "words": [
+          {
+            "en": "spring",
+            "zh": "n.春天"
+          },
+          {
+            "en": "warm",
+            "zh": "adj.暖和的"
+          },
+          {
+            "en": "summer",
+            "zh": "n.夏天"
+          },
+          {
+            "en": "hot",
+            "zh": "adj.炎热的"
+          },
+          {
+            "en": "autumn",
+            "zh": "n.秋天"
+          },
+          {
+            "en": "cool",
+            "zh": "adj.凉爽的"
+          },
+          {
+            "en": "winter",
+            "zh": "n.冬天"
+          },
+          {
+            "en": "cold",
+            "zh": "adj.寒冷的"
+          }
+        ]
+      },
+      {
+        "unit": 5,
+        "title": "Unit 5 What do you know about fruit?",
+        "words": [
+          {
+            "en": "lemon",
+            "zh": "n.柠檬"
+          },
+          {
+            "en": "banana",
+            "zh": "n.香蕉"
+          },
+          {
+            "en": "apple",
+            "zh": "n.苹果"
+          },
+          {
+            "en": "watermelon",
+            "zh": "n.西瓜"
+          },
+          {
+            "en": "pear",
+            "zh": "n.梨"
+          },
+          {
+            "en": "pineapple",
+            "zh": "n.菠萝"
+          },
+          {
+            "en": "peach",
+            "zh": "n.桃子"
+          },
+          {
+            "en": "orange",
+            "zh": "n.橙子；柑橘"
+          }
+        ]
+      },
+      {
+        "unit": 6,
+        "title": "Unit 6 How do animals grow?",
+        "words": [
+          {
+            "en": "tadpole",
+            "zh": "n.蝌蚪"
+          },
+          {
+            "en": "frog",
+            "zh": "n.青蛙"
+          },
+          {
+            "en": "butterfly",
+            "zh": "n.蝴蝶"
+          },
+          {
+            "en": "goldfish",
+            "zh": "n.金鱼"
+          },
+          {
+            "en": "duck",
+            "zh": "n.鸭子"
+          },
+          {
+            "en": "tortoise",
+            "zh": "n.龟"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 2,
+    "term": 1,
+    "source": "https://yyld.51jiaoxi.com/ershang/hjbsz_danci.html",
+    "units": [
+      {
+        "unit": 1,
+        "title": "Unit 1 What can you do with yourfive senses?",
+        "words": [
+          {
+            "en": "feel",
+            "zh": "v.感觉到"
+          },
+          {
+            "en": "see",
+            "zh": "v.看见"
+          },
+          {
+            "en": "smell",
+            "zh": "v.闻到"
+          },
+          {
+            "en": "hear",
+            "zh": "v.听见"
+          },
+          {
+            "en": "taste",
+            "zh": "v.品尝（味道）"
+          }
+        ]
+      },
+      {
+        "unit": 2,
+        "title": "Unit 2 What do you like about yourfamily?",
+        "words": [
+          {
+            "en": "uncle",
+            "zh": "n.舅父；叔父；伯父；姑父；姨父"
+          },
+          {
+            "en": "aunt",
+            "zh": "n.姑母；姨母；伯母；婶母；舅母"
+          },
+          {
+            "en": "cousin",
+            "zh": "n.堂兄（或弟、姐、妹）；表兄（或弟、姐、妹）"
+          },
+          {
+            "en": "old",
+            "zh": "adj.年纪大的"
+          },
+          {
+            "en": "young",
+            "zh": "adj.年轻的"
+          },
+          {
+            "en": "cute",
+            "zh": "adj.可爱的"
+          }
+        ]
+      },
+      {
+        "unit": 3,
+        "title": "Unit 3 What is your favourite toy?",
+        "words": [
+          {
+            "en": "doll",
+            "zh": "n.玩具娃娃"
+          },
+          {
+            "en": "toy plane",
+            "zh": "n.玩具飞机"
+          },
+          {
+            "en": "toy bear",
+            "zh": "n.玩具熊"
+          },
+          {
+            "en": "ball",
+            "zh": "n.球"
+          },
+          {
+            "en": "robot",
+            "zh": "n.机器人"
+          },
+          {
+            "en": "jigsaw puzzle",
+            "zh": "n.拼图游戏"
+          }
+        ]
+      },
+      {
+        "unit": 4,
+        "title": "Unit 4 What is around your home?",
+        "words": [
+          {
+            "en": "pet shop",
+            "zh": "n.宠物店"
+          },
+          {
+            "en": "fruit shop",
+            "zh": "n.水果店"
+          },
+          {
+            "en": "cinema",
+            "zh": "n.电影院"
+          },
+          {
+            "en": "zoo",
+            "zh": "n.动物园"
+          },
+          {
+            "en": "park",
+            "zh": "n.公园"
+          },
+          {
+            "en": "toy shop",
+            "zh": "n.玩具店"
+          }
+        ]
+      },
+      {
+        "unit": 5,
+        "title": "Unit 5 What do you like aboutfarms?",
+        "words": [
+          {
+            "en": "cow",
+            "zh": "n.奶牛"
+          },
+          {
+            "en": "sheep",
+            "zh": "n.羊；绵羊"
+          },
+          {
+            "en": "duck",
+            "zh": "n.鸭"
+          },
+          {
+            "en": "chick",
+            "zh": "n.小鸡"
+          },
+          {
+            "en": "chicken",
+            "zh": "n.鸡"
+          },
+          {
+            "en": "pig",
+            "zh": "n.猪"
+          }
+        ]
+      },
+      {
+        "unit": 6,
+        "title": "Unit 6 How do people celebrate theMid-Autumn Festival?",
+        "words": [
+          {
+            "en": "play with lanterns",
+            "zh": "玩灯笼"
+          },
+          {
+            "en": "eat mooncakes",
+            "zh": "吃月饼"
+          },
+          {
+            "en": "solve riddles",
+            "zh": "猜谜语"
+          },
+          {
+            "en": "look at the moon",
+            "zh": "赏月"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 2,
+    "term": 2,
+    "source": "https://yyld.51jiaoxi.com/erxia/hjbsz_danci.html",
+    "units": [
+      {
+        "unit": 1,
+        "title": "Unit 1 What is fun about food?",
+        "words": [
+          {
+            "en": "rice",
+            "zh": "n.米饭"
+          },
+          {
+            "en": "fish ball",
+            "zh": "n.鱼丸"
+          },
+          {
+            "en": "congee",
+            "zh": "n.粥"
+          },
+          {
+            "en": "cake",
+            "zh": "n.蛋糕"
+          },
+          {
+            "en": "bread",
+            "zh": "n.面包"
+          },
+          {
+            "en": "baozi",
+            "zh": "n.包子"
+          },
+          {
+            "en": "dim sum",
+            "zh": "n.点心"
+          }
+        ]
+      },
+      {
+        "unit": 2,
+        "title": "Unit 2 How can we keep clean?",
+        "words": [
+          {
+            "en": "wash my hands",
+            "zh": "v. phr.洗手"
+          },
+          {
+            "en": "brush my teeth",
+            "zh": "v. phr.刷牙"
+          },
+          {
+            "en": "wash my face",
+            "zh": "v. phr.洗脸"
+          }
+        ]
+      },
+      {
+        "unit": 3,
+        "title": "Unit 3 What do you do in school clubs?",
+        "words": [
+          {
+            "en": "do paper-cutting",
+            "zh": "v. phr.剪纸"
+          },
+          {
+            "en": "do the lion dance",
+            "zh": "v. phr.舞狮"
+          },
+          {
+            "en": "kick a shuttlecock",
+            "zh": "v. phr.踢毽子"
+          }
+        ]
+      },
+      {
+        "unit": 4,
+        "title": "Unit 4 How are people and animals different?",
+        "words": [
+          {
+            "en": "run",
+            "zh": "v.跑"
+          },
+          {
+            "en": "climb",
+            "zh": "v.爬"
+          },
+          {
+            "en": "fly",
+            "zh": "v.飞"
+          },
+          {
+            "en": "walk",
+            "zh": "v.步行；走"
+          }
+        ]
+      },
+      {
+        "unit": 5,
+        "title": "Unit 5 Who is your hero?",
+        "words": [
+          {
+            "en": "helpful",
+            "zh": "adj.乐于助人的"
+          },
+          {
+            "en": "kind",
+            "zh": "adj.友好的；友善的"
+          },
+          {
+            "en": "warm",
+            "zh": "adj.友好的；热心的"
+          }
+        ]
+      },
+      {
+        "unit": 6,
+        "title": "Unit 6 Why should we be honest?",
+        "words": [
+          {
+            "en": "farm",
+            "zh": "n.农场"
+          },
+          {
+            "en": "farmer",
+            "zh": "n.农民"
+          },
+          {
+            "en": "sleep",
+            "zh": "v.睡觉"
+          },
+          {
+            "en": "boy",
+            "zh": "n.男孩"
+          },
+          {
+            "en": "wolf",
+            "zh": "n.狼"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 3,
+    "term": 1,
+    "source": "https://yyld.51jiaoxi.com/sanshang/hjbsz_danci.html",
+    "units": [
+      {
+        "unit": 1,
+        "title": "Unit 1 How do we feel?",
+        "words": [
+          {
+            "en": "happy",
+            "zh": "开心的"
+          },
+          {
+            "en": "sad",
+            "zh": "伤心的"
+          },
+          {
+            "en": "angry",
+            "zh": "生气的"
+          },
+          {
+            "en": "tired",
+            "zh": "疲倦的"
+          },
+          {
+            "en": "boy",
+            "zh": "男孩"
+          },
+          {
+            "en": "girl",
+            "zh": "女孩"
+          },
+          {
+            "en": "I",
+            "zh": "我"
+          },
+          {
+            "en": "am",
+            "zh": "是"
+          },
+          {
+            "en": "cold",
+            "zh": "冷的"
+          },
+          {
+            "en": "OK",
+            "zh": "对；好；行"
+          },
+          {
+            "en": "find",
+            "zh": "找到"
+          },
+          {
+            "en": "pencil",
+            "zh": "铅笔"
+          },
+          {
+            "en": "too",
+            "zh": "也；太"
+          },
+          {
+            "en": "well",
+            "zh": "好；就这样；好啦"
+          },
+          {
+            "en": "now",
+            "zh": "现在"
+          },
+          {
+            "en": "look at the blackboard",
+            "zh": "看黑板"
+          },
+          {
+            "en": "Good morning.",
+            "zh": "上午好"
+          },
+          {
+            "en": "How are you?",
+            "zh": "你好吗？"
+          },
+          {
+            "en": "Not so good.",
+            "zh": "不太好。"
+          },
+          {
+            "en": "Let's close the window.",
+            "zh": "我们把窗户关上吧。"
+          },
+          {
+            "en": "Fine, thank you.",
+            "zh": "很好，谢谢。"
+          }
+        ]
+      },
+      {
+        "unit": 2,
+        "title": "Unit 2 What's interesting about families?",
+        "words": [
+          {
+            "en": "grandfather",
+            "zh": "（外）祖父；爷爷；外公"
+          },
+          {
+            "en": "grandpa",
+            "zh": "（外）祖父；爷爷；外公（口语）"
+          },
+          {
+            "en": "grandmother",
+            "zh": "（外）祖母；奶奶；外婆"
+          },
+          {
+            "en": "grandma",
+            "zh": "（外）祖母；奶奶；外婆（口语）"
+          },
+          {
+            "en": "father",
+            "zh": "爸爸"
+          },
+          {
+            "en": "mother",
+            "zh": "妈妈"
+          },
+          {
+            "en": "sister",
+            "zh": "姐姐；妹妹"
+          },
+          {
+            "en": "brother",
+            "zh": "哥哥；弟弟"
+          },
+          {
+            "en": "me",
+            "zh": "我"
+          },
+          {
+            "en": "family",
+            "zh": "家庭"
+          },
+          {
+            "en": "my",
+            "zh": "我的"
+          },
+          {
+            "en": "name",
+            "zh": "名字"
+          },
+          {
+            "en": "is",
+            "zh": "是"
+          },
+          {
+            "en": "this",
+            "zh": "这；这个"
+          },
+          {
+            "en": "and",
+            "zh": "和"
+          },
+          {
+            "en": "she",
+            "zh": "她"
+          },
+          {
+            "en": "he",
+            "zh": "他"
+          },
+          {
+            "en": "who",
+            "zh": "谁"
+          },
+          {
+            "en": "twin",
+            "zh": "双胞胎之一"
+          },
+          {
+            "en": "big",
+            "zh": "大的"
+          },
+          {
+            "en": "family tree",
+            "zh": "家庭树"
+          },
+          {
+            "en": "Hi.",
+            "zh": "嗨，你好。"
+          }
+        ]
+      },
+      {
+        "unit": 3,
+        "title": "Unit 3 What do we look like?",
+        "words": [
+          {
+            "en": "head",
+            "zh": "头"
+          },
+          {
+            "en": "eye",
+            "zh": "眼睛"
+          },
+          {
+            "en": "ear",
+            "zh": "耳朵"
+          },
+          {
+            "en": "mouth",
+            "zh": "嘴巴"
+          },
+          {
+            "en": "hair",
+            "zh": "头发"
+          },
+          {
+            "en": "nose",
+            "zh": "鼻子"
+          },
+          {
+            "en": "face",
+            "zh": "脸"
+          },
+          {
+            "en": "a (an)",
+            "zh": "一；一个"
+          },
+          {
+            "en": "haircut",
+            "zh": "理发；发型"
+          },
+          {
+            "en": "your",
+            "zh": "你的；你们的"
+          },
+          {
+            "en": "long",
+            "zh": "长的"
+          },
+          {
+            "en": "but",
+            "zh": "但是"
+          },
+          {
+            "en": "like",
+            "zh": "喜欢"
+          },
+          {
+            "en": "see",
+            "zh": "看见"
+          },
+          {
+            "en": "sit",
+            "zh": "坐"
+          },
+          {
+            "en": "on",
+            "zh": "在……上"
+          },
+          {
+            "en": "chair",
+            "zh": "椅子"
+          },
+          {
+            "en": "please",
+            "zh": "请"
+          },
+          {
+            "en": "you",
+            "zh": "你；你们"
+          },
+          {
+            "en": "have",
+            "zh": "有"
+          },
+          {
+            "en": "short",
+            "zh": "短的；个子矮的"
+          },
+          {
+            "en": "mum",
+            "zh": "妈妈"
+          },
+          {
+            "en": "You look great!",
+            "zh": "你看起来很棒！"
+          }
+        ]
+      },
+      {
+        "unit": 4,
+        "title": "Unit 4 How do we have fun?",
+        "words": [
+          {
+            "en": "skip",
+            "zh": "跳绳"
+          },
+          {
+            "en": "run",
+            "zh": "跑"
+          },
+          {
+            "en": "fly a kite",
+            "zh": "放风筝"
+          },
+          {
+            "en": "skateboard",
+            "zh": "滑滑板"
+          },
+          {
+            "en": "ride a bike",
+            "zh": "骑自行车"
+          },
+          {
+            "en": "child",
+            "zh": "孩子"
+          },
+          {
+            "en": "children",
+            "zh": "孩子（复）"
+          },
+          {
+            "en": "in",
+            "zh": "在……里面"
+          },
+          {
+            "en": "the",
+            "zh": "（表示特指）"
+          },
+          {
+            "en": "park",
+            "zh": "公园"
+          },
+          {
+            "en": "are",
+            "zh": "是"
+          },
+          {
+            "en": "can",
+            "zh": "能够"
+          },
+          {
+            "en": "fun",
+            "zh": "有趣的；乐趣"
+          },
+          {
+            "en": "fast",
+            "zh": "快的；快；快速"
+          },
+          {
+            "en": "help",
+            "zh": "帮助"
+          },
+          {
+            "en": "together",
+            "zh": "一起"
+          },
+          {
+            "en": "get",
+            "zh": "去取；得到；获得"
+          },
+          {
+            "en": "bring",
+            "zh": "带来"
+          },
+          {
+            "en": "jump",
+            "zh": "跳"
+          },
+          {
+            "en": "Hello.",
+            "zh": "喂，你好。"
+          }
+        ]
+      },
+      {
+        "unit": 5,
+        "title": "Unit 5 What do we eat?",
+        "words": [
+          {
+            "en": "milk",
+            "zh": "牛奶"
+          },
+          {
+            "en": "juice",
+            "zh": "果汁"
+          },
+          {
+            "en": "tomato",
+            "zh": "西红柿"
+          },
+          {
+            "en": "carrot",
+            "zh": "胡萝卜"
+          },
+          {
+            "en": "apple",
+            "zh": "苹果"
+          },
+          {
+            "en": "banana",
+            "zh": "香蕉"
+          },
+          {
+            "en": "grape",
+            "zh": "葡萄"
+          },
+          {
+            "en": "meat",
+            "zh": "肉"
+          },
+          {
+            "en": "fish",
+            "zh": "鱼；鱼肉"
+          },
+          {
+            "en": "funny",
+            "zh": "有趣的"
+          },
+          {
+            "en": "food",
+            "zh": "食物"
+          },
+          {
+            "en": "what",
+            "zh": "什么"
+          },
+          {
+            "en": "some",
+            "zh": "一些"
+          },
+          {
+            "en": "fruit",
+            "zh": "水果"
+          },
+          {
+            "en": "vegetable",
+            "zh": "蔬菜"
+          },
+          {
+            "en": "cut",
+            "zh": "切"
+          },
+          {
+            "en": "we",
+            "zh": "我们"
+          },
+          {
+            "en": "no",
+            "zh": "不；不是"
+          },
+          {
+            "en": "for",
+            "zh": "（表示对象、用途等）给；对"
+          },
+          {
+            "en": "yes",
+            "zh": "是的"
+          },
+          {
+            "en": "chicken",
+            "zh": "鸡肉"
+          },
+          {
+            "en": "soup",
+            "zh": "汤"
+          }
+        ]
+      },
+      {
+        "unit": 6,
+        "title": "Unit 6 What do we like about small animals?",
+        "words": [
+          {
+            "en": "squirrel",
+            "zh": "松鼠"
+          },
+          {
+            "en": "rabbit",
+            "zh": "兔子"
+          },
+          {
+            "en": "cat",
+            "zh": "猫"
+          },
+          {
+            "en": "mouse",
+            "zh": "老鼠"
+          },
+          {
+            "en": "mice",
+            "zh": "老鼠（复）"
+          },
+          {
+            "en": "dog",
+            "zh": "狗"
+          },
+          {
+            "en": "frog",
+            "zh": "青蛙"
+          },
+          {
+            "en": "day",
+            "zh": "白天；一天"
+          },
+          {
+            "en": "it",
+            "zh": "它"
+          },
+          {
+            "en": "nice",
+            "zh": "美好的"
+          },
+          {
+            "en": "has",
+            "zh": "有（have 的第三人称单数）"
+          },
+          {
+            "en": "small",
+            "zh": "小的"
+          },
+          {
+            "en": "cute",
+            "zh": "可爱的"
+          },
+          {
+            "en": "that",
+            "zh": "那；那个"
+          },
+          {
+            "en": "they",
+            "zh": "他们；她们；它们"
+          },
+          {
+            "en": "tail",
+            "zh": "尾巴"
+          },
+          {
+            "en": "two",
+            "zh": "二；二个（人或物）"
+          },
+          {
+            "en": "animal",
+            "zh": "动物"
+          },
+          {
+            "en": "eat",
+            "zh": "吃"
+          },
+          {
+            "en": "bad",
+            "zh": "坏的"
+          },
+          {
+            "en": "bug",
+            "zh": "虫子"
+          }
+        ]
+      },
+      {
+        "unit": 7,
+        "title": "Unit 7 What do we know about weather?",
+        "words": [
+          {
+            "en": "sunny",
+            "zh": "晴朗的"
+          },
+          {
+            "en": "sun",
+            "zh": "太阳"
+          },
+          {
+            "en": "windy",
+            "zh": "刮风的"
+          },
+          {
+            "en": "wind",
+            "zh": "风"
+          },
+          {
+            "en": "rainy",
+            "zh": "下雨的"
+          },
+          {
+            "en": "rain",
+            "zh": "雨"
+          },
+          {
+            "en": "cloudy",
+            "zh": "多云的"
+          },
+          {
+            "en": "cloud",
+            "zh": "云"
+          },
+          {
+            "en": "different",
+            "zh": "不同的"
+          },
+          {
+            "en": "weather",
+            "zh": "天气"
+          },
+          {
+            "en": "how",
+            "zh": "怎样；如何"
+          },
+          {
+            "en": "today",
+            "zh": "今天"
+          },
+          {
+            "en": "hat",
+            "zh": "帽子"
+          },
+          {
+            "en": "plant",
+            "zh": "植物"
+          },
+          {
+            "en": "hot",
+            "zh": "热的"
+          },
+          {
+            "en": "very",
+            "zh": "非常"
+          },
+          {
+            "en": "go to the park",
+            "zh": "去公园"
+          },
+          {
+            "en": "Hooray!",
+            "zh": "好极了！"
+          },
+          {
+            "en": "Oh, dear!",
+            "zh": "哦，天哪！"
+          }
+        ]
+      },
+      {
+        "unit": 8,
+        "title": "Unit 8 Why do we like birthdays?",
+        "words": [
+          {
+            "en": "cake",
+            "zh": "蛋糕"
+          },
+          {
+            "en": "candle",
+            "zh": "蜡烛"
+          },
+          {
+            "en": "gift",
+            "zh": "礼物"
+          },
+          {
+            "en": "toy plane",
+            "zh": "玩具飞机"
+          },
+          {
+            "en": "doll",
+            "zh": "洋娃娃"
+          },
+          {
+            "en": "card",
+            "zh": "卡片"
+          },
+          {
+            "en": "noodles",
+            "zh": "面条"
+          },
+          {
+            "en": "come",
+            "zh": "来"
+          },
+          {
+            "en": "love",
+            "zh": "爱"
+          },
+          {
+            "en": "dad",
+            "zh": "爸爸"
+          },
+          {
+            "en": "afternoon",
+            "zh": "下午"
+          },
+          {
+            "en": "share",
+            "zh": "分享"
+          },
+          {
+            "en": "his",
+            "zh": "他的"
+          },
+          {
+            "en": "evening",
+            "zh": "傍晚；晚上"
+          },
+          {
+            "en": "ten years old",
+            "zh": "十岁"
+          },
+          {
+            "en": "go out",
+            "zh": "出去"
+          },
+          {
+            "en": "Happy birthday!",
+            "zh": "生日快乐！"
+          },
+          {
+            "en": "What a lovely picture!",
+            "zh": "多么可爱的一幅 画啊！"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 3,
+    "term": 2,
+    "source": "https://yyld.51jiaoxi.com/sanxia/hjbsz_danci.html",
+    "units": [
+      {
+        "unit": 1,
+        "title": "Unit 1 How do we spend our free time?",
+        "words": [
+          {
+            "en": "our",
+            "zh": "adj. 我们的"
+          },
+          {
+            "en": "read",
+            "zh": "v. 看；读"
+          },
+          {
+            "en": "sing",
+            "zh": "v. 唱；唱歌"
+          },
+          {
+            "en": "paint",
+            "zh": "v. 用颜料画"
+          },
+          {
+            "en": "dance",
+            "zh": "v. 跳舞"
+          },
+          {
+            "en": "swim",
+            "zh": "v. 游泳"
+          },
+          {
+            "en": "play basketball",
+            "zh": "phra. 打篮球"
+          },
+          {
+            "en": "play ping-pong",
+            "zh": "phra. 打乒乓球"
+          },
+          {
+            "en": "play football",
+            "zh": "phra. 踢足球"
+          },
+          {
+            "en": "Ms",
+            "zh": "n. 女士(不知婚否)"
+          },
+          {
+            "en": "talk",
+            "zh": "v. 谈论，说话"
+          },
+          {
+            "en": "hobby",
+            "zh": "n. 业余爱好"
+          },
+          {
+            "en": "do",
+            "zh": "v. 做；干"
+          },
+          {
+            "en": "free",
+            "zh": "adj. 空闲的，有空的"
+          },
+          {
+            "en": "music",
+            "zh": "n. 音乐"
+          },
+          {
+            "en": "favourite",
+            "zh": "adj. 特别喜爱的"
+          },
+          {
+            "en": "sport",
+            "zh": "n. 体育运动"
+          }
+        ]
+      },
+      {
+        "unit": 2,
+        "title": "Unit 2 How do we make friends?",
+        "words": [
+          {
+            "en": "play a game",
+            "zh": "v. phr. 做游戏"
+          },
+          {
+            "en": "take a photo",
+            "zh": "拍照"
+          },
+          {
+            "en": "row a boat",
+            "zh": "划船"
+          },
+          {
+            "en": "tell a story",
+            "zh": "讲故事"
+          },
+          {
+            "en": "boat",
+            "zh": "n.小船"
+          },
+          {
+            "en": "sandcastle",
+            "zh": "n. 沙堡"
+          },
+          {
+            "en": "great",
+            "zh": "adj.很好的；很棒的"
+          },
+          {
+            "en": "sand",
+            "zh": "n. 沙，沙子"
+          },
+          {
+            "en": "join",
+            "zh": "v. 参与；加入到......之中"
+          },
+          {
+            "en": "meet",
+            "zh": "v. (与…)见面"
+          },
+          {
+            "en": "her",
+            "zh": "adj. 她的"
+          },
+          {
+            "en": "we",
+            "zh": "pron. 我们"
+          },
+          {
+            "en": "play in the sand",
+            "zh": "v. phr.玩沙子"
+          },
+          {
+            "en": "play beach volleyball",
+            "zh": "v.玩沙滩排球"
+          }
+        ]
+      },
+      {
+        "unit": 3,
+        "title": "Unit 3 What do we wear?",
+        "words": [
+          {
+            "en": "sweater",
+            "zh": "n. 毛衣"
+          },
+          {
+            "en": "T-shirt",
+            "zh": "n. T恤衫;短袖汗衫"
+          },
+          {
+            "en": "skirt",
+            "zh": "n. 短裙；半身裙"
+          },
+          {
+            "en": "dress",
+            "zh": "n. 连衣裙"
+          },
+          {
+            "en": "shirt",
+            "zh": "n. 衬衫"
+          },
+          {
+            "en": "trousers",
+            "zh": "n. （用复数）裤子"
+          },
+          {
+            "en": "shorts",
+            "zh": "n. （用复数）短裤"
+          },
+          {
+            "en": "coat",
+            "zh": "n. 外套；外衣；大衣"
+          },
+          {
+            "en": "cap",
+            "zh": "n. 帽子"
+          },
+          {
+            "en": "shoes",
+            "zh": "n. 鞋子（复数）"
+          },
+          {
+            "en": "student",
+            "zh": "n. 学生"
+          },
+          {
+            "en": "wear",
+            "zh": "v. 穿；戴；佩戴"
+          },
+          {
+            "en": "school",
+            "zh": "n. 学校"
+          },
+          {
+            "en": "different",
+            "zh": "adj. 不同的"
+          },
+          {
+            "en": "clothes",
+            "zh": "n. 衣服"
+          },
+          {
+            "en": "uniform",
+            "zh": "n. 制服"
+          },
+          {
+            "en": "whose",
+            "zh": "pron. 谁的"
+          },
+          {
+            "en": "around the world",
+            "zh": "prep.在世界各地"
+          },
+          {
+            "en": "take a look",
+            "zh": "v.看一看"
+          },
+          {
+            "en": "a pair of",
+            "zh": "n.一条；一双；一对"
+          }
+        ]
+      },
+      {
+        "unit": 4,
+        "title": "Unit 4 What sounds can we hear?",
+        "words": [
+          {
+            "en": "grass",
+            "zh": "n. 草"
+          },
+          {
+            "en": "river",
+            "zh": "n. 河；江"
+          },
+          {
+            "en": "hear",
+            "zh": "v. 听见"
+          },
+          {
+            "en": "bird",
+            "zh": "n. 鸟"
+          },
+          {
+            "en": "duck",
+            "zh": "n. 鸭子"
+          },
+          {
+            "en": "bee",
+            "zh": "n. 蜜蜂"
+          },
+          {
+            "en": "lake",
+            "zh": "n. 湖；湖泊"
+          },
+          {
+            "en": "chirp",
+            "zh": "v..（鸟叫声）"
+          },
+          {
+            "en": "buzz",
+            "zh": "v. （蜜蜂声）"
+          },
+          {
+            "en": "by",
+            "zh": "prep. 在……旁边"
+          },
+          {
+            "en": "swish",
+            "zh": "v.（风声）"
+          },
+          {
+            "en": "blow",
+            "zh": "v. 刮；吹"
+          },
+          {
+            "en": "quack",
+            "zh": "n. (鸭叫声)嘎嘎"
+          },
+          {
+            "en": "past",
+            "zh": "prep. 经过"
+          },
+          {
+            "en": "walk",
+            "zh": "v. 走；行走"
+          },
+          {
+            "en": "along",
+            "zh": "prep. 沿着；顺着"
+          },
+          {
+            "en": "path",
+            "zh": "n. 小路；小径"
+          },
+          {
+            "en": "pitter-patter",
+            "zh": "n.（雨声）"
+          },
+          {
+            "en": "time",
+            "zh": "n. 时间"
+          },
+          {
+            "en": "again",
+            "zh": "adv. 再一次；又一次"
+          },
+          {
+            "en": "sound",
+            "zh": "v. 听起来；令人觉得"
+          },
+          {
+            "en": "go outside",
+            "zh": "v.去外面"
+          },
+          {
+            "en": "go home",
+            "zh": "phra. 回家"
+          }
+        ]
+      },
+      {
+        "unit": 5,
+        "title": "Unit 5 Where can we see colours?",
+        "words": [
+          {
+            "en": "where",
+            "zh": "adv. 哪里"
+          },
+          {
+            "en": "colour",
+            "zh": "n. 颜色"
+          },
+          {
+            "en": "pink",
+            "zh": "adj. 粉红的 n. 粉红色"
+          },
+          {
+            "en": "blue",
+            "zh": "adj. 蓝色的 n. 蓝色"
+          },
+          {
+            "en": "red",
+            "zh": "adj. 红色的 n. 红色"
+          },
+          {
+            "en": "brown",
+            "zh": "adj. 棕色的 n. 棕色"
+          },
+          {
+            "en": "black",
+            "zh": "adj. 黑色的 n. 黑色"
+          },
+          {
+            "en": "white",
+            "zh": "adj. 白色的 n. 白色"
+          },
+          {
+            "en": "purple",
+            "zh": "adj. 紫色的 n. 紫色"
+          },
+          {
+            "en": "green",
+            "zh": "adj. 绿色的 n. 绿色"
+          },
+          {
+            "en": "orange",
+            "zh": "adj. 橘黄色的 n. 橘黄色"
+          },
+          {
+            "en": "yellow",
+            "zh": "adj. 黄色的 n. 黄色"
+          },
+          {
+            "en": "snow",
+            "zh": "n.雪"
+          },
+          {
+            "en": "tree",
+            "zh": "n. 树；树木；乔木"
+          },
+          {
+            "en": "out",
+            "zh": "adv. 在室外"
+          },
+          {
+            "en": "garden",
+            "zh": "n. 花园"
+          },
+          {
+            "en": "up",
+            "zh": "prep. 向上；在上面"
+          },
+          {
+            "en": "there",
+            "zh": "pron. 表示存在或发生"
+          },
+          {
+            "en": "butterfly",
+            "zh": "n. 蝴蝶"
+          },
+          {
+            "en": "lizard",
+            "zh": "n.蜥蜴"
+          },
+          {
+            "en": "now",
+            "zh": "adv. 现在"
+          },
+          {
+            "en": "problem",
+            "zh": "n. 难题；困难"
+          },
+          {
+            "en": "sky",
+            "zh": "n. 天，天空"
+          },
+          {
+            "en": "dark",
+            "zh": "adj. 黑暗的，昏暗的"
+          },
+          {
+            "en": "night",
+            "zh": "n.夜晚"
+          },
+          {
+            "en": "colourful",
+            "zh": "adj. 五彩缤纷的"
+          },
+          {
+            "en": "firework",
+            "zh": "n. 烟花"
+          }
+        ]
+      },
+      {
+        "unit": 6,
+        "title": "Unit 6 What are our homes like?",
+        "words": [
+          {
+            "en": "kitchen",
+            "zh": "n. 厨房"
+          },
+          {
+            "en": "bathroom",
+            "zh": "n. 浴室；盥洗室"
+          },
+          {
+            "en": "bedroom",
+            "zh": "n. 卧室"
+          },
+          {
+            "en": "dining room",
+            "zh": "n.餐厅"
+          },
+          {
+            "en": "living room",
+            "zh": "phra. 客厅；起居室"
+          },
+          {
+            "en": "study",
+            "zh": "n. 书房"
+          },
+          {
+            "en": "desk",
+            "zh": "n. 书桌"
+          },
+          {
+            "en": "chair",
+            "zh": "n. 椅子"
+          },
+          {
+            "en": "sofa",
+            "zh": "n. 长沙发"
+          },
+          {
+            "en": "room",
+            "zh": "n.房间"
+          },
+          {
+            "en": "from",
+            "zh": "prep. 从；来自"
+          },
+          {
+            "en": "new",
+            "zh": "adj. 新的"
+          },
+          {
+            "en": "dear",
+            "zh": "adj. (用于信函抬头的名字或头..."
+          },
+          {
+            "en": "show",
+            "zh": "v. 展示；显示 n. 演出；表演..."
+          },
+          {
+            "en": "write",
+            "zh": "v. 写字；写作"
+          },
+          {
+            "en": "window",
+            "zh": "n. 窗户"
+          },
+          {
+            "en": "wish",
+            "zh": "v. 祝愿"
+          },
+          {
+            "en": "in front of",
+            "zh": "phra. 在……前面"
+          },
+          {
+            "en": "look out of",
+            "zh": "v.向...外看"
+          },
+          {
+            "en": "teddy bear",
+            "zh": "n. 泰迪熊"
+          }
+        ]
+      },
+      {
+        "unit": 7,
+        "title": "Unit 7 What do we do at school?",
+        "words": [
+          {
+            "en": "welcome",
+            "zh": "n. 欢迎"
+          },
+          {
+            "en": "classroom",
+            "zh": "n. 教室"
+          },
+          {
+            "en": "computer room",
+            "zh": "phra. 电脑室"
+          },
+          {
+            "en": "toilet",
+            "zh": "n. 厕所；卫生间；盥洗室"
+          },
+          {
+            "en": "sports ground",
+            "zh": "n.操场"
+          },
+          {
+            "en": "library",
+            "zh": "n. 图书馆"
+          },
+          {
+            "en": "office",
+            "zh": "n. 办公室"
+          },
+          {
+            "en": "picture",
+            "zh": "n. 图画"
+          },
+          {
+            "en": "tomorrow",
+            "zh": "n. 明天"
+          },
+          {
+            "en": "also",
+            "zh": "adv. 也"
+          },
+          {
+            "en": "schoolbag",
+            "zh": "n. 书包"
+          },
+          {
+            "en": "ruler",
+            "zh": "n. 直尺"
+          },
+          {
+            "en": "pencil",
+            "zh": "n. 铅笔"
+          },
+          {
+            "en": "pen",
+            "zh": "n. 钢笔"
+          },
+          {
+            "en": "art room",
+            "zh": "phra. 美术教室"
+          },
+          {
+            "en": "swimming pool",
+            "zh": "n.游泳池"
+          },
+          {
+            "en": "lots of",
+            "zh": "phra. 大量；很多的"
+          },
+          {
+            "en": "Come and see!",
+            "zh": "phr. 来看一看！"
+          }
+        ]
+      },
+      {
+        "unit": 8,
+        "title": "Unit 8 What do you do on Children",
+        "words": [
+          {
+            "en": "Children's Day",
+            "zh": "n.儿童节"
+          },
+          {
+            "en": "go to the beach",
+            "zh": "v.去海滩"
+          },
+          {
+            "en": "go to the cinema",
+            "zh": "v.（去电影院）看电影"
+          },
+          {
+            "en": "go to the park",
+            "zh": "v.去公园"
+          },
+          {
+            "en": "go to the zoo",
+            "zh": "v.去动物园"
+          },
+          {
+            "en": "go to the museum",
+            "zh": "v.去博物馆"
+          },
+          {
+            "en": "elephant",
+            "zh": "n. 大象"
+          },
+          {
+            "en": "film",
+            "zh": "n. 电影"
+          },
+          {
+            "en": "pizza",
+            "zh": "n. 比萨饼；意大利饼"
+          },
+          {
+            "en": "shop",
+            "zh": "n. 商店"
+          },
+          {
+            "en": "eat",
+            "zh": "v. 吃"
+          },
+          {
+            "en": "classmate",
+            "zh": "n. 同班同学"
+          },
+          {
+            "en": "do a survey",
+            "zh": "v. phr. 做调查"
+          },
+          {
+            "en": "science museum",
+            "zh": "n.科技馆"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 4,
+    "term": 1,
+    "source": "https://yyld.51jiaoxi.com/sishang/hjbsz_danci.html",
+    "units": [
+      {
+        "unit": 1,
+        "title": "Unit 1",
+        "words": [
+          {
+            "en": "city",
+            "zh": "城市"
+          },
+          {
+            "en": "building",
+            "zh": "建筑物；楼房"
+          },
+          {
+            "en": "flat",
+            "zh": "公寓"
+          },
+          {
+            "en": "street",
+            "zh": "大街；街道"
+          },
+          {
+            "en": "country",
+            "zh": "国家"
+          },
+          {
+            "en": "farm",
+            "zh": "农场"
+          },
+          {
+            "en": "house",
+            "zh": "房屋；房子"
+          },
+          {
+            "en": "people",
+            "zh": "人；人们"
+          },
+          {
+            "en": "live",
+            "zh": "住；居住"
+          },
+          {
+            "en": "many",
+            "zh": "许多"
+          },
+          {
+            "en": "place",
+            "zh": "地方"
+          },
+          {
+            "en": "quiet",
+            "zh": "安静的"
+          },
+          {
+            "en": "all kinds of",
+            "zh": "各种各样的"
+          },
+          {
+            "en": "a lot of",
+            "zh": "许多"
+          }
+        ]
+      },
+      {
+        "unit": 2,
+        "title": "Unit 2",
+        "words": [
+          {
+            "en": "eagle",
+            "zh": "老鹰"
+          },
+          {
+            "en": "owl",
+            "zh": "猫头鹰"
+          },
+          {
+            "en": "honeybee",
+            "zh": "蜜蜂"
+          },
+          {
+            "en": "nest",
+            "zh": "巢穴"
+          },
+          {
+            "en": "their",
+            "zh": "他们的；她们的；它们的"
+          },
+          {
+            "en": "tree hole",
+            "zh": "树洞"
+          },
+          {
+            "en": "safe",
+            "zh": "安全的"
+          },
+          {
+            "en": "there",
+            "zh": "那里；在那里"
+          },
+          {
+            "en": "snake",
+            "zh": "蛇"
+          },
+          {
+            "en": "hive",
+            "zh": "蜂巢"
+          },
+          {
+            "en": "under",
+            "zh": "在…… 下面；小于；少于"
+          },
+          {
+            "en": "at night",
+            "zh": "晚上"
+          },
+          {
+            "en": "make honey",
+            "zh": "酿蜜"
+          }
+        ]
+      },
+      {
+        "unit": 3,
+        "title": "Unit 3",
+        "words": [
+          {
+            "en": "plus",
+            "zh": "加；加号"
+          },
+          {
+            "en": "equal",
+            "zh": "等于"
+          },
+          {
+            "en": "answer",
+            "zh": "答案；回答"
+          },
+          {
+            "en": "minus",
+            "zh": "减；减号"
+          },
+          {
+            "en": "odd numbers",
+            "zh": "奇数"
+          },
+          {
+            "en": "even numbers",
+            "zh": "偶数"
+          },
+          {
+            "en": "use",
+            "zh": "使用"
+          },
+          {
+            "en": "help",
+            "zh": "帮助"
+          },
+          {
+            "en": "count",
+            "zh": "（按顺序）数数"
+          },
+          {
+            "en": "thing",
+            "zh": "东西；事物"
+          },
+          {
+            "en": "say",
+            "zh": "说"
+          },
+          {
+            "en": "every day",
+            "zh": "每天"
+          },
+          {
+            "en": "how many",
+            "zh": "（用于问数量）多少"
+          }
+        ]
+      },
+      {
+        "unit": 4,
+        "title": "Unit 4",
+        "words": [
+          {
+            "en": "supermarket",
+            "zh": "超市"
+          },
+          {
+            "en": "a bag of rice",
+            "zh": "一袋米"
+          },
+          {
+            "en": "a box of eggs",
+            "zh": "一盒鸡蛋"
+          },
+          {
+            "en": "a bottle of juice",
+            "zh": "一瓶果汁"
+          },
+          {
+            "en": "buy",
+            "zh": "购买"
+          },
+          {
+            "en": "sell",
+            "zh": "出售"
+          },
+          {
+            "en": "need",
+            "zh": "需要"
+          },
+          {
+            "en": "shopping list",
+            "zh": "购物单"
+          },
+          {
+            "en": "each",
+            "zh": "每个"
+          },
+          {
+            "en": "team",
+            "zh": "队；组"
+          },
+          {
+            "en": "faster",
+            "zh": "更快的"
+          },
+          {
+            "en": "candy",
+            "zh": "糖果；巧克力"
+          },
+          {
+            "en": "bread",
+            "zh": "面包"
+          },
+          {
+            "en": "win",
+            "zh": "获胜"
+          },
+          {
+            "en": "still",
+            "zh": "还；仍然"
+          },
+          {
+            "en": "share",
+            "zh": "分享"
+          },
+          {
+            "en": "water",
+            "zh": "水；给…… 浇水"
+          },
+          {
+            "en": "how much",
+            "zh": "多少钱；多少"
+          },
+          {
+            "en": "a bar of chocolate",
+            "zh": "一块巧克力"
+          },
+          {
+            "en": "Here they are.",
+            "zh": "它们在这里。"
+          },
+          {
+            "en": "All right.",
+            "zh": "好的。"
+          },
+          {
+            "en": "What would you like?",
+            "zh": "你想要什么？"
+          }
+        ]
+      },
+      {
+        "unit": 5,
+        "title": "Unit 5",
+        "words": [
+          {
+            "en": "spring",
+            "zh": "春天"
+          },
+          {
+            "en": "warm",
+            "zh": "温暖的"
+          },
+          {
+            "en": "summer",
+            "zh": "夏天"
+          },
+          {
+            "en": "hot",
+            "zh": "炎热的"
+          },
+          {
+            "en": "autumn",
+            "zh": "秋天"
+          },
+          {
+            "en": "cool",
+            "zh": "凉爽的"
+          },
+          {
+            "en": "winter",
+            "zh": "冬天"
+          },
+          {
+            "en": "cold",
+            "zh": "寒冷的"
+          },
+          {
+            "en": "parent",
+            "zh": "父亲（或母亲）"
+          },
+          {
+            "en": "season",
+            "zh": "季节"
+          },
+          {
+            "en": "year",
+            "zh": "年"
+          },
+          {
+            "en": "grow",
+            "zh": "（使）生长"
+          },
+          {
+            "en": "get",
+            "zh": "变得"
+          },
+          {
+            "en": "usually",
+            "zh": "通常"
+          },
+          {
+            "en": "after",
+            "zh": "在…… 之后"
+          },
+          {
+            "en": "fall",
+            "zh": "落下"
+          },
+          {
+            "en": "turn",
+            "zh": "（使）变成"
+          },
+          {
+            "en": "often",
+            "zh": "经常"
+          },
+          {
+            "en": "snow",
+            "zh": "下雪；雪"
+          },
+          {
+            "en": "then",
+            "zh": "然后"
+          },
+          {
+            "en": "begin",
+            "zh": "开始"
+          }
+        ]
+      },
+      {
+        "unit": 6,
+        "title": "Unit 6",
+        "words": [
+          {
+            "en": "flower",
+            "zh": "花"
+          },
+          {
+            "en": "fruit",
+            "zh": "果实；水果"
+          },
+          {
+            "en": "leaf",
+            "zh": "叶子"
+          },
+          {
+            "en": "soil",
+            "zh": "土壤"
+          },
+          {
+            "en": "sunflower",
+            "zh": "向日葵"
+          },
+          {
+            "en": "seed",
+            "zh": "种子"
+          },
+          {
+            "en": "put",
+            "zh": "放"
+          },
+          {
+            "en": "plant",
+            "zh": "植物"
+          },
+          {
+            "en": "root",
+            "zh": "根"
+          },
+          {
+            "en": "tall",
+            "zh": "高的"
+          },
+          {
+            "en": "round",
+            "zh": "圆形的"
+          },
+          {
+            "en": "oil",
+            "zh": "食用油"
+          },
+          {
+            "en": "amazing",
+            "zh": "令人惊叹的"
+          }
+        ]
+      },
+      {
+        "unit": 7,
+        "title": "Unit 7",
+        "words": [
+          {
+            "en": "green light",
+            "zh": "绿灯"
+          },
+          {
+            "en": "red light",
+            "zh": "红灯"
+          },
+          {
+            "en": "wait",
+            "zh": "等待"
+          },
+          {
+            "en": "cross",
+            "zh": "穿越"
+          },
+          {
+            "en": "Mr",
+            "zh": "先生"
+          },
+          {
+            "en": "way",
+            "zh": "路线；道路"
+          },
+          {
+            "en": "road",
+            "zh": "路；马路"
+          },
+          {
+            "en": "should",
+            "zh": "应该"
+          },
+          {
+            "en": "first",
+            "zh": "首先"
+          },
+          {
+            "en": "left",
+            "zh": "左边"
+          },
+          {
+            "en": "car",
+            "zh": "小汽车"
+          },
+          {
+            "en": "right",
+            "zh": "右边"
+          },
+          {
+            "en": "skate",
+            "zh": "滑（滑板）"
+          },
+          {
+            "en": "sorry",
+            "zh": "对不起"
+          },
+          {
+            "en": "kid",
+            "zh": "小孩；孩子"
+          },
+          {
+            "en": "late",
+            "zh": "迟到"
+          },
+          {
+            "en": "Good job!",
+            "zh": "做得好！"
+          },
+          {
+            "en": "Hurry up!",
+            "zh": "快点！"
+          }
+        ]
+      },
+      {
+        "unit": 8,
+        "title": "Unit 8",
+        "words": [
+          {
+            "en": "go shopping",
+            "zh": "购物"
+          },
+          {
+            "en": "go for a walk",
+            "zh": "去散步"
+          },
+          {
+            "en": "use the internet",
+            "zh": "使用互联网"
+          },
+          {
+            "en": "do exercise",
+            "zh": "锻炼"
+          },
+          {
+            "en": "do housework",
+            "zh": "做家务"
+          },
+          {
+            "en": "do gardening",
+            "zh": "做园艺"
+          },
+          {
+            "en": "grandparent",
+            "zh": "祖父（母）；外祖父（母）"
+          },
+          {
+            "en": "week",
+            "zh": "星期；周"
+          },
+          {
+            "en": "work",
+            "zh": "工作"
+          },
+          {
+            "en": "always",
+            "zh": "总是"
+          },
+          {
+            "en": "vlog",
+            "zh": "视频博客"
+          },
+          {
+            "en": "watch",
+            "zh": "看；观看"
+          },
+          {
+            "en": "do tai chi",
+            "zh": "打太极拳"
+          },
+          {
+            "en": "tidy up",
+            "zh": "收拾；整理"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 4,
+    "term": 2,
+    "source": "https://yyld.51jiaoxi.com/sixia/hjbsz_danci.html",
+    "units": [
+      {
+        "unit": 1,
+        "title": "Unit 1",
+        "words": [
+          {
+            "en": "get up",
+            "zh": "起床"
+          },
+          {
+            "en": "have breakfast",
+            "zh": "吃早餐"
+          },
+          {
+            "en": "go to school",
+            "zh": "上学"
+          },
+          {
+            "en": "have lunch",
+            "zh": "吃午餐"
+          },
+          {
+            "en": "go home",
+            "zh": "回家"
+          },
+          {
+            "en": "have dinner",
+            "zh": "吃晚餐"
+          },
+          {
+            "en": "go to bed",
+            "zh": "睡觉"
+          },
+          {
+            "en": "daily",
+            "zh": "每日的; 日常的"
+          },
+          {
+            "en": "schedule",
+            "zh": "日程安排"
+          },
+          {
+            "en": "at",
+            "zh": "在 (某时间或时刻)"
+          },
+          {
+            "en": "o'clock",
+            "zh": "(表示整点) ……点钟"
+          },
+          {
+            "en": "half",
+            "zh": "(时间) ……点半"
+          },
+          {
+            "en": "little",
+            "zh": "年幼的"
+          },
+          {
+            "en": "drink",
+            "zh": "喝; 饮"
+          },
+          {
+            "en": "lesson",
+            "zh": "课"
+          },
+          {
+            "en": "draw",
+            "zh": "画"
+          },
+          {
+            "en": "quarter",
+            "zh": "15 分钟; 一刻钟"
+          },
+          {
+            "en": "Miss",
+            "zh": "小姐"
+          },
+          {
+            "en": "brush my teeth",
+            "zh": "刷牙"
+          },
+          {
+            "en": "wash my face",
+            "zh": "洗脸"
+          },
+          {
+            "en": "Good night, kids!",
+            "zh": "晚安, 孩子们!"
+          }
+        ]
+      },
+      {
+        "unit": 2,
+        "title": "Unit 2",
+        "words": [
+          {
+            "en": "Chinese",
+            "zh": "(学科) 语文"
+          },
+          {
+            "en": "Maths",
+            "zh": "(学科) 数学"
+          },
+          {
+            "en": "English",
+            "zh": "(学科) 英语"
+          },
+          {
+            "en": "PE",
+            "zh": "(学科) 体育"
+          },
+          {
+            "en": "Music",
+            "zh": "(学科) 音乐"
+          },
+          {
+            "en": "Art",
+            "zh": "(学科) 美术"
+          },
+          {
+            "en": "IT",
+            "zh": "(学科) 信息技术"
+          },
+          {
+            "en": "Science",
+            "zh": "(学科) 科学"
+          },
+          {
+            "en": "club",
+            "zh": "俱乐部; 社团"
+          },
+          {
+            "en": "student",
+            "zh": "学生"
+          },
+          {
+            "en": "different",
+            "zh": "不同的"
+          },
+          {
+            "en": "subject",
+            "zh": "科目"
+          },
+          {
+            "en": "class",
+            "zh": "课; 班级"
+          },
+          {
+            "en": "pig",
+            "zh": "猪"
+          },
+          {
+            "en": "timetable",
+            "zh": "时间表"
+          },
+          {
+            "en": "raise the national flag",
+            "zh": "升国旗"
+          },
+          {
+            "en": "work out",
+            "zh": "解决; 算出"
+          },
+          {
+            "en": "after school",
+            "zh": "放学后"
+          },
+          {
+            "en": "put on a play",
+            "zh": "演出戏剧"
+          },
+          {
+            "en": "model plane",
+            "zh": "飞机模型"
+          },
+          {
+            "en": "Great!",
+            "zh": "太棒了!"
+          }
+        ]
+      },
+      {
+        "unit": 3,
+        "title": "Unit 3",
+        "words": [
+          {
+            "en": "firefighter",
+            "zh": "消防员"
+          },
+          {
+            "en": "police officer",
+            "zh": "警察"
+          },
+          {
+            "en": "farmer",
+            "zh": "农夫; 农民"
+          },
+          {
+            "en": "teacher",
+            "zh": "老师"
+          },
+          {
+            "en": "doctor",
+            "zh": "医生"
+          },
+          {
+            "en": "bus driver",
+            "zh": "公交车司机"
+          },
+          {
+            "en": "fire",
+            "zh": "火"
+          },
+          {
+            "en": "sick",
+            "zh": "生病的"
+          },
+          {
+            "en": "soup",
+            "zh": "汤"
+          },
+          {
+            "en": "Mrs",
+            "zh": "夫人; 太太"
+          },
+          {
+            "en": "job",
+            "zh": "工作; 职业"
+          },
+          {
+            "en": "people",
+            "zh": "人; 人们"
+          },
+          {
+            "en": "know",
+            "zh": "知道"
+          },
+          {
+            "en": "dentist",
+            "zh": "牙医"
+          },
+          {
+            "en": "or",
+            "zh": "或; 或者"
+          },
+          {
+            "en": "sweet",
+            "zh": "甜的"
+          },
+          {
+            "en": "check",
+            "zh": "检查"
+          },
+          {
+            "en": "hospital",
+            "zh": "医院"
+          },
+          {
+            "en": "nurse",
+            "zh": "护士"
+          },
+          {
+            "en": "put out fires",
+            "zh": "灭火"
+          },
+          {
+            "en": "look after",
+            "zh": "照顾; 照料"
+          },
+          {
+            "en": "twice or three times",
+            "zh": "两次或三次"
+          },
+          {
+            "en": "fill holes in teeth",
+            "zh": "补牙"
+          },
+          {
+            "en": "pull bad teeth out",
+            "zh": "拔蛀牙"
+          }
+        ]
+      },
+      {
+        "unit": 4,
+        "title": "Unit 4",
+        "words": [
+          {
+            "en": "triangle",
+            "zh": "三角铁"
+          },
+          {
+            "en": "violin",
+            "zh": "小提琴"
+          },
+          {
+            "en": "piano",
+            "zh": "钢琴"
+          },
+          {
+            "en": "guitar",
+            "zh": "吉他"
+          },
+          {
+            "en": "erhu",
+            "zh": "二胡"
+          },
+          {
+            "en": "flute",
+            "zh": "长笛"
+          },
+          {
+            "en": "pipa",
+            "zh": "琵琶"
+          },
+          {
+            "en": "drum",
+            "zh": "鼓"
+          },
+          {
+            "en": "woman",
+            "zh": "成年女子; 妇女"
+          },
+          {
+            "en": "concert",
+            "zh": "音乐会"
+          },
+          {
+            "en": "think",
+            "zh": "思考; 想到 (主意)"
+          },
+          {
+            "en": "clever",
+            "zh": "聪明的"
+          },
+          {
+            "en": "idea",
+            "zh": "想法"
+          },
+          {
+            "en": "jar",
+            "zh": "广口瓶"
+          },
+          {
+            "en": "them",
+            "zh": "他们; 她们; 它们"
+          },
+          {
+            "en": "these",
+            "zh": "这些"
+          },
+          {
+            "en": "bucket",
+            "zh": "桶"
+          },
+          {
+            "en": "pot",
+            "zh": "锅"
+          },
+          {
+            "en": "hit",
+            "zh": "打; 击"
+          },
+          {
+            "en": "beautiful",
+            "zh": "美妙的; 漂亮的"
+          },
+          {
+            "en": "clap",
+            "zh": "鼓掌"
+          },
+          {
+            "en": "musical instrument",
+            "zh": "乐器"
+          }
+        ]
+      },
+      {
+        "unit": 5,
+        "title": "Unit 5",
+        "words": [
+          {
+            "en": "paper-cut",
+            "zh": "剪纸"
+          },
+          {
+            "en": "painting",
+            "zh": "绘画; 画作"
+          },
+          {
+            "en": "circle",
+            "zh": "圆形"
+          },
+          {
+            "en": "triangle",
+            "zh": "三角形"
+          },
+          {
+            "en": "square",
+            "zh": "正方形; 正方形的"
+          },
+          {
+            "en": "star",
+            "zh": "星星; 星形物"
+          },
+          {
+            "en": "rectangle",
+            "zh": "矩形; 长方形"
+          },
+          {
+            "en": "clock",
+            "zh": "钟"
+          },
+          {
+            "en": "shape",
+            "zh": "形状"
+          },
+          {
+            "en": "side",
+            "zh": "边"
+          },
+          {
+            "en": "corner",
+            "zh": "角"
+          },
+          {
+            "en": "ask",
+            "zh": "问"
+          },
+          {
+            "en": "tiger",
+            "zh": "老虎"
+          },
+          {
+            "en": "say",
+            "zh": "说"
+          }
+        ]
+      },
+      {
+        "unit": 6,
+        "title": "Unit 6",
+        "words": [
+          {
+            "en": "day",
+            "zh": "天; 白昼; 白天"
+          },
+          {
+            "en": "night",
+            "zh": "夜晚; 晚上"
+          },
+          {
+            "en": "hour",
+            "zh": "小时"
+          },
+          {
+            "en": "minute",
+            "zh": "分钟"
+          },
+          {
+            "en": "second",
+            "zh": "秒"
+          },
+          {
+            "en": "month",
+            "zh": "月; 月份"
+          },
+          {
+            "en": "year",
+            "zh": "年"
+          },
+          {
+            "en": "measure",
+            "zh": "测量"
+          },
+          {
+            "en": "question",
+            "zh": "问题"
+          },
+          {
+            "en": "around",
+            "zh": "围绕; 环绕"
+          },
+          {
+            "en": "exercise",
+            "zh": "运动; 锻炼"
+          },
+          {
+            "en": "get ready",
+            "zh": "准备好"
+          },
+          {
+            "en": "at the same time",
+            "zh": "同时"
+          },
+          {
+            "en": "What time is it?",
+            "zh": "几点了?"
+          }
+        ]
+      },
+      {
+        "unit": 7,
+        "title": "Unit 7",
+        "words": [
+          {
+            "en": "liquid",
+            "zh": "液体"
+          },
+          {
+            "en": "solid",
+            "zh": "固体"
+          },
+          {
+            "en": "gas",
+            "zh": "气体"
+          },
+          {
+            "en": "sugar",
+            "zh": "食糖"
+          },
+          {
+            "en": "salt",
+            "zh": "盐; 食盐"
+          },
+          {
+            "en": "cream",
+            "zh": "奶油"
+          },
+          {
+            "en": "melt",
+            "zh": "(使) 熔化; 融化"
+          },
+          {
+            "en": "steam",
+            "zh": "水蒸气"
+          },
+          {
+            "en": "heat",
+            "zh": "加热"
+          },
+          {
+            "en": "hungry",
+            "zh": "感到饿的"
+          },
+          {
+            "en": "party",
+            "zh": "聚会; 派对"
+          },
+          {
+            "en": "ice cream",
+            "zh": "冰淇淋"
+          },
+          {
+            "en": "freezer",
+            "zh": "冰柜"
+          },
+          {
+            "en": "door",
+            "zh": "门"
+          },
+          {
+            "en": "open",
+            "zh": "开着的; 敞开的"
+          },
+          {
+            "en": "plastic",
+            "zh": "塑料的"
+          },
+          {
+            "en": "mix",
+            "zh": "(使) 混合"
+          },
+          {
+            "en": "put",
+            "zh": "放"
+          },
+          {
+            "en": "mixture",
+            "zh": "混合物"
+          },
+          {
+            "en": "chocolate",
+            "zh": "巧克力"
+          },
+          {
+            "en": "shake",
+            "zh": "摇动"
+          },
+          {
+            "en": "freeze",
+            "zh": "结冰; 冻住"
+          },
+          {
+            "en": "Sure!",
+            "zh": "当然!"
+          },
+          {
+            "en": "Don't worry!",
+            "zh": "别担心!"
+          },
+          {
+            "en": "Done!",
+            "zh": "做好了!"
+          }
+        ]
+      },
+      {
+        "unit": 8,
+        "title": "Unit 8",
+        "words": [
+          {
+            "en": "polite",
+            "zh": "有礼貌的"
+          },
+          {
+            "en": "take turns",
+            "zh": "轮流"
+          },
+          {
+            "en": "knock",
+            "zh": "敲击"
+          },
+          {
+            "en": "ox",
+            "zh": "公牛"
+          },
+          {
+            "en": "until",
+            "zh": "直到……为止"
+          },
+          {
+            "en": "someone",
+            "zh": "某人"
+          },
+          {
+            "en": "invite",
+            "zh": "邀请"
+          },
+          {
+            "en": "behind",
+            "zh": "在……之后"
+          },
+          {
+            "en": "maybe",
+            "zh": "(不确定) 大概, 可能"
+          },
+          {
+            "en": "cry",
+            "zh": "哭泣"
+          },
+          {
+            "en": "kind",
+            "zh": "友善的"
+          },
+          {
+            "en": "honey",
+            "zh": "蜂蜜"
+          },
+          {
+            "en": "joke",
+            "zh": "笑话; 玩笑"
+          },
+          {
+            "en": "whatever",
+            "zh": "无论什么"
+          },
+          {
+            "en": "another",
+            "zh": "另一个"
+          },
+          {
+            "en": "helpful",
+            "zh": "愿意帮忙的"
+          },
+          {
+            "en": "way",
+            "zh": "方法; 方式"
+          },
+          {
+            "en": "May I come in?",
+            "zh": "我可以进来吗?"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 5,
+    "term": 1,
+    "source": "https://yyld.51jiaoxi.com/wushang/hjbsz_danci.html",
+    "units": [
+      {
+        "unit": 1,
+        "title": "Unit 1",
+        "words": [
+          {
+            "en": "go jogging",
+            "zh": "去慢跑"
+          },
+          {
+            "en": "go fishing",
+            "zh": "去钓鱼"
+          },
+          {
+            "en": "do chores",
+            "zh": "做家务"
+          },
+          {
+            "en": "watch TV",
+            "zh": "看电视"
+          },
+          {
+            "en": "play with friends",
+            "zh": "和朋友一起玩"
+          },
+          {
+            "en": "have a picnic",
+            "zh": "野餐"
+          },
+          {
+            "en": "busy",
+            "zh": "忙碌的"
+          },
+          {
+            "en": "weekend",
+            "zh": "周末"
+          },
+          {
+            "en": "plan",
+            "zh": "计划"
+          },
+          {
+            "en": "early",
+            "zh": "早的"
+          },
+          {
+            "en": "catch",
+            "zh": "抓住"
+          },
+          {
+            "en": "any",
+            "zh": "任何"
+          },
+          {
+            "en": "robot",
+            "zh": "机器人"
+          },
+          {
+            "en": "sock",
+            "zh": "袜子"
+          },
+          {
+            "en": "sweep",
+            "zh": "打扫；清扫"
+          },
+          {
+            "en": "warm up",
+            "zh": "热身"
+          },
+          {
+            "en": "more ... than",
+            "zh": "超过；比⋯⋯更⋯⋯"
+          }
+        ]
+      },
+      {
+        "unit": 2,
+        "title": "Unit 2",
+        "words": [
+          {
+            "en": "do exercise",
+            "zh": "做运动"
+          },
+          {
+            "en": "eat healthy food",
+            "zh": "吃健康的食物"
+          },
+          {
+            "en": "drink a lot of water",
+            "zh": "多喝水"
+          },
+          {
+            "en": "get enough sleep",
+            "zh": "保证充足的睡眠"
+          },
+          {
+            "en": "strong",
+            "zh": "强壮的"
+          },
+          {
+            "en": "poster",
+            "zh": "海报"
+          },
+          {
+            "en": "about",
+            "zh": "关于"
+          },
+          {
+            "en": "habit",
+            "zh": "习惯"
+          },
+          {
+            "en": "junk food",
+            "zh": "垃圾食品"
+          },
+          {
+            "en": "must",
+            "zh": "必须"
+          },
+          {
+            "en": "less",
+            "zh": "更少的"
+          },
+          {
+            "en": "hard",
+            "zh": "难的"
+          },
+          {
+            "en": "try",
+            "zh": "尝试"
+          },
+          {
+            "en": "lie",
+            "zh": "躺"
+          },
+          {
+            "en": "stay",
+            "zh": "保持；待；暂住"
+          },
+          {
+            "en": "ill",
+            "zh": "生病的"
+          },
+          {
+            "en": "a glass of",
+            "zh": "一杯"
+          },
+          {
+            "en": "Me too.",
+            "zh": "我也是。"
+          }
+        ]
+      },
+      {
+        "unit": 3,
+        "title": "Unit 3",
+        "words": [
+          {
+            "en": "north",
+            "zh": "北方"
+          },
+          {
+            "en": "south",
+            "zh": "南方"
+          },
+          {
+            "en": "east",
+            "zh": "东方"
+          },
+          {
+            "en": "west",
+            "zh": "西方"
+          },
+          {
+            "en": "capital",
+            "zh": "首都"
+          },
+          {
+            "en": "museum",
+            "zh": "博物馆"
+          },
+          {
+            "en": "palace",
+            "zh": "王宫；宫殿"
+          },
+          {
+            "en": "tourist",
+            "zh": "游客"
+          },
+          {
+            "en": "visit",
+            "zh": "参观；拜访"
+          },
+          {
+            "en": "northwest",
+            "zh": "西北"
+          },
+          {
+            "en": "across",
+            "zh": "穿过"
+          },
+          {
+            "en": "fish and chips",
+            "zh": "炸鱼薯条"
+          },
+          {
+            "en": "popular",
+            "zh": "流行的；受欢迎的"
+          },
+          {
+            "en": "wine",
+            "zh": "葡萄酒"
+          },
+          {
+            "en": "on foot",
+            "zh": "步行"
+          }
+        ]
+      },
+      {
+        "unit": 4,
+        "title": "Unit 4",
+        "words": [
+          {
+            "en": "mountain",
+            "zh": "山"
+          },
+          {
+            "en": "cave",
+            "zh": "洞穴"
+          },
+          {
+            "en": "waterfall",
+            "zh": "瀑布"
+          },
+          {
+            "en": "hotel",
+            "zh": "酒店"
+          },
+          {
+            "en": "holiday",
+            "zh": "假期"
+          },
+          {
+            "en": "will",
+            "zh": "将；将要"
+          },
+          {
+            "en": "soon",
+            "zh": "很快；马上"
+          },
+          {
+            "en": "shall",
+            "zh": "（表示将来的可能性）将"
+          },
+          {
+            "en": "high-speed train",
+            "zh": "高铁"
+          },
+          {
+            "en": "explore",
+            "zh": "探索"
+          },
+          {
+            "en": "pagoda",
+            "zh": "塔"
+          },
+          {
+            "en": "cave house",
+            "zh": "窑洞"
+          },
+          {
+            "en": "famous",
+            "zh": "著名的"
+          },
+          {
+            "en": "deep-fried cake",
+            "zh": "油炸糕"
+          },
+          {
+            "en": "wonderful",
+            "zh": "令人惊奇的；令人赞叹的"
+          },
+          {
+            "en": "view",
+            "zh": "景色；风景"
+          },
+          {
+            "en": "It sounds great.",
+            "zh": "听起来很棒。"
+          },
+          {
+            "en": "I can't wait to go!",
+            "zh": "我等不及要去了！"
+          }
+        ]
+      },
+      {
+        "unit": 5,
+        "title": "Unit 5",
+        "words": [
+          {
+            "en": "get sunlight",
+            "zh": "获取阳光"
+          },
+          {
+            "en": "get food and water",
+            "zh": "获取食物和水"
+          },
+          {
+            "en": "grow",
+            "zh": "生长"
+          },
+          {
+            "en": "change",
+            "zh": "变化"
+          },
+          {
+            "en": "move",
+            "zh": "移动"
+          },
+          {
+            "en": "living",
+            "zh": "有生命的"
+          },
+          {
+            "en": "non-living",
+            "zh": "无生命的"
+          },
+          {
+            "en": "thing",
+            "zh": "东西"
+          },
+          {
+            "en": "air",
+            "zh": "空气"
+          },
+          {
+            "en": "by themselves",
+            "zh": "独自地；无需外力地"
+          },
+          {
+            "en": "important",
+            "zh": "重要的"
+          },
+          {
+            "en": "by itself",
+            "zh": "独自地；无需外力地"
+          },
+          {
+            "en": "look around",
+            "zh": "环顾"
+          }
+        ]
+      },
+      {
+        "unit": 6,
+        "title": "Unit 6",
+        "words": [
+          {
+            "en": "smoke",
+            "zh": "烟"
+          },
+          {
+            "en": "dirty",
+            "zh": "脏的"
+          },
+          {
+            "en": "rubbish",
+            "zh": "垃圾"
+          },
+          {
+            "en": "recycle",
+            "zh": "回收利用"
+          },
+          {
+            "en": "reduce",
+            "zh": "减少"
+          },
+          {
+            "en": "natural resources",
+            "zh": "自然资源"
+          },
+          {
+            "en": "call",
+            "zh": "把⋯⋯叫作"
+          },
+          {
+            "en": "wood",
+            "zh": "木材"
+          },
+          {
+            "en": "land",
+            "zh": "土地"
+          },
+          {
+            "en": "why",
+            "zh": "为什么"
+          },
+          {
+            "en": "clean",
+            "zh": "干净的"
+          },
+          {
+            "en": "hurt",
+            "zh": "伤害"
+          },
+          {
+            "en": "factory",
+            "zh": "工厂"
+          },
+          {
+            "en": "near",
+            "zh": "在⋯⋯附近"
+          },
+          {
+            "en": "those",
+            "zh": "那些"
+          },
+          {
+            "en": "turn off",
+            "zh": "关掉"
+          }
+        ]
+      },
+      {
+        "unit": 7,
+        "title": "Unit 7",
+        "words": [
+          {
+            "en": "aunt",
+            "zh": "阿姨；姑母；姨母；伯母；舅母；婶母"
+          },
+          {
+            "en": "uncle",
+            "zh": "舅父；叔父；伯父；姑父；姨父"
+          },
+          {
+            "en": "together",
+            "zh": "一起"
+          },
+          {
+            "en": "celebrate",
+            "zh": "庆祝"
+          },
+          {
+            "en": "main",
+            "zh": "主要的"
+          },
+          {
+            "en": "eve",
+            "zh": "前夕"
+          },
+          {
+            "en": "stocking",
+            "zh": "长筒袜"
+          },
+          {
+            "en": "visit relatives",
+            "zh": "拜访亲戚；探亲"
+          },
+          {
+            "en": "eat mooncakes",
+            "zh": "吃月饼"
+          },
+          {
+            "en": "have a dragon boat race",
+            "zh": "进行龙舟比赛"
+          },
+          {
+            "en": "watch lanterns",
+            "zh": "赏花灯"
+          },
+          {
+            "en": "next month",
+            "zh": "下个月"
+          },
+          {
+            "en": "make jiaozi",
+            "zh": "包饺子"
+          },
+          {
+            "en": "watch a lion dance",
+            "zh": "观看舞狮表演"
+          },
+          {
+            "en": "have a big meal",
+            "zh": "吃大餐"
+          },
+          {
+            "en": "put up",
+            "zh": "搭建；张贴；挂起"
+          }
+        ]
+      },
+      {
+        "unit": 8,
+        "title": "Unit 8",
+        "words": [
+          {
+            "en": "fast",
+            "zh": "快的"
+          },
+          {
+            "en": "slow",
+            "zh": "慢的"
+          },
+          {
+            "en": "excited",
+            "zh": "兴奋的"
+          },
+          {
+            "en": "unhappy",
+            "zh": "不开心的"
+          },
+          {
+            "en": "feel",
+            "zh": "觉得；感到"
+          },
+          {
+            "en": "feeling",
+            "zh": "感情；情绪"
+          },
+          {
+            "en": "relaxed",
+            "zh": "放松的"
+          },
+          {
+            "en": "person",
+            "zh": "人"
+          },
+          {
+            "en": "imagination",
+            "zh": "想象；想象力"
+          },
+          {
+            "en": "imagine",
+            "zh": "想象"
+          },
+          {
+            "en": "all over the world",
+            "zh": "世界各地"
+          },
+          {
+            "en": "Proper nouns",
+            "zh": "专有名词"
+          },
+          {
+            "en": "China",
+            "zh": "中国"
+          },
+          {
+            "en": "France",
+            "zh": "法国"
+          },
+          {
+            "en": "UK",
+            "zh": "英国"
+          },
+          {
+            "en": "Paris",
+            "zh": "巴黎"
+          },
+          {
+            "en": "the Eiffel Tower",
+            "zh": "埃菲尔铁塔"
+          },
+          {
+            "en": "Big Ben",
+            "zh": "大本钟"
+          },
+          {
+            "en": "Venice",
+            "zh": "威尼斯"
+          },
+          {
+            "en": "Italy",
+            "zh": "意大利"
+          },
+          {
+            "en": "Suzhou",
+            "zh": "苏州"
+          },
+          {
+            "en": "Asia",
+            "zh": "亚洲"
+          },
+          {
+            "en": "the Great Wall",
+            "zh": "长城"
+          },
+          {
+            "en": "Beijing roast duck",
+            "zh": "北京烤鸭"
+          },
+          {
+            "en": "Europe",
+            "zh": "欧洲"
+          },
+          {
+            "en": "London",
+            "zh": "伦敦"
+          },
+          {
+            "en": "Tower Bridge",
+            "zh": "伦敦塔桥"
+          },
+          {
+            "en": "the British Museum",
+            "zh": "大英博物馆"
+          },
+          {
+            "en": "the Louvre Museum",
+            "zh": "卢浮宫"
+          },
+          {
+            "en": "India",
+            "zh": "印度"
+          },
+          {
+            "en": "Japan",
+            "zh": "日本"
+          },
+          {
+            "en": "Canada",
+            "zh": "加拿大"
+          },
+          {
+            "en": "North America",
+            "zh": "北美洲"
+          },
+          {
+            "en": "Harbin",
+            "zh": "哈尔滨"
+          },
+          {
+            "en": "the Ice and Snow World",
+            "zh": "冰雪大世界"
+          },
+          {
+            "en": "the Northeast Tiger Forest Park",
+            "zh": "东北虎林园"
+          },
+          {
+            "en": "Mount Lushan",
+            "zh": "庐山"
+          },
+          {
+            "en": "the Milky Way",
+            "zh": "银河"
+          },
+          {
+            "en": "Yan'an",
+            "zh": "延安"
+          },
+          {
+            "en": "Yan'an Revolutionary Memorial Hall",
+            "zh": "延安革命纪念馆"
+          },
+          {
+            "en": "Pagoda Hill",
+            "zh": "宝塔山"
+          },
+          {
+            "en": "the Hukou Waterfall",
+            "zh": "壶口瀑布"
+          },
+          {
+            "en": "Shaanxi Province",
+            "zh": "陕西省"
+          },
+          {
+            "en": "the Yellow River",
+            "zh": "黄河"
+          },
+          {
+            "en": "the Palace Museum",
+            "zh": "故宫博物院"
+          },
+          {
+            "en": "Sanya",
+            "zh": "三亚"
+          },
+          {
+            "en": "Spring Festival",
+            "zh": "春节"
+          },
+          {
+            "en": "Lantern Festival",
+            "zh": "元宵节"
+          },
+          {
+            "en": "Dragon Boat Festival",
+            "zh": "端午节"
+          },
+          {
+            "en": "Mid-Autumn Festival",
+            "zh": "中秋节"
+          },
+          {
+            "en": "Christmas",
+            "zh": "圣诞节"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 5,
+    "term": 2,
+    "source": "https://yyld.51jiaoxi.com/wuxia/hjbsz_danci.html",
+    "units": [
+      {
+        "unit": 1,
+        "title": "Unit 1 tidy up!",
+        "words": [
+          {
+            "en": "tidy",
+            "zh": "整理：整洁的"
+          },
+          {
+            "en": "mess",
+            "zh": "脏乱，不整洁"
+          },
+          {
+            "en": "let",
+            "zh": "让"
+          },
+          {
+            "en": "sock",
+            "zh": "短袜"
+          },
+          {
+            "en": "yours",
+            "zh": "你的；你们的"
+          },
+          {
+            "en": "cap",
+            "zh": "帽子"
+          },
+          {
+            "en": "mine",
+            "zh": "我的"
+          },
+          {
+            "en": "crayon",
+            "zh": "彩色蜡笔(或粉笔、铅笔)"
+          },
+          {
+            "en": "umbrella",
+            "zh": "伞"
+          },
+          {
+            "en": "nail",
+            "zh": "指甲"
+          },
+          {
+            "en": "drop",
+            "zh": "使落下：掉落"
+          },
+          {
+            "en": "stick",
+            "zh": "粘贴；粘住"
+          },
+          {
+            "en": "second",
+            "zh": "秒(时间单位)"
+          },
+          {
+            "en": "hers",
+            "zh": "她的"
+          },
+          {
+            "en": "theirs",
+            "zh": "他们的；她们的；它们的"
+          },
+          {
+            "en": "tidy up",
+            "zh": "把……整理好"
+          },
+          {
+            "en": "(be) full of",
+            "zh": "装满……；充满"
+          },
+          {
+            "en": "a few",
+            "zh": "几个； 一些"
+          }
+        ]
+      },
+      {
+        "unit": 2,
+        "title": "Unit 2 our new home",
+        "words": [
+          {
+            "en": "why",
+            "zh": "为什么"
+          },
+          {
+            "en": "because",
+            "zh": "因为"
+          },
+          {
+            "en": "study",
+            "zh": "书房；学习"
+          },
+          {
+            "en": "dining room",
+            "zh": "餐室；餐厅"
+          },
+          {
+            "en": "wild goose",
+            "zh": "大雁(复数wild geese)"
+          },
+          {
+            "en": "change",
+            "zh": "改变；变化"
+          },
+          {
+            "en": "place",
+            "zh": "地方"
+          },
+          {
+            "en": "twice",
+            "zh": "两次"
+          },
+          {
+            "en": "every",
+            "zh": "每；每个"
+          },
+          {
+            "en": "north",
+            "zh": "北方；向北"
+          },
+          {
+            "en": "south",
+            "zh": "南方：向南"
+          },
+          {
+            "en": "enough",
+            "zh": "足够的"
+          },
+          {
+            "en": "then",
+            "zh": "然后"
+          },
+          {
+            "en": "all day",
+            "zh": "一天到晚"
+          }
+        ]
+      },
+      {
+        "unit": 3,
+        "title": "Unit 3 in the future",
+        "words": [
+          {
+            "en": "future",
+            "zh": "将来；未来"
+          },
+          {
+            "en": "stand",
+            "zh": "站，站住"
+          },
+          {
+            "en": "machine",
+            "zh": "机器"
+          },
+          {
+            "en": "will",
+            "zh": "将，将会"
+          },
+          {
+            "en": "exercise",
+            "zh": "运动，锻炼，活动"
+          },
+          {
+            "en": "early",
+            "zh": "早；提早"
+          },
+          {
+            "en": "easily",
+            "zh": "容易地"
+          },
+          {
+            "en": "hard",
+            "zh": "努力地"
+          },
+          {
+            "en": "more",
+            "zh": "更多的"
+          },
+          {
+            "en": "in the future",
+            "zh": "将来"
+          },
+          {
+            "en": "in front of",
+            "zh": "在……前面"
+          },
+          {
+            "en": "take a photo",
+            "zh": "拍照"
+          },
+          {
+            "en": "wear glasses",
+            "zh": "戴眼镜"
+          },
+          {
+            "en": "do exercise",
+            "zh": "做运动"
+          },
+          {
+            "en": "(be) weak in",
+            "zh": "不擅长"
+          },
+          {
+            "en": "not …any more",
+            "zh": "不再"
+          }
+        ]
+      },
+      {
+        "unit": 4,
+        "title": "Unit 4 reading is fun",
+        "words": [
+          {
+            "en": "storybook",
+            "zh": "故事书"
+          },
+          {
+            "en": "buy",
+            "zh": "买"
+          },
+          {
+            "en": "story",
+            "zh": "故事"
+          },
+          {
+            "en": "dictionary",
+            "zh": "字典； 词典"
+          },
+          {
+            "en": "magazine",
+            "zh": "杂志"
+          },
+          {
+            "en": "newspaper",
+            "zh": "报纸"
+          },
+          {
+            "en": "week",
+            "zh": "周； 星期"
+          },
+          {
+            "en": "student",
+            "zh": "学生"
+          },
+          {
+            "en": "poster",
+            "zh": "海报"
+          },
+          {
+            "en": "best",
+            "zh": "最好的"
+          },
+          {
+            "en": "writer",
+            "zh": "作家"
+          },
+          {
+            "en": "over there",
+            "zh": "在那边"
+          },
+          {
+            "en": "do a survey",
+            "zh": "做调查"
+          },
+          {
+            "en": "act…out",
+            "zh": "表演"
+          }
+        ]
+      },
+      {
+        "unit": 5,
+        "title": "Unit 5 at the weekend",
+        "words": [
+          {
+            "en": "weekend",
+            "zh": "周末"
+          },
+          {
+            "en": "stay",
+            "zh": "待； 暂住； 逗留"
+          },
+          {
+            "en": "film",
+            "zh": "电影"
+          },
+          {
+            "en": "boat",
+            "zh": "小船； 舟"
+          },
+          {
+            "en": "plan",
+            "zh": "安排；计划"
+          },
+          {
+            "en": "tomorrow",
+            "zh": "明天"
+          },
+          {
+            "en": "build",
+            "zh": "建筑； 建造"
+          },
+          {
+            "en": "next",
+            "zh": "紧接着； 随后； 紧接着的"
+          },
+          {
+            "en": "swing",
+            "zh": "秋千"
+          },
+          {
+            "en": "cry",
+            "zh": "哭； 喊叫"
+          },
+          {
+            "en": "until",
+            "zh": "直到"
+          },
+          {
+            "en": "see a film",
+            "zh": "看电影"
+          },
+          {
+            "en": "row a boat",
+            "zh": "划船"
+          }
+        ]
+      },
+      {
+        "unit": 6,
+        "title": "Unit 6 holiday",
+        "words": [
+          {
+            "en": "holiday",
+            "zh": "假日；假期"
+          },
+          {
+            "en": "clear",
+            "zh": "清澈的"
+          },
+          {
+            "en": "seafood",
+            "zh": "海鲜"
+          },
+          {
+            "en": "hotel",
+            "zh": "旅馆"
+          },
+          {
+            "en": "island",
+            "zh": "岛"
+          },
+          {
+            "en": "butterfly",
+            "zh": "蝴蝶"
+          },
+          {
+            "en": "how long",
+            "zh": "多久"
+          },
+          {
+            "en": "go swimming",
+            "zh": "去游泳"
+          },
+          {
+            "en": "in the south of",
+            "zh": "在……的南部"
+          },
+          {
+            "en": "all year round",
+            "zh": "一年到头"
+          }
+        ]
+      },
+      {
+        "unit": 7,
+        "title": "Unit 7 open day",
+        "words": [
+          {
+            "en": "meet",
+            "zh": "迎接；会见"
+          },
+          {
+            "en": "school gate",
+            "zh": "校门；校门口"
+          },
+          {
+            "en": "art room",
+            "zh": "美术室"
+          },
+          {
+            "en": "hall",
+            "zh": "礼堂"
+          },
+          {
+            "en": "finally",
+            "zh": "最后"
+          },
+          {
+            "en": "meeting room",
+            "zh": "会客室；会议室"
+          },
+          {
+            "en": "show",
+            "zh": "给……看"
+          },
+          {
+            "en": "project",
+            "zh": "课题"
+          },
+          {
+            "en": "board",
+            "zh": "布告牌；木板"
+          }
+        ]
+      },
+      {
+        "unit": 8,
+        "title": "Unit 8 buying clothes",
+        "words": [
+          {
+            "en": "which",
+            "zh": "哪一个； 哪一些"
+          },
+          {
+            "en": "trousers",
+            "zh": "裤子"
+          },
+          {
+            "en": "size",
+            "zh": "尺码"
+          },
+          {
+            "en": "sweater",
+            "zh": "毛衣"
+          },
+          {
+            "en": "coat",
+            "zh": "外套； 大衣"
+          },
+          {
+            "en": "shoe",
+            "zh": "鞋"
+          },
+          {
+            "en": "emperor",
+            "zh": "皇帝"
+          },
+          {
+            "en": "only",
+            "zh": "只有；仅"
+          },
+          {
+            "en": "nod",
+            "zh": "点头"
+          },
+          {
+            "en": "smile",
+            "zh": "笑容；微笑"
+          },
+          {
+            "en": "money",
+            "zh": "钱"
+          },
+          {
+            "en": "keep",
+            "zh": "保持"
+          },
+          {
+            "en": "laugh",
+            "zh": "大笑"
+          },
+          {
+            "en": "try … on",
+            "zh": "试穿（衣物）"
+          },
+          {
+            "en": "put…on",
+            "zh": "穿； 戴"
+          },
+          {
+            "en": "keep quiet",
+            "zh": "保持安静"
+          },
+          {
+            "en": "have a look",
+            "zh": "看一看"
+          }
+        ]
+      },
+      {
+        "unit": 9,
+        "title": "Unit 9 seeing the doctor",
+        "words": [
+          {
+            "en": "ill",
+            "zh": "生病的；不舒服"
+          },
+          {
+            "en": "wrong",
+            "zh": "有毛病；不正常；错误的"
+          },
+          {
+            "en": "headache",
+            "zh": "头痛"
+          },
+          {
+            "en": "fever",
+            "zh": "发烧； 发热"
+          },
+          {
+            "en": "should",
+            "zh": "应该"
+          },
+          {
+            "en": "medicine",
+            "zh": "药"
+          },
+          {
+            "en": "rest",
+            "zh": "休息"
+          },
+          {
+            "en": "toothache",
+            "zh": "牙痛"
+          },
+          {
+            "en": "toothless",
+            "zh": "没有牙齿的"
+          },
+          {
+            "en": "present",
+            "zh": "礼物"
+          },
+          {
+            "en": "world",
+            "zh": "世界"
+          },
+          {
+            "en": "dentist",
+            "zh": "牙医"
+          },
+          {
+            "en": "have a headache",
+            "zh": "头疼"
+          },
+          {
+            "en": "have a fever",
+            "zh": "发烧"
+          },
+          {
+            "en": "have a cold",
+            "zh": "感冒"
+          },
+          {
+            "en": "have a rest",
+            "zh": "休息一下"
+          },
+          {
+            "en": "get well",
+            "zh": "康复"
+          },
+          {
+            "en": "have a toothache",
+            "zh": "牙疼"
+          },
+          {
+            "en": "have a meeting",
+            "zh": "开会"
+          },
+          {
+            "en": "pull…out",
+            "zh": "把…拔出"
+          }
+        ]
+      },
+      {
+        "unit": 10,
+        "title": "Unit 10 great inventions",
+        "words": [
+          {
+            "en": "invention",
+            "zh": "发明；创造"
+          },
+          {
+            "en": "watch",
+            "zh": "手表"
+          },
+          {
+            "en": "anywhere",
+            "zh": "任何地方"
+          },
+          {
+            "en": "travel",
+            "zh": "旅行； 长途行走"
+          },
+          {
+            "en": "invent",
+            "zh": "发明"
+          },
+          {
+            "en": "something",
+            "zh": "某事； 某物"
+          },
+          {
+            "en": "myself",
+            "zh": "我自己"
+          },
+          {
+            "en": "camera",
+            "zh": "相机"
+          },
+          {
+            "en": "far away from …",
+            "zh": "远离 …"
+          }
+        ]
+      },
+      {
+        "unit": 11,
+        "title": "Unit 11 chinese festival",
+        "words": [
+          {
+            "en": "festival",
+            "zh": "节日"
+          },
+          {
+            "en": "important",
+            "zh": "重要的"
+          },
+          {
+            "en": "call",
+            "zh": "把…叫做"
+          },
+          {
+            "en": "dumpling",
+            "zh": "饺子"
+          },
+          {
+            "en": "relative",
+            "zh": "亲戚"
+          },
+          {
+            "en": "red packet",
+            "zh": "红包"
+          },
+          {
+            "en": "firework",
+            "zh": "烟火； 烟花"
+          },
+          {
+            "en": "monster",
+            "zh": "怪物"
+          },
+          {
+            "en": "end",
+            "zh": "结尾； 结束"
+          },
+          {
+            "en": "village",
+            "zh": "村庄"
+          },
+          {
+            "en": "last",
+            "zh": "最后的"
+          },
+          {
+            "en": "firecracker",
+            "zh": "鞭炮；爆竹"
+          },
+          {
+            "en": "mooncake",
+            "zh": "月饼"
+          }
+        ]
+      },
+      {
+        "unit": 12,
+        "title": "Unit 12 the giant's garden",
+        "words": [
+          {
+            "en": "at the end of …",
+            "zh": "在……的最后"
+          },
+          {
+            "en": "giant",
+            "zh": "巨人"
+          },
+          {
+            "en": "wall",
+            "zh": "墙； 围墙"
+          },
+          {
+            "en": "kind",
+            "zh": "友好的；体贴的"
+          },
+          {
+            "en": "through",
+            "zh": "穿过"
+          },
+          {
+            "en": "no entry",
+            "zh": "禁止进入"
+          },
+          {
+            "en": "(be) kind to …",
+            "zh": "对…友好"
+          },
+          {
+            "en": "knock down",
+            "zh": "推倒；拆掉"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 6,
+    "term": 1,
+    "source": "https://yyld.51jiaoxi.com/liushang/hjbsz_danci.html",
+    "units": [
+      {
+        "unit": 1,
+        "title": "Unit 1 Why do people move to new places?",
+        "words": [
+          {
+            "en": "meet the neighbours",
+            "zh": "phr.结识邻居"
+          },
+          {
+            "en": "make new friends",
+            "zh": "phr.交新朋友"
+          },
+          {
+            "en": "go ice skating",
+            "zh": "phr.去滑冰"
+          },
+          {
+            "en": "throw snowballs",
+            "zh": "phr.扔雪球"
+          },
+          {
+            "en": "ago",
+            "zh": "adv.以前"
+          },
+          {
+            "en": "postcard",
+            "zh": "n.明信片"
+          },
+          {
+            "en": "lonely",
+            "zh": "adj.孤独的"
+          },
+          {
+            "en": "miss",
+            "zh": "v.想念"
+          },
+          {
+            "en": "PS",
+            "zh": "n.附言"
+          },
+          {
+            "en": "homeless",
+            "zh": "adj.无家可归的"
+          },
+          {
+            "en": "ski",
+            "zh": "v./n.滑雪"
+          },
+          {
+            "en": "raise money",
+            "zh": "phr.募捐钱"
+          },
+          {
+            "en": "I'm so excited!",
+            "zh": "sent.我太激动了！"
+          }
+        ]
+      },
+      {
+        "unit": 2,
+        "title": "Unit 2 Why do we make art?",
+        "words": [
+          {
+            "en": "ink painting",
+            "zh": "phra.水墨画"
+          },
+          {
+            "en": "oil painting",
+            "zh": "phr.油画"
+          },
+          {
+            "en": "artist",
+            "zh": "n.艺术家"
+          },
+          {
+            "en": "paintbrush",
+            "zh": "n.画笔"
+          },
+          {
+            "en": "powerful",
+            "zh": "adj.有力量的"
+          },
+          {
+            "en": "express",
+            "zh": "v.表达"
+          },
+          {
+            "en": "painter",
+            "zh": "n.画家"
+          },
+          {
+            "en": "own",
+            "zh": "adj.自己的"
+          },
+          {
+            "en": "anyone",
+            "zh": "pron.任何人"
+          },
+          {
+            "en": "share",
+            "zh": "v.分享"
+          },
+          {
+            "en": "touch one's heart",
+            "zh": "phr.打动某人的心"
+          },
+          {
+            "en": "show one's feelings",
+            "zh": "phr.表现某人的情感"
+          },
+          {
+            "en": "be famous for",
+            "zh": "phr.因…… 而出名"
+          }
+        ]
+      },
+      {
+        "unit": 3,
+        "title": "Unit 3 How should we protect ourselves?",
+        "words": [
+          {
+            "en": "protect",
+            "zh": "v.保护"
+          },
+          {
+            "en": "warm up",
+            "zh": "phr.热身"
+          },
+          {
+            "en": "get hurt",
+            "zh": "phr.受伤"
+          },
+          {
+            "en": "call for help",
+            "zh": "phr.呼叫救援"
+          },
+          {
+            "en": "break",
+            "zh": "v.（使）破，裂，碎"
+          },
+          {
+            "en": "arm",
+            "zh": "n.手臂"
+          },
+          {
+            "en": "skatepark",
+            "zh": "n.滑板运动场"
+          },
+          {
+            "en": "luckily",
+            "zh": "adv.幸好"
+          },
+          {
+            "en": "helmet",
+            "zh": "n.头盔"
+          },
+          {
+            "en": "pad",
+            "zh": "n.防护垫"
+          },
+          {
+            "en": "call an ambulance",
+            "zh": "phr.叫救护车"
+          },
+          {
+            "en": "check injuries",
+            "zh": "phr.检查受伤情况"
+          },
+          {
+            "en": "emergency worker",
+            "zh": "phr.应急工作人员"
+          },
+          {
+            "en": "X-ray",
+            "zh": "n.X 光检查"
+          },
+          {
+            "en": "choose",
+            "zh": "v.选择"
+          },
+          {
+            "en": "lost",
+            "zh": "adj.迷路的"
+          }
+        ]
+      },
+      {
+        "unit": 4,
+        "title": "Unit 4 What makes things move?",
+        "words": [
+          {
+            "en": "push",
+            "zh": "v.推"
+          },
+          {
+            "en": "pull",
+            "zh": "v.拉"
+          },
+          {
+            "en": "heavy",
+            "zh": "adj.重的"
+          },
+          {
+            "en": "light",
+            "zh": "adj.轻的"
+          },
+          {
+            "en": "easy",
+            "zh": "adj.容易的"
+          },
+          {
+            "en": "difficult",
+            "zh": "adj.难的"
+          },
+          {
+            "en": "win",
+            "zh": "v.获胜"
+          },
+          {
+            "en": "force",
+            "zh": "n.力"
+          },
+          {
+            "en": "movement",
+            "zh": "n.移动"
+          },
+          {
+            "en": "towards",
+            "zh": "prep.向；朝"
+          },
+          {
+            "en": "cause",
+            "zh": "n./v.起因；引起"
+          },
+          {
+            "en": "speed",
+            "zh": "n.速度"
+          },
+          {
+            "en": "tortoise",
+            "zh": "n.陆龟；龟"
+          },
+          {
+            "en": "yourself",
+            "zh": "pron.你自己"
+          }
+        ]
+      },
+      {
+        "unit": 5,
+        "title": "Unit 5 How do inventions change our lives?",
+        "words": [
+          {
+            "en": "invention",
+            "zh": "n.发明"
+          },
+          {
+            "en": "slide",
+            "zh": "n.滑梯"
+          },
+          {
+            "en": "seesaw",
+            "zh": "n.跷跷板"
+          },
+          {
+            "en": "watch",
+            "zh": "n.手表"
+          },
+          {
+            "en": "lever",
+            "zh": "n.杠杆"
+          },
+          {
+            "en": "wheel",
+            "zh": "n.轮子"
+          },
+          {
+            "en": "simple",
+            "zh": "adj.简单的"
+          },
+          {
+            "en": "machine",
+            "zh": "n.机器"
+          },
+          {
+            "en": "basic",
+            "zh": "adj.基本的；基础的"
+          },
+          {
+            "en": "everyday",
+            "zh": "adj.每天的"
+          },
+          {
+            "en": "playground",
+            "zh": "n.游乐场"
+          },
+          {
+            "en": "point",
+            "zh": "n.尖端；点"
+          },
+          {
+            "en": "truck",
+            "zh": "n.卡车"
+          },
+          {
+            "en": "inside",
+            "zh": "prep./adv.在…… 里"
+          },
+          {
+            "en": "tiny",
+            "zh": "adj.极小的"
+          },
+          {
+            "en": "ramp",
+            "zh": "n.斜坡；坡道"
+          },
+          {
+            "en": "wheelchair",
+            "zh": "n.轮椅"
+          },
+          {
+            "en": "hill",
+            "zh": "n.山丘；小山"
+          },
+          {
+            "en": "nature",
+            "zh": "n.自然界；大自然"
+          },
+          {
+            "en": "board",
+            "zh": "n.木板"
+          },
+          {
+            "en": "push down",
+            "zh": "phr.向下按压"
+          }
+        ]
+      },
+      {
+        "unit": 6,
+        "title": "Unit 6 What is a city?",
+        "words": [
+          {
+            "en": "shopping centre",
+            "zh": "phr.购物中心"
+          },
+          {
+            "en": "art gallery",
+            "zh": "phr.美术馆"
+          },
+          {
+            "en": "amusement park",
+            "zh": "phr.游乐园"
+          },
+          {
+            "en": "historic building",
+            "zh": "phr.历史建筑"
+          },
+          {
+            "en": "modern building",
+            "zh": "phr.现代建筑"
+          },
+          {
+            "en": "snapshot",
+            "zh": "n.快照；简介"
+          },
+          {
+            "en": "nobody",
+            "zh": "pron.无人"
+          },
+          {
+            "en": "bored",
+            "zh": "adj.厌倦的"
+          },
+          {
+            "en": "emperor",
+            "zh": "n.皇帝"
+          },
+          {
+            "en": "once",
+            "zh": "adv.曾经"
+          },
+          {
+            "en": "opera",
+            "zh": "n.歌剧"
+          },
+          {
+            "en": "sell",
+            "zh": "v.出售"
+          },
+          {
+            "en": "a mix of",
+            "zh": "phr. ……的混合"
+          },
+          {
+            "en": "thousands of",
+            "zh": "phr.成千上万的"
+          },
+          {
+            "en": "take a trip",
+            "zh": "phr.去旅行"
+          },
+          {
+            "en": "a drop of",
+            "zh": "phr.一滴"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 6,
+    "term": 2,
+    "source": "https://yyld.51jiaoxi.com/liuxia/hjbsz_danci.html",
+    "units": [
+      {
+        "unit": 1,
+        "title": "Unit 1 you and me",
+        "words": [
+          {
+            "en": "weigh",
+            "zh": "有……重； 重"
+          },
+          {
+            "en": "kilogram",
+            "zh": "千克；公斤（缩略形式kg）"
+          },
+          {
+            "en": "centimeter",
+            "zh": "厘米（缩略形式 cm）"
+          },
+          {
+            "en": "taller",
+            "zh": "更高的"
+          },
+          {
+            "en": "fan",
+            "zh": "（足球 、电影等） 迷；爱好者"
+          },
+          {
+            "en": "fantastic",
+            "zh": "极好的"
+          },
+          {
+            "en": "themselves",
+            "zh": "他们自己； 她们自己；它们自己"
+          },
+          {
+            "en": "theatre",
+            "zh": "剧院"
+          },
+          {
+            "en": "go fishing",
+            "zh": "去钓鱼"
+          },
+          {
+            "en": "enjoy oneself",
+            "zh": "玩得愉快；得到乐趣"
+          },
+          {
+            "en": "get…in",
+            "zh": "收割"
+          }
+        ]
+      },
+      {
+        "unit": 2,
+        "title": "Unit 2 changes in our lives",
+        "words": [
+          {
+            "en": "life",
+            "zh": "生活"
+          },
+          {
+            "en": "writer",
+            "zh": "作家"
+          },
+          {
+            "en": "photographer",
+            "zh": "摄影师"
+          },
+          {
+            "en": "film",
+            "zh": "胶卷"
+          },
+          {
+            "en": "digital",
+            "zh": "数码的"
+          },
+          {
+            "en": "street cleaner",
+            "zh": "环卫工人"
+          },
+          {
+            "en": "sweep",
+            "zh": "扫地"
+          },
+          {
+            "en": "broom",
+            "zh": "扫帚"
+          },
+          {
+            "en": "drive",
+            "zh": "驾驶"
+          },
+          {
+            "en": "street sweeper",
+            "zh": "扫地车"
+          },
+          {
+            "en": "wife",
+            "zh": "妻子"
+          },
+          {
+            "en": "poor",
+            "zh": "贫穷的；差的；次的"
+          },
+          {
+            "en": "fairy",
+            "zh": "仙子；小精灵"
+          },
+          {
+            "en": "wish",
+            "zh": "愿望；祝愿"
+          },
+          {
+            "en": "by hand",
+            "zh": "用手"
+          },
+          {
+            "en": "right away",
+            "zh": "立即；马上"
+          },
+          {
+            "en": "in a short time",
+            "zh": "很快"
+          }
+        ]
+      },
+      {
+        "unit": 3,
+        "title": "Unit 3 our school in the future",
+        "words": [
+          {
+            "en": "carry",
+            "zh": "背 ；提；拿"
+          },
+          {
+            "en": "online",
+            "zh": "在线地；在线的"
+          },
+          {
+            "en": "head teacher",
+            "zh": "校长"
+          },
+          {
+            "en": "PS",
+            "zh": "附言（用于信末）"
+          },
+          {
+            "en": "mountain",
+            "zh": "山；山脉"
+          },
+          {
+            "en": "even",
+            "zh": "甚至"
+          },
+          {
+            "en": "space",
+            "zh": "太空"
+          },
+          {
+            "en": "dinosaur",
+            "zh": "恐龙"
+          },
+          {
+            "en": "a piece of",
+            "zh": "一张； 一片"
+          },
+          {
+            "en": "have a picnic",
+            "zh": "去野餐"
+          },
+          {
+            "en": "better and better",
+            "zh": "越来越好"
+          }
+        ]
+      },
+      {
+        "unit": 4,
+        "title": "Unit 4 art",
+        "words": [
+          {
+            "en": "oil",
+            "zh": "油"
+          },
+          {
+            "en": "oil painting",
+            "zh": "油画"
+          },
+          {
+            "en": "powerful",
+            "zh": "强有力的； 力量大的"
+          },
+          {
+            "en": "ink",
+            "zh": "墨水；墨汁"
+          },
+          {
+            "en": "Chinese ink painting",
+            "zh": "中国水墨画"
+          },
+          {
+            "en": "brush",
+            "zh": "画笔；刷子；刷"
+          },
+          {
+            "en": "paints",
+            "zh": "绘画颜料"
+          },
+          {
+            "en": "artist",
+            "zh": "艺术家； 尤指（画家）"
+          },
+          {
+            "en": "unhappy",
+            "zh": "不高兴的"
+          },
+          {
+            "en": "carefully",
+            "zh": "仔细地"
+          },
+          {
+            "en": "on the left",
+            "zh": "在左边"
+          },
+          {
+            "en": "on the right",
+            "zh": "在右边"
+          },
+          {
+            "en": "all the time",
+            "zh": "一直；始终"
+          }
+        ]
+      },
+      {
+        "unit": 5,
+        "title": "Unit 5 crafts",
+        "words": [
+          {
+            "en": "craft",
+            "zh": "手艺； 工艺"
+          },
+          {
+            "en": "crown",
+            "zh": "王冠； 皇冠"
+          },
+          {
+            "en": "scissors",
+            "zh": "剪刀"
+          },
+          {
+            "en": "tape",
+            "zh": "胶带"
+          },
+          {
+            "en": "glue",
+            "zh": "胶水"
+          },
+          {
+            "en": "saw",
+            "zh": "锯"
+          },
+          {
+            "en": "craftsman",
+            "zh": "工 匠 ；手 艺 人（复 数craftsmen）"
+          },
+          {
+            "en": "tool",
+            "zh": "工具"
+          },
+          {
+            "en": "easily",
+            "zh": "容易地"
+          },
+          {
+            "en": "himself",
+            "zh": "他自己"
+          },
+          {
+            "en": "still",
+            "zh": "仍然"
+          },
+          {
+            "en": "model house",
+            "zh": "房子模型"
+          },
+          {
+            "en": "a long time ago",
+            "zh": "很久以前"
+          },
+          {
+            "en": "at work",
+            "zh": "忙着（做事情）"
+          },
+          {
+            "en": "say to oneself",
+            "zh": "自言自语"
+          }
+        ]
+      },
+      {
+        "unit": 6,
+        "title": "Unit 6 pe lessons",
+        "words": [
+          {
+            "en": "long race",
+            "zh": "长跑"
+          },
+          {
+            "en": "short race",
+            "zh": "短跑"
+          },
+          {
+            "en": "win",
+            "zh": "获胜；赢"
+          },
+          {
+            "en": "long jump",
+            "zh": "跳远"
+          },
+          {
+            "en": "high jump",
+            "zh": "跳高"
+          },
+          {
+            "en": "swimsuit",
+            "zh": "（尤指女式的）游泳衣"
+          },
+          {
+            "en": "swimming cap",
+            "zh": "游泳帽"
+          },
+          {
+            "en": "swimming pool",
+            "zh": "游泳池"
+          },
+          {
+            "en": "warm-up",
+            "zh": "准备活动；热身练习"
+          },
+          {
+            "en": "fit",
+            "zh": "健壮的"
+          },
+          {
+            "en": "swimming goggles",
+            "zh": "游泳镜"
+          }
+        ]
+      },
+      {
+        "unit": 7,
+        "title": "Unit 7 helping others",
+        "words": [
+          {
+            "en": "bell",
+            "zh": "铃铛"
+          },
+          {
+            "en": "neck",
+            "zh": "脖子"
+          },
+          {
+            "en": "ago",
+            "zh": "以前"
+          },
+          {
+            "en": "gatekeeper",
+            "zh": "门卫"
+          },
+          {
+            "en": "praise",
+            "zh": "赞扬；称赞"
+          },
+          {
+            "en": "praise…for …",
+            "zh": "因……而表扬 … …"
+          }
+        ]
+      },
+      {
+        "unit": 8,
+        "title": "Unit 8 reading signs",
+        "words": [
+          {
+            "en": "sign",
+            "zh": "标识"
+          },
+          {
+            "en": "middle",
+            "zh": "中间；中部；中心"
+          },
+          {
+            "en": "special",
+            "zh": "特别的"
+          },
+          {
+            "en": "path",
+            "zh": "小路；小径"
+          },
+          {
+            "en": "may",
+            "zh": "可能； 可以"
+          },
+          {
+            "en": "lost",
+            "zh": "迷路的；迷失的"
+          },
+          {
+            "en": "worry",
+            "zh": "担心"
+          },
+          {
+            "en": "follow",
+            "zh": "跟随；跟着"
+          },
+          {
+            "en": "in the middle",
+            "zh": "在中间"
+          },
+          {
+            "en": "look out",
+            "zh": "小心；当心"
+          },
+          {
+            "en": "no smoking",
+            "zh": "禁止吸烟"
+          },
+          {
+            "en": "no swimming",
+            "zh": "禁止游泳"
+          },
+          {
+            "en": "get lost",
+            "zh": "迷路"
+          },
+          {
+            "en": "some time",
+            "zh": "一段时间"
+          },
+          {
+            "en": "on the way",
+            "zh": "在路上"
+          }
+        ]
+      },
+      {
+        "unit": 9,
+        "title": "Unit 9 reusing things",
+        "words": [
+          {
+            "en": "reuse",
+            "zh": "重新利用"
+          },
+          {
+            "en": "can",
+            "zh": "金属罐"
+          },
+          {
+            "en": "rubber",
+            "zh": "橡皮"
+          },
+          {
+            "en": "vase",
+            "zh": "花瓶"
+          },
+          {
+            "en": "pen holder",
+            "zh": "笔筒"
+          },
+          {
+            "en": "envelope",
+            "zh": "信封"
+          },
+          {
+            "en": "plastic",
+            "zh": "塑料制的； 塑料的"
+          },
+          {
+            "en": "rubbish bin",
+            "zh": "垃圾桶"
+          },
+          {
+            "en": "truck",
+            "zh": "卡车"
+          },
+          {
+            "en": "piece",
+            "zh": "碎片；碎块"
+          },
+          {
+            "en": "cloth",
+            "zh": "布；布料"
+          },
+          {
+            "en": "throw away",
+            "zh": "扔掉"
+          }
+        ]
+      },
+      {
+        "unit": 10,
+        "title": "Unit 10 great storybooks",
+        "words": [
+          {
+            "en": "fairy tale",
+            "zh": "童话（故事）"
+          },
+          {
+            "en": "adult",
+            "zh": "成年人"
+          },
+          {
+            "en": "well-known",
+            "zh": "众所周知的； 著名的"
+          },
+          {
+            "en": "stronger",
+            "zh": "更强大的"
+          },
+          {
+            "en": "than",
+            "zh": "比"
+          },
+          {
+            "en": "scarf",
+            "zh": "围 巾 （复 数 scarves 或scarfs）"
+          },
+          {
+            "en": "blow off",
+            "zh": "吹掉"
+          },
+          {
+            "en": "take off",
+            "zh": "脱掉"
+          }
+        ]
+      },
+      {
+        "unit": 11,
+        "title": "Unit 11 western festivals",
+        "words": [
+          {
+            "en": "Western",
+            "zh": "西方的"
+          },
+          {
+            "en": "turkey",
+            "zh": "火鸡"
+          },
+          {
+            "en": "bright",
+            "zh": "明亮的；鲜艳的"
+          },
+          {
+            "en": "laugh at",
+            "zh": "嘲笑"
+          },
+          {
+            "en": "jack-o ’-lantern",
+            "zh": "南瓜灯"
+          }
+        ]
+      },
+      {
+        "unit": 12,
+        "title": "Unit 12 the five peas",
+        "words": [
+          {
+            "en": "pea",
+            "zh": "豌豆"
+          },
+          {
+            "en": "pod",
+            "zh": "豆荚"
+          },
+          {
+            "en": "forever",
+            "zh": "永远"
+          },
+          {
+            "en": "bigger",
+            "zh": "更大的"
+          },
+          {
+            "en": "excited",
+            "zh": "兴奋的"
+          },
+          {
+            "en": "bullet",
+            "zh": "子弹"
+          },
+          {
+            "en": "lazy",
+            "zh": "懒惰的"
+          },
+          {
+            "en": "roof",
+            "zh": "屋顶"
+          },
+          {
+            "en": "yard",
+            "zh": "院子"
+          },
+          {
+            "en": "hit",
+            "zh": "碰撞；撞击"
+          },
+          {
+            "en": "see the world",
+            "zh": "见世面"
+          },
+          {
+            "en": "one by one",
+            "zh": "一个接一个地"
+          },
+          {
+            "en": "look out of",
+            "zh": "往外看"
+          }
+        ]
+      }
+    ]
+  }
+]

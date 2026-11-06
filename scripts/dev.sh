@@ -240,17 +240,15 @@ fi
 
 echo "Clearing port ${DEPLOY_RUN_PORT} before start."
 kill_port_if_listening
-if [[ "${COZE_WEB_LOCAL_MIRROR:-}" != "1" ]]; then
-  pnpm install --prefer-frozen-lockfile --prefer-offline --loglevel debug --reporter=append-only
-fi
-echo "Starting HTTP service on port ${DEPLOY_RUN_PORT} for dev..."
+
+echo "Starting static HTTP service on port ${DEPLOY_RUN_PORT} for dev..."
 
 mkdir -p "${LOG_DIR}"
 : > "${LOG_FILE}"
 
 export PORT="${DEPLOY_RUN_PORT}"
 server_pid="$(spawn_detached "${COZE_WORKSPACE_PATH}" "${LOG_FILE}" \
-  "$(command -v node)" "${SCRIPT_DIR}/local-workspace.cjs" watch "$(command -v pnpm)" next dev --hostname 0.0.0.0 --port "${DEPLOY_RUN_PORT}")"
+  "$(command -v node)" "${SCRIPT_DIR}/../server.cjs")"
 if [[ -z "${server_pid}" ]]; then
   echo "Dev server failed to start: 未获取到后台进程 PID。" >&2
   dump_log

@@ -2,16 +2,26 @@
 set -Eeuo pipefail
 
 COZE_WORKSPACE_PATH="${COZE_WORKSPACE_PATH:-$(pwd)}"
-
 cd "${COZE_WORKSPACE_PATH}"
 
-echo "Installing dependencies..."
-pnpm install --prefer-frozen-lockfile --prefer-offline --loglevel debug --reporter=append-only
+echo "Static site — skipping Next.js build."
 
-echo "Building the Next.js project..."
-pnpm next build
+required=(
+  "index.html"
+  "server.cjs"
+  "assets/style.css"
+  "assets/app.js"
+  "assets/words.js"
+  "assets/scenes.js"
+  "assets/songs.js"
+  "assets/stories.js"
+)
 
-echo "Bundling server with tsup..."
-pnpm tsup src/server.ts --format cjs --platform node --target node20 --outDir dist --no-splitting --no-minify
+for file in "${required[@]}"; do
+  if [ ! -f "${file}" ]; then
+    echo "Missing required file: ${file}" >&2
+    exit 1
+  fi
+done
 
-echo "Build completed successfully!"
+echo "Static assets verified. Deploy will serve the repository root."

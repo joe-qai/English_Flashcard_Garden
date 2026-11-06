@@ -1249,10 +1249,10 @@ window.DIALOGUE_SCENES = [
       },
       {
         who: 'Shopkeeper',
-        en: 'It\'s twenty dollars. Cash or card?',
+        en: 'It\'s twenty yuan. Cash or card?',
         zh: '二十美元。现金还是刷卡？',
         notes: {
-          dollars: '/ˈdɒləz/',
+          yuan: '/juˈɑːn/',
           cash: '/kæʃ/'
         },
       },
@@ -1715,7 +1715,7 @@ window.DIALOGUE_SCENES = [
       },
       {
         who: 'Clerk',
-        en: 'Let me weigh it… It\'s two kilograms. That will be fifteen dollars.',
+        en: 'Let me weigh it… It\'s two kilograms. That will be fifteen yuan.',
         zh: '我称一下……两公斤，十五美元。',
         notes: {
           weigh: '/weɪ/',

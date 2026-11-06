@@ -41,7 +41,7 @@ if (Test-Path $pidFile) {
 $previousPort = $env:PORT
 $env:PORT = "$port"
 try {
-  $process = Start-Process -FilePath $env:ComSpec -ArgumentList @("/d", "/s", "/c", "pnpm next dev --hostname 0.0.0.0 --port $port") -WorkingDirectory $workspace -RedirectStandardOutput $logFile -RedirectStandardError $errorLogFile -PassThru
+  $process = Start-Process -FilePath "node" -ArgumentList @("server.cjs") -WorkingDirectory $workspace -RedirectStandardOutput $logFile -RedirectStandardError $errorLogFile -PassThru
 } finally {
   if ($null -eq $previousPort) { Remove-Item Env:PORT -ErrorAction SilentlyContinue } else { $env:PORT = $previousPort }
 }

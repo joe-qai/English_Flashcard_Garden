@@ -1,7 +1,8 @@
 /**
  * 英文闪卡园 · 交互逻辑（无依赖、无构建）
  * - 5 Tab：单词 / 情景 / 音乐 / 故事会 / 游戏
- * - 单词按学校/生活/拓展分组排序
+ * - 单词按学校/生活/拓展分组，并按教材年级（1–6 / 拓展）筛选
+ * - 音标默认隐藏，点击卡片显示音标并朗读；未读词高亮
  * - 场景对话 & 英文歌谣播放器（Web Audio 旋律 + 文字跟读）
  * - 故事会：逐句朗读，支持单句/连续播放
  * - 互动游戏：听音选词 + 看中文选英文
@@ -10,7 +11,8 @@
 (function () {
   'use strict';
 
-  var CATEGORIES = Array.isArray(window.WORD_CATEGORIES) ? window.WORD_CATEGORIES : [];
+  var ALL_CATEGORIES = Array.isArray(window.WORD_CATEGORIES) ? window.WORD_CATEGORIES : [];
+  var CATEGORIES = ALL_CATEGORIES.filter(function (c) { return !c.hidden; });
   var SCENES = Array.isArray(window.DIALOGUE_SCENES) ? window.DIALOGUE_SCENES : [];
   var SONGS = Array.isArray(window.SONG_LIBRARY) ? window.SONG_LIBRARY : [];
   var STORIES = Array.isArray(window.STORY_LIBRARY) ? window.STORY_LIBRARY : [];
@@ -27,13 +29,9 @@
   var supportsSpeech = !!synth && typeof window.SpeechSynthesisUtterance === 'function';
 
   /* ============ Category context tags ============ */
-  var SCHOOL_IDS = ['stationery','food','colors','measure','jobs','time','weather','seasons','sports-general'];
-  var LIFE_IDS   = ['body','health','clothing','transport','shopping','rooms','tools','furniture','kitchenware'];
-
   function getCategoryGroup(id) {
-    if (SCHOOL_IDS.indexOf(id) !== -1) return 'school';
-    if (LIFE_IDS.indexOf(id) !== -1)  return 'life';
-    return 'fun';
+    var cat = findCategory(id);
+    return cat && cat.group ? cat.group : 'fun';
   }
 
   /* ============ Scene context tags ============ */
@@ -252,6 +250,26 @@
     }
   }
 
+  // 统一英式发音：优先 en-GB，其次任意英语语音
+  function pickEnglishVoice() {
+    if (!supportsSpeech) return null;
+    var voices = [];
+    try { voices = synth.getVoices() || []; } catch (e) { return null; }
+    var i;
+    for (i = 0; i < voices.length; i++) {
+      if (/^en[-_]GB/i.test(voices[i].lang || '')) return voices[i];
+    }
+    for (i = 0; i < voices.length; i++) {
+      if (/^en(-|_|$)/i.test(voices[i].lang || '')) return voices[i];
+    }
+    return null;
+  }
+
+  function applyVoice(u) {
+    var v = pickEnglishVoice();
+    if (v) { u.voice = v; u.lang = v.lang; }
+  }
+
   function markSpeechBroken(btn) {
     speechBroken = true;
     if (speechStartTimer) { window.clearTimeout(speechStartTimer); speechStartTimer = null; }
@@ -369,12 +387,24 @@
   var emptyTextEl = document.getElementById('word-empty-text');
   var catNavEl = document.getElementById('word-cat-nav');
 
-  var state = { activeId: CATEGORIES[0].id, group: 'all' };
+  var state = { activeId: CATEGORIES[0].id, group: 'all', grade: readStore('flashcard:grade') || 'all' };
   var pills = {};
 
+  var KEY_SEEN = 'flashcard:seen';
+  var seenWords = {};
+  try { seenWords = JSON.parse(readStore(KEY_SEEN) || '{}') || {}; } catch (e) { seenWords = {}; }
+
+  function wordPassesGrade(w) {
+    if (state.grade === 'all') return true;
+    if (state.grade === 'ext') return w.level === 'extension';
+    return w.grade === Number(state.grade);
+  }
+
   function getFilteredCats() {
-    if (state.group === 'all') return CATEGORIES;
-    return CATEGORIES.filter(function (c) { return getCategoryGroup(c.id) === state.group; });
+    return CATEGORIES.filter(function (c) {
+      if (state.group !== 'all' && getCategoryGroup(c.id) !== state.group) return false;
+      return c.words.some(wordPassesGrade);
+    });
   }
 
   function buildCatNav() {
@@ -396,7 +426,7 @@
       var zh = document.createElement('span'); zh.textContent = cat.zh;
       var count = document.createElement('span');
       count.className = 'pill-count';
-      count.textContent = cat.words.length;
+      count.textContent = cat.words.filter(wordPassesGrade).length;
       btn.appendChild(icon);
       btn.appendChild(zh);
       btn.appendChild(count);
@@ -412,6 +442,31 @@
       var isActive = id === state.activeId;
       pills[id].classList.toggle('is-active', isActive);
       pills[id].setAttribute('aria-pressed', isActive ? 'true' : 'false');
+    });
+  }
+
+  function updateCounts() {
+    var filtered = 0;
+    getFilteredCats().forEach(function (c) {
+      c.words.forEach(function (w) { if (wordPassesGrade(w)) filtered += 1; });
+    });
+    var totalVisible = 0;
+    CATEGORIES.forEach(function (c) { totalVisible += c.words.length; });
+    var tabWordCount = document.getElementById('tab-words-count');
+    if (tabWordCount) tabWordCount.textContent = String(filtered);
+    var totalEl = document.getElementById('total-count');
+    if (totalEl) totalEl.textContent = String(totalVisible);
+    var sceneCount = SCENES.length;
+    var songCount = SONGS.length;
+    var storyCount = STORIES.length;
+    var pairs = [
+      ['tab-scenes-count', sceneCount], ['scene-total', sceneCount],
+      ['tab-songs-count', songCount], ['song-total', songCount],
+      ['tab-stories-count', storyCount], ['story-total', storyCount]
+    ];
+    pairs.forEach(function (p) {
+      var el = document.getElementById(p[0]);
+      if (el) el.textContent = String(p[1]);
     });
   }
 
@@ -440,8 +495,10 @@
     card.className = 'card';
     card.style.setProperty('--cat', cat.color);
     card.style.animationDelay = Math.min(index, 11) * 22 + 'ms';
-    card.title = '点击播放发音：' + word.en;
-    card.setAttribute('aria-label', '播放 ' + word.en + '（' + word.zh + '）的发音');
+    var seen = !!seenWords[word.en];
+    if (!seen) card.classList.add('is-new');
+    card.title = '点击显示音标并播放发音：' + word.en;
+    card.setAttribute('aria-label', '播放 ' + word.en + '（' + word.zh + '）的发音并显示音标');
     var figure = document.createElement('span');
     figure.className = 'card-figure';
     if (word.swatch) {
@@ -451,7 +508,7 @@
       swatch.style.background = word.swatch;
       swatch.setAttribute('aria-hidden', 'true');
       figure.appendChild(swatch);
-    } else if (/\.svg$/i.test(word.icon)) {
+    } else if (word.icon && /\.svg$/i.test(word.icon)) {
       // 没有对应 emoji 的实物，用本地手绘 SVG，保证图物一致
       var pic = document.createElement('img');
       pic.className = 'card-img';
@@ -461,40 +518,76 @@
       pic.height = 56;
       pic.decoding = 'async';
       figure.appendChild(pic);
-    } else {
+    } else if (word.icon) {
       var emoji = document.createElement('span');
       emoji.className = 'card-emoji';
       emoji.setAttribute('aria-hidden', 'true');
       emoji.textContent = word.icon;
       figure.appendChild(emoji);
+    } else {
+      // 抽象词没有合适图标时用首字母色块，避免拿“看起来像”的图凑数
+      var letter = document.createElement('span');
+      letter.className = 'card-letter';
+      letter.setAttribute('aria-hidden', 'true');
+      letter.textContent = word.en.charAt(0).toUpperCase();
+      figure.appendChild(letter);
     }
     var body = document.createElement('span');
     body.className = 'card-body';
     var en = document.createElement('span');
     en.className = 'card-en'; en.lang = 'en'; en.textContent = word.en;
     var ipa = document.createElement('span');
-    ipa.className = 'card-ipa'; ipa.lang = 'en'; ipa.textContent = word.ipa;
+    ipa.className = 'card-ipa'; ipa.lang = 'en'; ipa.textContent = word.ipa || '';
+    var ipaHint = document.createElement('span');
+    ipaHint.className = 'card-ipa-hint'; ipaHint.textContent = '点按看音标';
     var zh = document.createElement('span');
     zh.className = 'card-zh'; zh.textContent = word.zh;
+    var meta = document.createElement('span');
+    meta.className = 'card-meta';
+    if (word.level === 'core' && word.grade) {
+      var cn = ['', '一', '二', '三', '四', '五', '六'][word.grade] || word.grade;
+      meta.textContent = word.unit
+        ? cn + '年级' + (word.term === 2 ? '下' : '上') + ' · U' + word.unit
+        : cn + '年级';
+      meta.classList.add('is-core');
+    } else {
+      meta.textContent = '拓展';
+    }
     body.appendChild(en);
+    body.appendChild(ipaHint);
     body.appendChild(ipa);
     body.appendChild(zh);
+    body.appendChild(meta);
     card.appendChild(figure);
     card.appendChild(body);
-    card.addEventListener('click', function () { speak(word.en, card); });
+    card.addEventListener('click', function () {
+      if (!card.classList.contains('is-revealed')) {
+        card.classList.add('is-revealed');
+        card.classList.remove('is-new');
+        seenWords[word.en] = 1;
+        try { writeStore(KEY_SEEN, JSON.stringify(seenWords)); } catch (e) {}
+      }
+      speak(word.en, card);
+    });
     return card;
   }
 
   function renderWords() {
-    var cat = findCategory(state.activeId) || CATEGORIES[0];
-    var words = cat.words;
+    var cat = findCategory(state.activeId);
+    if (!cat || !cat.words.some(wordPassesGrade)) {
+      var available = getFilteredCats();
+      cat = available[0] || findCategory(CATEGORIES[0].id) || CATEGORIES[0];
+      state.activeId = cat.id;
+      updateHash(cat.id);
+    }
+    var words = cat.words.filter(wordPassesGrade);
     rootEl.style.setProperty('--cat', cat.color);
     rootEl.style.setProperty('--ring', cat.color);
     gridEl.textContent = '';
     if (!words.length) {
       gridEl.hidden = true;
       emptyEl.hidden = false;
-      emptyTextEl.textContent = '该分类暂无单词';
+      emptyTextEl.textContent = state.grade === 'ext' ? '该分类暂无拓展词' : '该分类在本年级暂无单词';
     } else {
       gridEl.hidden = false;
       emptyEl.hidden = true;
@@ -503,7 +596,28 @@
       gridEl.appendChild(frag);
     }
     syncPills();
+    updateCounts();
   }
+
+  var gradePills = document.querySelectorAll('.grade-pill[data-grade]');
+  function syncGradePills() {
+    gradePills.forEach(function (b) {
+      b.classList.toggle('is-active', b.dataset.grade === state.grade);
+    });
+  }
+  gradePills.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      state.grade = btn.dataset.grade;
+      writeStore('flashcard:grade', state.grade);
+      syncGradePills();
+      var available = getFilteredCats();
+      state.activeId = available[0] ? available[0].id : CATEGORIES[0].id;
+      writeStore(KEY_CATEGORY, state.activeId);
+      buildCatNav();
+      syncPills();
+      renderWords();
+    });
+  });
 
   var subPills = document.querySelectorAll('.sub-pill[data-group]');
   subPills.forEach(function (btn) {
@@ -542,7 +656,8 @@
       if (speechStartTimer) { window.clearTimeout(speechStartTimer); speechStartTimer = null; }
     };
     var utter = new window.SpeechSynthesisUtterance(text);
-    utter.lang = 'en-US';
+    utter.lang = 'en-GB';
+    applyVoice(utter);
     utter.rate = 0.85;
     utter.onstart = function () {
       started = true;
@@ -858,7 +973,8 @@
         clearLineHighlight();
         if (els[current]) els[current].classList.add('is-speaking');
         var utter = new window.SpeechSynthesisUtterance(lines[current].en);
-        utter.lang = 'en-US';
+        utter.lang = 'en-GB';
+        applyVoice(utter);
         var lineRate = Math.min(2, Math.max(0.1, rate + moodTone.rateDelta));
         var linePitch = Math.min(2, Math.max(0, moodTone.pitch));
         utter.rate = lineRate;
@@ -1122,7 +1238,8 @@
       });
       var sent = storyState.sentences[idx];
       var utter = new window.SpeechSynthesisUtterance(sent.en);
-      utter.lang = 'en-US';
+      utter.lang = 'en-GB';
+      applyVoice(utter);
       utter.rate = 0.82;
       utter.onend = function () {
         storyErrors = 0;
@@ -1156,7 +1273,8 @@
         storySpeakTimer = setTimeout(function () { playNextSentence(0); }, 450);
       };
       var titleUtter = new window.SpeechSynthesisUtterance(storyState.item ? storyState.item.en : '');
-      titleUtter.lang = 'en-US';
+      titleUtter.lang = 'en-GB';
+      applyVoice(titleUtter);
       titleUtter.rate = 0.85;
       // 华为/微信内核可能接口存在但永远不触发 start/end，超时后提示并停止
       var titleStarted = false;
@@ -1229,7 +1347,10 @@
     var cats = game.cat === 'all' ? CATEGORIES : CATEGORIES.filter(function (c) { return c.id === game.cat; });
     var pool = [];
     cats.forEach(function (cat) {
-      cat.words.forEach(function (w) { pool.push(Object.assign({}, w, { cat: cat.zh, catColor: cat.color })); });
+      cat.words.forEach(function (w) {
+        if (!wordPassesGrade(w)) return;
+        pool.push(Object.assign({}, w, { cat: cat.zh, catId: cat.id, catColor: cat.color }));
+      });
     });
     return pool;
   }
@@ -1269,12 +1390,20 @@
     }
     if (gameWord) gameWord.lang = game.mode === 'en-zh' ? 'en' : 'zh';
 
-    var pool = getGamePool().filter(function (w) {
-      return game.mode === 'en-zh' ? w.en !== q.en : w.zh !== q.zh;
-    });
-    var opts = shuffle(pool).slice(0, 3).map(function (w) {
-      return game.mode === 'en-zh' ? w.zh : w.en;
-    });
+    var fullPool = getGamePool();
+    var labelKey = game.mode === 'en-zh' ? 'zh' : 'en';
+    // 优先用同分类词做干扰项，更像教材里的同类词练习
+    var sameCat = fullPool.filter(function (w) { return w.catId === q.catId; });
+    var candidates = shuffle(sameCat).concat(shuffle(fullPool));
+    var used = {};
+    used[game.mode === 'en-zh' ? q.zh : q.en] = 1;
+    var opts = [];
+    for (var i = 0; i < candidates.length && opts.length < 3; i++) {
+      var val = candidates[i][labelKey];
+      if (!val || used[val]) continue;
+      used[val] = 1;
+      opts.push(val);
+    }
     opts.push(game.mode === 'en-zh' ? q.zh : q.en);
     opts = shuffle(opts);
 
@@ -1291,7 +1420,7 @@
         showCompatTip('failed');
       } else {
         var u = new window.SpeechSynthesisUtterance(q.en);
-        u.lang = 'en-US'; u.rate = 0.8;
+        u.lang = 'en-GB'; applyVoice(u); u.rate = 0.8;
         var heard = false;
         var gameWatch = window.setTimeout(function () {
           if (!heard && canSpeak()) markSpeechBroken(null);
@@ -1373,7 +1502,7 @@
 
   /* ============ INIT ============ */
   function init() {
-    buildCatNav(); syncPills(); renderWords();
+    buildCatNav(); syncPills(); syncGradePills(); renderWords();
     var hash = String(window.location.hash || '').replace(/^#\/?/, '');
     var saved = readStore(KEY_CATEGORY);
     var initial = findCategory(hash) || findCategory(saved) || CATEGORIES[0];

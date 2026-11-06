@@ -3,14 +3,24 @@ $ErrorActionPreference = "Stop"
 $workspace = if ($env:COZE_WORKSPACE_PATH) { $env:COZE_WORKSPACE_PATH } else { (Get-Location).Path }
 Set-Location $workspace
 
-Write-Host "Installing dependencies..."
-& pnpm install --prefer-frozen-lockfile --prefer-offline --loglevel debug --reporter=append-only
-if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+Write-Host "Static site - skipping Next.js build."
 
-Write-Host "Building the Next.js project..."
-& pnpm next build
-if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+$required = @(
+  "index.html",
+  "server.cjs",
+  "assets/style.css",
+  "assets/app.js",
+  "assets/words.js",
+  "assets/scenes.js",
+  "assets/songs.js",
+  "assets/stories.js"
+)
 
-Write-Host "Bundling server with tsup..."
-& pnpm tsup src/server.ts --format cjs --platform node --target node20 --outDir dist --no-splitting --no-minify
-exit $LASTEXITCODE
+foreach ($file in $required) {
+  if (-not (Test-Path -LiteralPath $file -PathType Leaf)) {
+    Write-Error "Missing required file: $file"
+    exit 1
+  }
+}
+
+Write-Host "Static assets verified. Deploy will serve the repository root."

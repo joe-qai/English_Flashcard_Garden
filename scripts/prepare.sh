@@ -11,7 +11,10 @@ COZE_WORKSPACE_PATH="${PROJECT_ROOT}"
 
 cd "${COZE_WORKSPACE_PATH}"
 
-echo "Installing dependencies..."
-if [[ "${COZE_WEB_LOCAL_MIRROR:-}" != "1" ]]; then
-  pnpm install --prefer-frozen-lockfile --prefer-offline --loglevel debug --reporter=append-only
-fi
+echo "Static site — no dependencies to install."
+for file in index.html server.cjs assets/app.js assets/words.js; do
+  if [ ! -f "${file}" ]; then
+    echo "Missing required file: ${file}" >&2
+    exit 1
+  fi
+done

@@ -30,6 +30,10 @@
   var searchWrapEl = searchEl.parentNode;
   var themeBtn = document.getElementById('theme-toggle');
   var totalEl = document.getElementById('total-count');
+  var sceneTabsEl = document.getElementById('scene-tabs');
+  var scenePanelEl = document.getElementById('scene-panel');
+  var sceneTotalEl = document.getElementById('scene-total');
+  var jumpScenesBtn = document.getElementById('jump-scenes');
 
   var state = { activeId: CATEGORIES[0].id, query: '' };
   var pills = {};
@@ -250,6 +254,10 @@
   /* ---------------- 发音 ---------------- */
 
   function speak(text, btn) {
+    if (sceneState.playing) {
+      stopPlayback();
+    }
+
     if (!supportsSpeech) {
       btn.classList.add('is-speaking');
       window.setTimeout(function () {
@@ -347,6 +355,318 @@
     }
   });
 
+  /* ---------------- 场景对话 ---------------- */
+
+  var SCENES = Array.isArray(window.DIALOGUE_SCENES) ? window.DIALOGUE_SCENES : [];
+  var KEY_HIDE_ZH = 'flashcard:hideZh';
+  var sceneTabs = {};
+  var sceneState = {
+    id: '',
+    hideZh: readStore(KEY_HIDE_ZH) === '1',
+    playing: false,
+    token: 0,
+    lines: [],
+    lineEls: [],
+    playBtn: null,
+    zhBtn: null,
+  };
+
+  function findScene(id) {
+    for (var i = 0; i < SCENES.length; i += 1) {
+      if (SCENES[i].id === id) {
+        return SCENES[i];
+      }
+    }
+    return null;
+  }
+
+  function buildSceneTabs() {
+    if (!sceneTabsEl) {
+      return;
+    }
+
+    var frag = document.createDocumentFragment();
+
+    SCENES.forEach(function (scene) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'pill';
+      btn.dataset.scene = scene.id;
+      btn.style.setProperty('--cat', scene.color);
+      btn.setAttribute('role', 'tab');
+      btn.setAttribute('aria-selected', 'false');
+      btn.setAttribute('aria-controls', 'scene-panel');
+
+      var icon = document.createElement('span');
+      icon.className = 'pill-icon';
+      icon.setAttribute('aria-hidden', 'true');
+      icon.textContent = scene.icon;
+
+      var zh = document.createElement('span');
+      zh.textContent = scene.zh;
+
+      var en = document.createElement('span');
+      en.className = 'pill-en';
+      en.textContent = scene.en;
+
+      btn.appendChild(icon);
+      btn.appendChild(zh);
+      btn.appendChild(en);
+      btn.addEventListener('click', function () {
+        if (sceneState.id === scene.id) {
+          return;
+        }
+        stopPlayback();
+        renderScene(scene.id);
+      });
+
+      frag.appendChild(btn);
+      sceneTabs[scene.id] = btn;
+    });
+
+    sceneTabsEl.appendChild(frag);
+  }
+
+  function syncSceneTabs() {
+    Object.keys(sceneTabs).forEach(function (id) {
+      var isActive = id === sceneState.id;
+      sceneTabs[id].classList.toggle('is-active', isActive);
+      sceneTabs[id].setAttribute('aria-selected', isActive ? 'true' : 'false');
+    });
+  }
+
+  function renderScene(id) {
+    var scene = findScene(id) || SCENES[0];
+    if (!scene || !scenePanelEl) {
+      return;
+    }
+
+    sceneState.id = scene.id;
+    sceneState.lines = scene.lines;
+    sceneState.lineEls = [];
+    sceneState.playing = false;
+    sceneState.token += 1;
+
+    scenePanelEl.textContent = '';
+    scenePanelEl.style.setProperty('--cat', scene.color);
+    scenePanelEl.classList.toggle('hide-zh', sceneState.hideZh);
+
+    var top = document.createElement('div');
+    top.className = 'scene-top';
+
+    var icon = document.createElement('span');
+    icon.className = 'scene-icon';
+    icon.setAttribute('aria-hidden', 'true');
+    icon.textContent = scene.icon;
+
+    var meta = document.createElement('div');
+    meta.className = 'scene-meta';
+
+    var title = document.createElement('h3');
+    title.className = 'scene-title';
+    title.textContent = scene.zh + ' · ' + scene.en;
+
+    var desc = document.createElement('p');
+    desc.className = 'scene-desc';
+    desc.textContent = scene.desc;
+
+    meta.appendChild(title);
+    meta.appendChild(desc);
+
+    var actions = document.createElement('div');
+    actions.className = 'scene-actions';
+
+    var zhBtn = document.createElement('button');
+    zhBtn.type = 'button';
+    zhBtn.className = 'ghost-btn';
+    zhBtn.textContent = sceneState.hideZh ? '显示中文' : '隐藏中文';
+    zhBtn.setAttribute('aria-pressed', sceneState.hideZh ? 'true' : 'false');
+    zhBtn.addEventListener('click', toggleZh);
+
+    var playBtn = document.createElement('button');
+    playBtn.type = 'button';
+    playBtn.className = 'play-btn';
+    playBtn.textContent = '▶ 播放全部';
+    playBtn.addEventListener('click', togglePlayback);
+
+    actions.appendChild(zhBtn);
+    actions.appendChild(playBtn);
+
+    top.appendChild(icon);
+    top.appendChild(meta);
+    top.appendChild(actions);
+
+    var list = document.createElement('ol');
+    list.className = 'dialog';
+
+    scene.lines.forEach(function (line) {
+      var li = document.createElement('li');
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'line';
+      btn.setAttribute('aria-label', '播放 ' + line.who + '：' + line.en);
+
+      var who = document.createElement('span');
+      who.className = 'line-who';
+      who.textContent = line.who;
+
+      var en = document.createElement('span');
+      en.className = 'line-en';
+      en.lang = 'en';
+      en.textContent = line.en;
+
+      var zh = document.createElement('span');
+      zh.className = 'line-zh';
+      zh.textContent = line.zh;
+
+      btn.appendChild(who);
+      btn.appendChild(en);
+      btn.appendChild(zh);
+      btn.addEventListener('click', function () {
+        if (sceneState.playing) {
+          stopPlayback();
+        }
+        speak(line.en, btn);
+      });
+
+      li.appendChild(btn);
+      list.appendChild(li);
+      sceneState.lineEls.push(btn);
+    });
+
+    sceneState.zhBtn = zhBtn;
+    sceneState.playBtn = playBtn;
+
+    scenePanelEl.appendChild(top);
+    scenePanelEl.appendChild(list);
+
+    syncSceneTabs();
+  }
+
+  function toggleZh() {
+    sceneState.hideZh = !sceneState.hideZh;
+    scenePanelEl.classList.toggle('hide-zh', sceneState.hideZh);
+    writeStore(KEY_HIDE_ZH, sceneState.hideZh ? '1' : '0');
+
+    if (sceneState.zhBtn) {
+      sceneState.zhBtn.textContent = sceneState.hideZh ? '显示中文' : '隐藏中文';
+      sceneState.zhBtn.setAttribute(
+        'aria-pressed',
+        sceneState.hideZh ? 'true' : 'false',
+      );
+    }
+  }
+
+  function clearLineHighlight() {
+    sceneState.lineEls.forEach(function (el) {
+      el.classList.remove('is-speaking');
+    });
+  }
+
+  function updatePlayBtn() {
+    var btn = sceneState.playBtn;
+    if (!btn) {
+      return;
+    }
+    btn.textContent = sceneState.playing ? '■ 停止' : '▶ 播放全部';
+    btn.classList.toggle('is-playing', sceneState.playing);
+  }
+
+  function stopPlayback() {
+    sceneState.playing = false;
+    sceneState.token += 1;
+    clearLineHighlight();
+
+    if (speakTimer) {
+      window.clearTimeout(speakTimer);
+      speakTimer = null;
+    }
+    if (synth) {
+      try {
+        synth.cancel();
+      } catch (e) {
+        /* 忽略 */
+      }
+    }
+    if (speakingBtn) {
+      speakingBtn.classList.remove('is-speaking');
+      speakingBtn = null;
+    }
+
+    updatePlayBtn();
+  }
+
+  function finishPlayback() {
+    sceneState.playing = false;
+    sceneState.token += 1;
+    clearLineHighlight();
+    updatePlayBtn();
+  }
+
+  function togglePlayback() {
+    if (sceneState.playing) {
+      stopPlayback();
+      return;
+    }
+    if (!supportsSpeech) {
+      return;
+    }
+    startPlayback();
+  }
+
+  function startPlayback() {
+    var lines = sceneState.lines;
+    var els = sceneState.lineEls;
+    if (!lines.length) {
+      return;
+    }
+
+    sceneState.playing = true;
+    var token = (sceneState.token += 1);
+    var index = 0;
+    updatePlayBtn();
+
+    function next() {
+      if (token !== sceneState.token || !sceneState.playing) {
+        return;
+      }
+      if (index >= lines.length) {
+        finishPlayback();
+        return;
+      }
+
+      var current = index;
+      index += 1;
+
+      clearLineHighlight();
+      els[current].classList.add('is-speaking');
+
+      var utter = new window.SpeechSynthesisUtterance(lines[current].en);
+      utter.lang = 'en-US';
+      utter.rate = 0.85;
+      utter.onend = function () {
+        if (token !== sceneState.token) {
+          return;
+        }
+        window.setTimeout(next, 260);
+      };
+      utter.onerror = function () {
+        if (token !== sceneState.token) {
+          return;
+        }
+        finishPlayback();
+      };
+
+      try {
+        synth.speak(utter);
+      } catch (e) {
+        finishPlayback();
+      }
+    }
+
+    window.setTimeout(next, 120);
+  }
+
   /* ---------------- 主题 ---------------- */
 
   function currentTheme() {
@@ -376,11 +696,20 @@
 
   function init() {
     buildNav();
+    buildSceneTabs();
+
     totalEl.textContent = String(
       CATEGORIES.reduce(function (sum, cat) {
         return sum + cat.words.length;
       }, 0),
     );
+
+    if (SCENES.length) {
+      if (sceneTotalEl) {
+        sceneTotalEl.textContent = String(SCENES.length);
+      }
+      renderScene(SCENES[0].id);
+    }
 
     var initial = findCategory(hashId()) || findCategory(readStore(KEY_CATEGORY)) || CATEGORIES[0];
     state.activeId = initial.id;
@@ -397,6 +726,22 @@
         render();
       }
     });
+
+    if (jumpScenesBtn) {
+      jumpScenesBtn.addEventListener('click', function () {
+        var scenesEl = document.getElementById('scenes');
+        if (!scenesEl) {
+          return;
+        }
+        var reduceMotion = window.matchMedia(
+          '(prefers-reduced-motion: reduce)',
+        ).matches;
+        scenesEl.scrollIntoView({
+          behavior: reduceMotion ? 'auto' : 'smooth',
+          block: 'start',
+        });
+      });
+    }
 
     window.addEventListener('pagehide', function () {
       if (synth && synth.speaking) {

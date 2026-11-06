@@ -26,9 +26,11 @@ window.WORD_CATEGORIES = [
       { en: 'kiwi', ipa: '/ˈkiːwiː/', zh: '猕猴桃', icon: '🥝' },
       { en: 'coconut', ipa: '/ˈkəʊkənʌt/', zh: '椰子', icon: '🥥' },
       { en: 'tangerine', ipa: '/ˌtændʒəˈriːn/', zh: '橘子', icon: '🍊' },
-      { en: 'pomelo', ipa: '/ˈpɒmələʊ/', zh: '柚子', icon: '🍈' },
+      { en: 'pomelo', ipa: '/ˈpɒmələʊ/', zh: '柚子', icon: '🍊' },
       { en: 'dragon fruit', ipa: '/ˈdræɡən fruːt/', zh: '火龙果', icon: '🌺' },
       { en: 'longan', ipa: '/ˈlɒŋɡən/', zh: '龙眼', icon: '🍇' },
+      { en: 'melon', ipa: '/ˈmelən/', zh: '甜瓜', icon: '🍈' },
+      { en: 'avocado', ipa: '/ˌævəˈkɑːdəʊ/', zh: '牛油果', icon: '🥑' },
     ],
   },
   {
@@ -51,6 +53,9 @@ window.WORD_CATEGORIES = [
       { en: 'gray', ipa: '/ɡreɪ/', zh: '灰色', icon: '🌫️' },
       { en: 'gold', ipa: '/ɡəʊld/', zh: '金色', icon: '🥇' },
       { en: 'silver', ipa: '/ˈsɪlvə/', zh: '银色', icon: '🥈' },
+      { en: 'navy', ipa: '/ˈneɪvi/', zh: '藏青色', icon: '🧢' },
+      { en: 'light blue', ipa: '/ˌlaɪt ˈbluː/', zh: '浅蓝色', icon: '💧' },
+      { en: 'dark green', ipa: '/ˌdɑːk ˈɡriːn/', zh: '深绿色', icon: '🌲' },
     ],
   },
   {
@@ -107,6 +112,8 @@ window.WORD_CATEGORIES = [
       { en: 'mouse', ipa: '/maʊs/', zh: '老鼠', icon: '🐭' },
       { en: 'dragon', ipa: '/ˈdræɡən/', zh: '龙', icon: '🐉' },
       { en: 'snake', ipa: '/sneɪk/', zh: '蛇', icon: '🐍' },
+      { en: 'fox', ipa: '/fɒks/', zh: '狐狸', icon: '🦊' },
+      { en: 'giraffe', ipa: '/dʒəˈrɑːf/', zh: '长颈鹿', icon: '🦒' },
     ],
   },
   {
@@ -128,6 +135,10 @@ window.WORD_CATEGORIES = [
       { en: 'paper', ipa: '/ˈpeɪpə/', zh: '纸', icon: '📄' },
       { en: 'folder', ipa: '/ˈfəʊldə/', zh: '文件夹', icon: '📁' },
       { en: 'glue', ipa: '/ɡluː/', zh: '胶水', icon: '🧴' },
+      { en: 'dictionary', ipa: '/ˈdɪkʃənri/', zh: '字典', icon: '📕' },
+      { en: 'paperclip', ipa: '/ˈpeɪpəklɪp/', zh: '回形针', icon: '📎' },
+      { en: 'calculator', ipa: '/ˈkælkjuleɪtə/', zh: '计算器', icon: '🧮' },
+      { en: 'paintbrush', ipa: '/ˈpeɪntbrʌʃ/', zh: '画笔', icon: '🖌️' },
     ],
   },
   {

@@ -445,7 +445,8 @@
     var kidVoice = isChildVoice(voice);
     var pitch = 1;
     if (profile.age === 'child') {
-      pitch = kidVoice ? 1 : (vg === 'male' ? 1.2 : 1.26);
+      // 童声只在成年音色上做轻微抬升（1.1 左右）：抬得越多越容易出现“含混”的失真
+      pitch = kidVoice ? 1 : (vg === 'male' ? 1.1 : 1.14);
     } else if (profile.age === 'group') {
       pitch = kidVoice ? 1.12 : 1.06;
     } else if (profile.gender === 'female') {
@@ -1109,7 +1110,7 @@
       utter.rate = Math.min(1.6, Math.max(0.55, (0.9 + toneRate) * (cast && cast.rate ? cast.rate : 1)));
       utter.pitch = Math.min(1.9, Math.max(0.45, tonePitch * (cast && cast.pitch ? cast.pitch : 1)));
       // 童声抬得过高会失真、听不清，统一压一个上限
-      if (utter.pitch > 1.45) utter.pitch = 1.45;
+      if (utter.pitch > 1.32) utter.pitch = 1.32;
       var voice = utter.voice;
       var remote = !!(voice && voice.localService === false);
       var started = false;
@@ -1476,7 +1477,7 @@
         var lineRate = (rate + tone.rateDelta) * (entry && entry.rate ? entry.rate : 1);
         var linePitch = tone.pitch * (entry && entry.pitch ? entry.pitch : 1);
         utter.rate = Math.min(2, Math.max(0.1, lineRate));
-        utter.pitch = Math.min(1.45, Math.max(0.1, linePitch));
+        utter.pitch = Math.min(1.32, Math.max(0.1, linePitch));
         utter.onend = function () {
           if (token !== state2.token) return;
           window.setTimeout(next, lineGap(line.en, config.gap));
@@ -1764,7 +1765,7 @@
           else if (/[?？]$/.test(part.text)) { rate += 0.02; pitch += 0.03; }
         }
         utter.rate = Math.min(1.5, Math.max(0.6, rate));
-        utter.pitch = Math.min(1.8, Math.max(0.5, pitch));
+        utter.pitch = Math.min(1.32, Math.max(0.5, pitch));
         utter.onend = function () {
           if (token !== storyState.token || !storyState.playing) return;
           storySpeakTimer = setTimeout(playPart, part.quote ? 180 : 120);

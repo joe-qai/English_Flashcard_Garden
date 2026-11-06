@@ -28,13 +28,14 @@ index.html              # 页面骨架（可直接双击打开）
 favicon.svg             # 站点图标（叠放闪卡 + Aa，同时用于顶栏 logo）
 assets/style.css        # 全部样式（设计基调见 DESIGN.md）
 assets/words.js         # 单词数据源（27 分类 × 24 词）
-assets/icons/*.svg      # 手绘实物图标（emoji 覆盖不到的 221 个词）
+assets/icons/*.svg      # 手绘实物图标（emoji 画不对或没有的 270 个词）
 assets/scenes.js        # 场景对话数据源
 assets/songs.js         # 歌曲数据源（24 首，歌词 + 音频路径）
 assets/stories.js       # 故事会数据源（24 篇：安徒生 5 + 伊索 10 + 格林 9）
 music/*.mp3             # 24 首歌曲音频（文件名即曲目名）
 scripts/make_icons.py   # 生成 assets/icons/ 下的基础 SVG
 scripts/make_icons_extra.py # 生成去重用的补充 SVG
+scripts/make_icons_fix.py   # 生成图物不匹配的修正版 SVG（身体部位同一套小人）
 scripts/patch_words.py  # 把图标 / 色块写回 assets/words.js（可重复运行）
 assets/app.js           # 页签 / 发音 / 播放 / 中文开关 / 游戏 / 主题
 .nojekyll               # 告诉 GitHub Pages 跳过 Jekyll 处理

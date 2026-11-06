@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64"><path d="M14 54V12" stroke="#C08B52" stroke-width="3" stroke-linecap="round"/>
+<path d="M14 14h20l-4 6 4 6H14z" fill="#EF7E6B"/>
+<g>
+<circle cx="30" cy="32" r="4.4" fill="#F2C7A0"/>
+<path d="M25 39c0-2 1.6-3.4 3.6-3.4h3c2 0 3.6 1.4 3.6 3.4l1 13H24z" fill="#F6A94D"/>
+<path d="M27 52l-1 6M33 52l1 6" stroke="#F6A94D" stroke-width="3.4" stroke-linecap="round"/>
+<path d="M26 40l-4 5M36 40l4 4" stroke="#F2C7A0" stroke-width="3" stroke-linecap="round"/>
+</g>
+<g>
+<circle cx="46" cy="35" r="4" fill="#F2C7A0"/>
+<path d="M41 41.5c0-1.8 1.5-3.2 3.3-3.2h2.6c1.8 0 3.3 1.4 3.3 3.2l.9 11.6H40z" fill="#6BB3F0"/>
+<path d="M43 53l-1 6M48 53l1 6" stroke="#6BB3F0" stroke-width="3.2" stroke-linecap="round"/>
+<path d="M42 42l-3 5" stroke="#F2C7A0" stroke-width="2.8" stroke-linecap="round"/>
+</g>
+<g fill="#F089B0"><circle cx="22" cy="14" r="1.8"/><circle cx="40" cy="10" r="1.6"/><circle cx="52" cy="20" r="1.8"/><circle cx="34" cy="20" r="1.4"/></g>
+<g fill="#F6C86B"><circle cx="30" cy="8" r="1.4"/><circle cx="56" cy="10" r="1.4"/><circle cx="46" cy="24" r="1.4"/></g></svg>

@@ -148,7 +148,6 @@ ICON_FIXES = {
     ('solar-terms', 'Spring Equinox'): S + 'spring-equinox.svg',
     ('solar-terms', 'Autumn Equinox'): '\U0001F330',      # 🌰 秋分
     ('seasons', 'solstice'): S + 'solstice.svg',
-    ('seasons', 'equinoxa'): S + 'equinoxa.svg',
     ('seasons', 'vernal'): '\U0001F423',                  # 🐣 春季的
     ('seasons', 'cool'): '\U0001F9CA',                    # 🧊 凉爽的
     ('weather', 'breeze'): '\U0001F390',                  # 🎐 微风
@@ -327,10 +326,106 @@ ICON_FIXES = {
     ('sports-general', 'jogging'): S + 'jogging.svg',
 
     # ---- remaining pairs ----
-    ('transport', 'distance'): '\U0001F6E3\uFE0F',        # 🛣️ 距离
+    ('transport', 'distance'): S + 'distance.svg',
     ('transport', 'platform'): S + 'platform.svg',
     ('festivals', 'wish'): '\U0001F320',                  # 🌠 愿望
     ('measure', 'recipe'): S + 'recipe.svg',
+
+    # ================= 第三轮：图物必须一致 =================
+    # ---- 身体部位：原来用的是通用的灰色小人，标不出具体部位 ----
+    ('body', 'head'): S + 'head.svg',
+    ('body', 'hair'): S + 'hair.svg',
+    ('body', 'forehead'): S + 'forehead.svg',
+    ('body', 'eyebrow'): S + 'eyebrow.svg',
+    ('body', 'neck'): S + 'neck.svg',
+    ('body', 'shoulder'): S + 'shoulder.svg',
+    ('body', 'arm'): S + 'arm.svg',
+    ('body', 'elbow'): S + 'elbow.svg',
+    ('body', 'wrist'): S + 'wrist.svg',
+    ('body', 'chest'): S + 'chest.svg',      # 原来是木质宝箱
+    ('body', 'stomach'): S + 'stomach.svg',
+    ('body', 'waist'): S + 'waist.svg',
+    ('body', 'knee'): S + 'knee.svg',
+
+    # ---- 动植物：🌿 是香草不是蕨类，🍀 是四叶草不是苔藓，🌺 是扶桑不是兰花 ----
+    ('jurassic', 'fern'): S + 'fern.svg',
+    ('plants', 'moss'): S + 'moss.svg',
+    ('plants', 'orchid'): S + 'orchid.svg',
+    ('plants', 'wheat'): S + 'wheat.svg',    # 🌾 是稻穗，不是麦子
+    ('plants', 'soil'): S + 'soil.svg',
+
+    # ---- 军事：🔱 是三叉戟，➡️ 是箭头符号，🚢 是客轮 ----
+    ('military', 'spear'): S + 'spear.svg',
+    ('military', 'arrow'): S + 'arrow.svg',
+    ('military', 'warship'): S + 'warship.svg',
+
+    # ---- 穿着：👔 是领带；🧵 是线轴 ----
+    ('clothing', 'shirt'): S + 'shirt.svg',
+    ('clothing', 'shoelace'): S + 'shoelace.svg',
+
+    # ---- 文具：📐 是三角尺，不是半圆量角器 ----
+    ('stationery', 'protractor'): S + 'protractor.svg',
+
+    # ---- 节气 / 季节 ----
+    ('solar-terms', 'Autumn Equinox'): S + 'autumn-equinox.svg',
+    ('solar-terms', 'Winter Solstice'): S + 'winter-solstice.svg',
+    ('solar-terms', "Frost's Descent"): S + 'frost-descent.svg',
+    ('solar-terms', 'Beginning of Winter'): S + 'beginning-of-winter.svg',
+    ('solar-terms', 'End of Heat'): S + 'end-of-heat.svg',
+    ('seasons', 'spring'): S + 'spring.svg',
+    ('seasons', 'winter'): S + 'winter.svg',
+    ('seasons', 'equinox'): S + 'equinox.svg',       # 🌗 是下弦月
+    ('seasons', 'midsummer'): S + 'midsummer.svg',
+    ('seasons', 'fertilise'): S + 'fertilise.svg',   # 🧪 是试管
+
+    # ---- 房间：🏚️ 是废屋，🧱 是单块砖，🏠/🏡 是整栋房子 ----
+    ('rooms', 'attic'): S + 'attic.svg',
+    ('rooms', 'wall'): S + 'wall.svg',
+    ('rooms', 'roof'): S + 'roof.svg',
+    ('rooms', 'porch'): S + 'porch.svg',
+    ('rooms', 'windowsill'): S + 'windowsill.svg',
+
+    # ---- 工具：🔗 是链接图标，🔋 是电池，💔 是心碎 ----
+    ('tools', 'duct tape'): S + 'duct-tape.svg',
+    ('tools', 'outlet'): S + 'outlet.svg',
+    ('tools', 'broken'): S + 'broken.svg',
+    ('tools', 'switch'): S + 'switch.svg',
+
+    # ---- 天气：龙卷风是气旋，画成螺旋更准确 ----
+    ('weather', 'typhoon'): S + 'typhoon.svg',
+
+    # ---- 交通：🚧 是施工路障，🛬 是降落，🧍 是站立符号 ----
+    ('transport', 'jam'): S + 'traffic-jam.svg',
+    ('transport', 'boarding'): S + 'boarding.svg',
+    ('transport', 'passenger'): S + 'passenger.svg',
+
+    # ---- 时间：⬅️ 是左箭头，🌑 是新月 ----
+    ('time', 'yesterday'): S + 'yesterday.svg',
+    ('time', 'midnight'): S + 'midnight.svg',
+
+    # ---- 健康 / 职业 ----
+    ('health', 'pharmacy'): S + 'pharmacy.svg',   # ⚕️ 是医学符号，不是药房
+    ('health', 'syrup'): S + 'syrup.svg',
+    ('jobs', 'reporter'): S + 'reporter.svg',
+    ('jobs', 'postman'): S + 'postman.svg',
+    ('jobs', 'musician'): S + 'musician.svg',
+
+    # ---- 运动：⚽ 是球不是球门，⭐ 是星星不是比分，👤 是无脸剪影 ----
+    ('sports-general', 'goal'): S + 'goal.svg',
+    ('sports-general', 'score'): S + 'score.svg',
+    ('sports-general', 'opponent'): S + 'opponent.svg',
+    ('sports-general', 'player'): S + 'player.svg',
+
+    # ---- 购物 / 计量 / 兴趣 ----
+    ('shopping', 'exchange'): S + 'exchange.svg',
+    ('measure', 'liter'): S + 'liter.svg',
+    ('measure', 'ingredient'): S + 'ingredient.svg',
+    ('hobbies', 'model'): S + 'model.svg',
+    ('festivals', 'parade'): S + 'parade.svg',
+    ('festivals', 'costume'): S + 'costume.svg',
+
+    # ---- 海洋：原来的海豹画得像猫 ----
+    ('marine', 'seal'): S + 'seal.svg',
 }
 
 # category id -> {en: swatch hex}
@@ -345,8 +440,18 @@ SWATCHES = {
     },
 }
 
+# (category id, en) -> 更准确的中文释义
+ZH_FIXES = {
+    ('tools', 'duct tape'): '大力胶带',   # 和「胶带 tape」区分开
+}
+
+# (category id, 旧 en) -> (新 en, 新 ipa, 新 zh)，用于修正数据本身的拼写错误
+RENAMES = {
+    ('seasons', 'equinoxa'): ('midsummer', '/ˈmɪdsʌmə(r)/', '仲夏'),
+}
+
 LINE_RE = re.compile(
-    r"^(?P<indent>\s*)\{ en: '(?P<en>[^']+)', ipa: '(?P<ipa>[^']*)', zh: '(?P<zh>[^']+)', icon: '(?P<icon>(?:[^'\\]|\\.)*)' \},$"
+    r"^(?P<indent>\s*)\{ en: '(?P<en>(?:[^'\\]|\\.)+)', ipa: '(?P<ipa>[^']*)', zh: '(?P<zh>[^']+)', icon: '(?P<icon>(?:[^'\\]|\\.)*)' \},$"
 )
 CAT_RE = re.compile(r"^\s*id: '([a-z0-9-]+)',\s*$")
 
@@ -362,17 +467,29 @@ for i, line in enumerate(lines):
     m = LINE_RE.match(line)
     if not m:
         continue
-    en = m.group('en')
+    en = m.group('en').replace("\\'", "'")
+    en_out = en.replace("'", "\\'")
+    ipa = m.group('ipa')
+    zh = m.group('zh')
     seen.add((cat, en))
+    if (cat, en) in RENAMES:
+        en, ipa, zh = RENAMES[(cat, en)]
+        seen.discard((cat, m.group('en')))
+        seen.add((cat, en))
+    zh = ZH_FIXES.get((cat, en), zh)
     new_icon = ICON_FIXES.get((cat, en))
     new_swatch = SWATCHES.get(cat, {}).get(en)
     if new_icon:
         lines[i] = "%s{ en: '%s', ipa: '%s', zh: '%s', icon: '%s' }," % (
-            m.group('indent'), en, m.group('ipa'), m.group('zh'), new_icon)
+            m.group('indent'), en_out, ipa, zh, new_icon)
         changed += 1
     elif new_swatch:
         lines[i] = "%s{ en: '%s', ipa: '%s', zh: '%s', swatch: '%s' }," % (
-            m.group('indent'), en, m.group('ipa'), m.group('zh'), new_swatch)
+            m.group('indent'), en_out, ipa, zh, new_swatch)
+        changed += 1
+    elif (cat, en) in RENAMES or (cat, en) in ZH_FIXES:
+        lines[i] = "%s{ en: '%s', ipa: '%s', zh: '%s', icon: '%s' }," % (
+            m.group('indent'), en_out, ipa, zh, m.group('icon'))
         changed += 1
 
 missing = [k for k in ICON_FIXES if k not in seen]

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64"><rect x="4" y="14" width="56" height="30" rx="4" fill="#3F5875"/>
+<rect x="8" y="18" width="48" height="22" rx="2" fill="#22344A"/>
+<text x="20" y="35" font-family="Segoe UI, sans-serif" font-size="16" font-weight="700" fill="#F6A94D" text-anchor="middle">3</text>
+<text x="32" y="34" font-family="Segoe UI, sans-serif" font-size="12" font-weight="700" fill="#C3CCD3" text-anchor="middle">:</text>
+<text x="44" y="35" font-family="Segoe UI, sans-serif" font-size="16" font-weight="700" fill="#FDFBF7" text-anchor="middle">1</text>
+<path d="M24 44v8M40 44v8" stroke="#93A0A9" stroke-width="3" stroke-linecap="round"/>
+<path d="M14 54h36" stroke="#93A0A9" stroke-width="3" stroke-linecap="round"/></svg>

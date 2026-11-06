@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>英文闪卡园 · 常见单词中英对照</title>
+    <meta
+      name="description"
+      content="按生活场景分类的常见英文单词闪卡，配图（图标）、国际音标与中文释义。覆盖水果、颜色、食物、动物、文具、家具、厨具等类别，点击卡片即可听发音。"
+    />
+    <meta name="theme-color" content="#FAF7F0" />
+    <meta name="color-scheme" content="light dark" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="英文闪卡园 · 常见单词中英对照" />
+    <meta
+      property="og:description"
+      content="七类生活场景、百余个常见英文单词，配 emoji 图标、国际音标与中文释义，点一下就能听发音。"
+    />
+    <meta property="og:locale" content="zh_CN" />
+
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="assets/style.css" />
+
+    <script>
+      // 在首屏渲染前确定主题，避免深色模式闪白
+      (function () {
+        try {
+          var t = localStorage.getItem('flashcard:theme');
+          if (!t) {
+            t = window.matchMedia('(prefers-color-scheme: dark)').matches
+              ? 'dark'
+              : 'light';
+          }
+          document.documentElement.setAttribute('data-theme', t);
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+
+  <body>
+    <div class="page">
+      <div class="topbar">
+        <button
+          id="theme-toggle"
+          class="icon-btn"
+          type="button"
+          aria-label="切换深色模式"
+          title="切换深色模式"
+        >
+          <span class="icon-moon" aria-hidden="true">🌙</span>
+          <span class="icon-sun" aria-hidden="true">☀️</span>
+        </button>
+      </div>
+
+      <header class="hero">
+        <p class="hero-badge"><span aria-hidden="true">💬</span> 常见单词中英对照 · 附音标</p>
+        <h1 class="hero-title">英文闪卡园</h1>
+        <p class="hero-desc">
+          按生活场景挑选常见英文单词，配图、音标与中文释义。点击任意卡片即可播放发音，分类切换轻松学习。
+        </p>
+      </header>
+
+      <nav id="category-nav" class="nav" aria-label="单词分类"></nav>
+
+      <div class="toolbar">
+        <div class="toolbar-title">
+          <span id="cat-icon" class="cat-icon" aria-hidden="true"></span>
+          <h2 id="cat-title" class="cat-title"></h2>
+          <span id="cat-count" class="cat-count" aria-live="polite"></span>
+        </div>
+
+        <div class="search">
+          <svg
+            class="search-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            aria-hidden="true"
+          >
+            <circle cx="11" cy="11" r="7" />
+            <path d="M20 20l-3.6-3.6" />
+          </svg>
+          <input
+            id="search"
+            class="search-input"
+            type="search"
+            placeholder="搜索英文 / 音标 / 中文…"
+            aria-label="搜索单词"
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <kbd class="search-kbd" aria-hidden="true">/</kbd>
+        </div>
+      </div>
+
+      <main>
+        <div id="grid" class="grid"></div>
+
+        <div id="empty" class="empty" hidden>
+          <span class="empty-emoji" aria-hidden="true">🔍</span>
+          <p id="empty-text" class="empty-text"></p>
+        </div>
+
+        <noscript>
+          <div class="empty">
+            <p class="empty-text">这个页面需要启用 JavaScript 才能渲染单词卡片。</p>
+          </div>
+        </noscript>
+      </main>
+
+      <footer class="footer">
+        <p>
+          共 <span id="total-count">0</span> 个单词 · 点击卡片听发音 · 音标为英式读音
+        </p>
+        <p class="footer-sub">纯静态页面 · 无需后端服务</p>
+      </footer>
+    </div>
+
+    <script src="assets/words.js"></script>
+    <script src="assets/app.js"></script>
+  </body>
+</html>

@@ -34,6 +34,11 @@
   var scenePanelEl = document.getElementById('scene-panel');
   var sceneTotalEl = document.getElementById('scene-total');
   var jumpScenesBtn = document.getElementById('jump-scenes');
+  var carouselBarEl = document.getElementById('carousel-bar');
+  var carCountEl = document.getElementById('car-count');
+  var carPrevBtn = document.getElementById('car-prev');
+  var carNextBtn = document.getElementById('car-next');
+  var mobileQuery = window.matchMedia('(max-width: 639px)');
 
   var state = { activeId: CATEGORIES[0].id, query: '' };
   var pills = {};
@@ -42,6 +47,10 @@
   var synth = window.speechSynthesis;
   var supportsSpeech = !!synth && typeof window.SpeechSynthesisUtterance === 'function';
   var inputTimer = null;
+  var carTotal = 0;
+  var carIndex = 0;
+  var carScrollTimer = null;
+  var resizeTimer = null;
 
   /* ---------------- 存储 ---------------- */
 
@@ -219,6 +228,7 @@
       gridEl.hidden = true;
       emptyEl.hidden = false;
       emptyTextEl.textContent = '没有找到匹配“' + query + '”的单词';
+      carTotal = 0;
     } else {
       gridEl.hidden = false;
       emptyEl.hidden = true;
@@ -228,9 +238,14 @@
         frag.appendChild(createCard(word, cat, index));
       });
       gridEl.appendChild(frag);
+
+      carTotal = words.length;
+      carIndex = 0;
+      gridEl.scrollLeft = 0;
     }
 
     syncPills();
+    syncCarousel();
   }
 
   function setCategory(id, clearQuery) {
@@ -353,6 +368,123 @@
         searchEl.blur();
       }
     }
+  });
+
+  /* ---------------- 移动端卡片左右滑动 ---------------- */
+
+  function carStep() {
+    var first = gridEl.firstElementChild;
+    if (!first) {
+      return 0;
+    }
+    var styles = window.getComputedStyle(gridEl);
+    var gap = parseFloat(styles.columnGap) || 0;
+    return first.getBoundingClientRect().width + gap;
+  }
+
+  function setCarLabel(index) {
+    if (carCountEl) {
+      carCountEl.textContent = index + 1 + ' / ' + carTotal;
+    }
+    if (carPrevBtn) {
+      carPrevBtn.disabled = index <= 0;
+    }
+    if (carNextBtn) {
+      carNextBtn.disabled = index >= carTotal - 1;
+    }
+  }
+
+  function syncCarousel() {
+    if (!carouselBarEl) {
+      return;
+    }
+
+    var active = mobileQuery.matches && carTotal > 1 && !gridEl.hidden;
+    carouselBarEl.classList.toggle('is-active', active);
+    if (!active) {
+      return;
+    }
+
+    var step = carStep();
+    if (!step) {
+      return;
+    }
+
+    var index = Math.round(gridEl.scrollLeft / step);
+    index = Math.max(0, Math.min(carTotal - 1, index));
+    carIndex = index;
+    setCarLabel(index);
+  }
+
+  function carGoTo(index) {
+    var step = carStep();
+    if (!step) {
+      return;
+    }
+
+    var target = Math.max(0, Math.min(carTotal - 1, index));
+    var reduceMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
+    var left = target * step;
+
+    if ('scrollBehavior' in document.documentElement.style) {
+      gridEl.scrollTo({
+        left: left,
+        behavior: reduceMotion ? 'auto' : 'smooth',
+      });
+    } else {
+      gridEl.scrollLeft = left;
+    }
+
+    carIndex = target;
+    setCarLabel(target);
+  }
+
+  if (carPrevBtn) {
+    carPrevBtn.addEventListener('click', function () {
+      carGoTo(carIndex - 1);
+    });
+  }
+
+  if (carNextBtn) {
+    carNextBtn.addEventListener('click', function () {
+      carGoTo(carIndex + 1);
+    });
+  }
+
+  gridEl.addEventListener(
+    'scroll',
+    function () {
+      if (!mobileQuery.matches) {
+        return;
+      }
+      if (carScrollTimer) {
+        return;
+      }
+      carScrollTimer = window.setTimeout(function () {
+        carScrollTimer = null;
+        syncCarousel();
+      }, 80);
+    },
+    { passive: true },
+  );
+
+  function onViewportChange() {
+    syncCarousel();
+  }
+
+  if (mobileQuery.addEventListener) {
+    mobileQuery.addEventListener('change', onViewportChange);
+  } else if (mobileQuery.addListener) {
+    mobileQuery.addListener(onViewportChange);
+  }
+
+  window.addEventListener('resize', function () {
+    if (resizeTimer) {
+      window.clearTimeout(resizeTimer);
+    }
+    resizeTimer = window.setTimeout(syncCarousel, 150);
   });
 
   /* ---------------- 场景对话 ---------------- */

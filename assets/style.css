@@ -543,6 +543,93 @@ body {
   opacity: 0.72;
 }
 
+/* ---------- 移动端：卡片左右滑动 ---------- */
+
+.carousel-bar {
+  display: none;
+}
+
+.car-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--card);
+  box-shadow: var(--shadow-1);
+  color: var(--fg);
+  font-family: inherit;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 0.15s ease, opacity 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.car-btn:hover:not(:disabled) {
+  border-color: var(--cat);
+  box-shadow: var(--shadow-2);
+}
+
+.car-btn:disabled {
+  opacity: 0.32;
+  cursor: default;
+}
+
+.car-btn:focus-visible {
+  outline: 2px solid var(--cat);
+  outline-offset: 2px;
+}
+
+.car-count {
+  min-width: 62px;
+  color: var(--muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  text-align: center;
+}
+
+@media (max-width: 639px) {
+  .grid {
+    display: flex;
+    gap: 12px;
+    margin: 0 -20px;
+    padding: 6px 20px 14px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-padding-left: 20px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .grid .card {
+    flex: 0 0 76%;
+    width: auto;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+
+  .grid .card:hover {
+    transform: none;
+  }
+
+  .carousel-bar.is-active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 6px;
+  }
+}
+
 /* ---------- 空状态 ---------- */
 
 .empty {

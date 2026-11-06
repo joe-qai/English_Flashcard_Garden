@@ -60,7 +60,7 @@
         <p class="hero-badge"><span aria-hidden="true">💬</span> 常见单词中英对照 · 附音标</p>
         <h1 class="hero-title">英文闪卡园</h1>
         <p class="hero-desc">
-          按生活场景挑选常见英文单词，配图、音标与中文释义。点击任意卡片即可播放发音；下面还有 7 个日常场景对话，可以逐句跟读。
+          按生活场景挑选常见英文单词，配图、音标与中文释义。点击卡片即可播放发音，下面还有日常场景对话可以逐句跟读。
         </p>
       </header>
 
@@ -101,6 +101,26 @@
 
       <main>
         <div id="grid" class="grid"></div>
+
+        <div id="carousel-bar" class="carousel-bar">
+          <button
+            id="car-prev"
+            class="car-btn"
+            type="button"
+            aria-label="上一个单词"
+          >
+            ‹
+          </button>
+          <span id="car-count" class="car-count" aria-hidden="true"></span>
+          <button
+            id="car-next"
+            class="car-btn"
+            type="button"
+            aria-label="下一个单词"
+          >
+            ›
+          </button>
+        </div>
 
         <div id="empty" class="empty" hidden>
           <span class="empty-emoji" aria-hidden="true">🔍</span>

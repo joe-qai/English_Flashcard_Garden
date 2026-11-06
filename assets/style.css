@@ -572,6 +572,47 @@ body.hide-zh .sub-note { display: none; }
   white-space: nowrap;
 }
 
+/* ========== 朗读发音选择 ========== */
+.voice-picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 30px;
+  padding: 0 6px 0 8px;
+  border-radius: 9px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-muted);
+}
+.voice-picker[hidden] { display: none; }
+.voice-picker-icon { font-size: 0.78rem; line-height: 1; }
+.voice-select {
+  max-width: 168px;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+}
+.voice-select:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; border-radius: 6px; }
+
+@media (max-width: 560px) {
+  .voice-picker { padding: 0 4px 0 6px; gap: 2px; }
+  .voice-picker-icon { display: none; }
+  .voice-select { max-width: 92px; font-size: 0.7rem; }
+}
+@media (max-width: 380px) {
+  .topbar { padding: 8px 10px; gap: 6px; }
+  .topbar-title { gap: 6px; }
+  .topbar-logo { width: 22px; height: 22px; }
+  .topbar-name { font-size: 0.88rem; }
+  .voice-select { max-width: 74px; font-size: 0.66rem; }
+  .zh-toggle { min-width: 38px; padding: 0 8px; }
+}
+
 /* ========== Icon Button ========== */
 .icon-btn {
   width: 34px;

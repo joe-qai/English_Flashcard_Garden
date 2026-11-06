@@ -12,7 +12,7 @@
   <meta property="og:description" content="覆盖小学 1–6 年级教材单元的双语闪卡：英式发音、生词高亮、点击看音标；含场景对话、英文歌谣、中国故事与互动游戏。" />
   <meta property="og:locale" content="zh_CN" />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="assets/style.css?v=20261106h" />
+  <link rel="stylesheet" href="assets/style.css?v=20261106l" />
   <script>
     (function(){try{var t=localStorage.getItem('flashcard:theme');if(!t){t=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
   </script>
@@ -31,6 +31,10 @@
         <span class="zh-toggle-label">CN</span>
       </button>
       <button id="jump-games" class="text-btn" type="button"><span aria-hidden>🎮</span> 开始游戏</button>
+      <label class="voice-picker" id="voice-picker" hidden title="选择朗读发音，默认使用最自然的英式发音">
+        <span class="voice-picker-icon" aria-hidden>🔊</span>
+        <select id="voice-select" class="voice-select" aria-label="选择朗读发音"></select>
+      </label>
       <button id="theme-toggle" class="icon-btn" type="button" aria-label="切换深色模式" title="切换深色模式">
         <span class="icon-moon" aria-hidden>🌙</span>
         <span class="icon-sun" aria-hidden>☀️</span>
@@ -160,10 +164,10 @@
 </div>
 
 <!-- Data files -->
-<script src="assets/words.js?v=20261106h"></script>
-<script src="assets/scenes.js?v=20261106h"></script>
-<script src="assets/songs.js?v=20261106h"></script>
-<script src="assets/stories.js?v=20261106h"></script>
-<script src="assets/app.js?v=20261106h"></script>
+<script src="assets/words.js?v=20261106l"></script>
+<script src="assets/scenes.js?v=20261106l"></script>
+<script src="assets/songs.js?v=20261106l"></script>
+<script src="assets/stories.js?v=20261106l"></script>
+<script src="assets/app.js?v=20261106l"></script>
 </body>
 </html>

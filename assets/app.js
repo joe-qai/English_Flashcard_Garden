@@ -238,36 +238,223 @@
     if (reason === 'autoplay') compatHideTimer = window.setTimeout(hideCompatTip, 6000);
   }
 
-  function refreshSpeechVoices() {
-    if (!supportsSpeech) return;
-    var voices = [];
-    try { voices = synth.getVoices() || []; } catch (e) { return; }
-    for (var i = 0; i < voices.length; i++) {
-      if (/^en(-|_|$)/i.test(voices[i].lang || '')) {
-        if (speechBroken) speechBroken = false;
-        return;
-      }
-    }
+  /* ---- 朗读发音：优先自然音，其次本机音，统一英式 ---- */
+  var KEY_VOICE = 'flashcard:voice';
+  var VOICE_AUTO = 'auto';
+  var voiceCache = [];
+  var preferredVoice = null;
+  var badVoiceKeys = {};
+  var lastVoiceSync = 0;
+  var voiceSelectEl = document.getElementById('voice-select');
+  var voicePickerEl = document.getElementById('voice-picker');
+
+  function normalizeVoiceLang(lang) {
+    return String(lang || '').replace(/_/g, '-').toLowerCase();
   }
 
-  // 统一英式发音：优先 en-GB，其次任意英语语音
+  function isEnglishVoice(v) {
+    return !!v && /^en(-|$)/.test(normalizeVoiceLang(v.lang));
+  }
+
+  function isBritishVoice(v) {
+    return !!v && normalizeVoiceLang(v.lang) === 'en-gb';
+  }
+
+  function voiceKeyOf(v) {
+    return v ? String(v.voiceURI || v.name || '') : '';
+  }
+
+  function shortVoiceName(v) {
+    var raw = String((v && v.name) || 'English');
+    var name = raw
+      .replace(/^Microsoft\s+/i, '')
+      .replace(/\s*[-–—]\s*English.*$/i, '')
+      .replace(/\s*Online\s*\(Natural\)/i, '')
+      .replace(/\s*\((?:Natural|Neural|Enhanced|Premium)\)\s*/gi, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    return name || raw;
+  }
+
+  // 打分：自然音 > 在线音 > 本机音；英式 > 其他英语
+  function voiceScore(v) {
+    var lang = normalizeVoiceLang(v && v.lang);
+    var name = String((v && v.name) || '');
+    var score = 0;
+    if (lang === 'en-gb') score += 100;
+    else if (/^en-(ie|au|nz|za|in|sg)$/.test(lang)) score += 55;
+    else if (lang === 'en-us') score += 30;
+    else if (/^en(-|$)/.test(lang)) score += 20;
+    else return -1;
+
+    if (/natural|neural/i.test(name)) score += 120;
+    else if (/online/i.test(name)) score += 60;
+    else if (/enhanced|premium/i.test(name)) score += 45;
+
+    if (/google uk english female/i.test(name)) score += 95;
+    else if (/google uk english male/i.test(name)) score += 90;
+    else if (/\b(libby|sonia|maisie|ryan|thomas|hollie|bella|alfie)\b/i.test(name)) score += 70;
+    else if (/\b(serena|kate|daniel|arthur|martha|stephanie|oliver|karen|moira|tessa)\b/i.test(name)) score += 55;
+    else if (/\bhazel\b/i.test(name)) score += 35;
+    else if (/\b(george|susan)\b/i.test(name)) score += 10;
+
+    // 明显机械/非英语朗读器降权
+    if (/compact|espeak|festival|pico|robot|synthesizer|chinese|中文/i.test(name)) score -= 150;
+    return score;
+  }
+
+  function englishVoices() {
+    var out = [];
+    for (var i = 0; i < voiceCache.length; i++) {
+      var v = voiceCache[i];
+      if (!isEnglishVoice(v)) continue;
+      var key = voiceKeyOf(v);
+      if (key && badVoiceKeys[key]) continue;
+      out.push(v);
+    }
+    out.sort(function (a, b) { return voiceScore(b) - voiceScore(a); });
+    return out;
+  }
+
   function pickEnglishVoice() {
-    if (!supportsSpeech) return null;
-    var voices = [];
-    try { voices = synth.getVoices() || []; } catch (e) { return null; }
-    var i;
-    for (i = 0; i < voices.length; i++) {
-      if (/^en[-_]GB/i.test(voices[i].lang || '')) return voices[i];
+    var list = englishVoices();
+    return list.length ? list[0] : null;
+  }
+
+  function findPreferredVoice() {
+    var saved = readStore(KEY_VOICE);
+    if (saved && saved !== VOICE_AUTO) {
+      for (var i = 0; i < voiceCache.length; i++) {
+        var v = voiceCache[i];
+        var key = voiceKeyOf(v);
+        if (key === saved && isEnglishVoice(v) && !badVoiceKeys[key]) return v;
+      }
     }
-    for (i = 0; i < voices.length; i++) {
-      if (/^en(-|_|$)/i.test(voices[i].lang || '')) return voices[i];
-    }
-    return null;
+    return pickEnglishVoice();
+  }
+
+  function getActiveVoice() {
+    return findPreferredVoice() || preferredVoice || null;
   }
 
   function applyVoice(u) {
-    var v = pickEnglishVoice();
-    if (v) { u.voice = v; u.lang = v.lang; }
+    syncVoicesThrottled();
+    var v = getActiveVoice();
+    if (v) { u.voice = v; u.lang = v.lang || 'en-GB'; }
+    else { u.lang = u.lang || 'en-GB'; }
+  }
+
+  // Edge 等浏览器的在线自然音常常晚于页面加载才出现，朗读前节流刷新一次
+  function syncVoicesThrottled() {
+    if (!supportsSpeech) return;
+    var now = Date.now();
+    if (now - lastVoiceSync < 1500) return;
+    lastVoiceSync = now;
+    refreshSpeechVoices();
+  }
+
+  // 在线自然音首次发声偏慢，给它更长等待时间
+  function speechStartTimeout() {
+    var v = getActiveVoice();
+    return v && v.localService === false ? 5000 : 1800;
+  }
+
+  function renderVoicePicker() {
+    if (!voiceSelectEl) return;
+    var list = englishVoices();
+    if (voicePickerEl) voicePickerEl.hidden = list.length < 2;
+    if (list.length < 2) return;
+
+    var selected = readStore(KEY_VOICE) || VOICE_AUTO;
+    var frag = document.createDocumentFragment();
+
+    var autoOpt = document.createElement('option');
+    autoOpt.value = VOICE_AUTO;
+    // 手机上空间窄，只显示「自动」，避免被截断
+    var narrow = !!(window.matchMedia && window.matchMedia('(max-width: 560px)').matches);
+    autoOpt.textContent = narrow ? '自动' : '自动 · ' + shortVoiceName(list[0]);
+    frag.appendChild(autoOpt);
+
+    var groups = [
+      { label: '英式发音（推荐）', items: list.filter(isBritishVoice) },
+      { label: '其他英语发音', items: list.filter(function (v) { return !isBritishVoice(v); }) }
+    ];
+    groups.forEach(function (group) {
+      if (!group.items.length) return;
+      var og = document.createElement('optgroup');
+      og.label = group.label;
+      group.items.forEach(function (v) {
+        var opt = document.createElement('option');
+        opt.value = voiceKeyOf(v);
+        opt.textContent = shortVoiceName(v) + (v.localService === false ? ' · 在线' : '');
+        og.appendChild(opt);
+      });
+      frag.appendChild(og);
+    });
+
+    voiceSelectEl.innerHTML = '';
+    voiceSelectEl.appendChild(frag);
+    voiceSelectEl.value = selected;
+    if (voiceSelectEl.value !== selected) voiceSelectEl.value = VOICE_AUTO;
+  }
+
+  // 在线音失败（断网/超时）时拉黑它，自动退回本机音
+  function markVoiceFailed(voice, type) {
+    if (!voice || voice.localService !== false) return false;
+    if (type !== 'timeout' && type !== 'network' && type !== 'synthesis-failed' &&
+        type !== 'audio-busy' && type !== 'not-allowed') return false;
+    var key = voiceKeyOf(voice);
+    if (!key) return false;
+    badVoiceKeys[key] = true;
+    if (readStore(KEY_VOICE) === key) writeStore(KEY_VOICE, VOICE_AUTO);
+    preferredVoice = pickEnglishVoice();
+    renderVoicePicker();
+    return !!preferredVoice;
+  }
+
+  function previewVoice() {
+    if (!canSpeak()) return;
+    window.setTimeout(function () {
+      if (!canSpeak()) return;
+      var v = getActiveVoice();
+      try {
+        synth.cancel();
+        var u = new window.SpeechSynthesisUtterance('Hello');
+        u.lang = v && v.lang ? v.lang : 'en-GB';
+        if (v) u.voice = v;
+        u.rate = 0.95;
+        synth.speak(u);
+      } catch (e) {}
+    }, 60);
+  }
+
+  function refreshSpeechVoices() {
+    if (!supportsSpeech) return;
+    lastVoiceSync = Date.now();
+    var voices = [];
+    try { voices = synth.getVoices() || []; } catch (e) { return; }
+    if (!voices.length) return;
+    voiceCache = voices;
+    preferredVoice = pickEnglishVoice();
+    if (preferredVoice) speechBroken = false;
+    // 用户选过的语音已不存在时回落到自动
+    var saved = readStore(KEY_VOICE);
+    if (saved && saved !== VOICE_AUTO) {
+      var found = false;
+      for (var i = 0; i < voiceCache.length; i++) {
+        if (voiceKeyOf(voiceCache[i]) === saved && isEnglishVoice(voiceCache[i])) { found = true; break; }
+      }
+      if (!found) writeStore(KEY_VOICE, VOICE_AUTO);
+    }
+    renderVoicePicker();
+  }
+
+  if (voiceSelectEl) {
+    voiceSelectEl.addEventListener('change', function () {
+      writeStore(KEY_VOICE, voiceSelectEl.value || VOICE_AUTO);
+      preferredVoice = pickEnglishVoice();
+      previewVoice();
+    });
   }
 
   function markSpeechBroken(btn) {
@@ -296,6 +483,9 @@
         }
       } catch (e) {}
       refreshSpeechVoices();
+      // 部分浏览器语音列表异步返回，稍后再刷新几次
+      window.setTimeout(refreshSpeechVoices, 500);
+      window.setTimeout(refreshSpeechVoices, 1500);
     }
     if (weakBrowser || !supportsSpeech) {
       window.setTimeout(function () {
@@ -651,39 +841,65 @@
     if (speakTimer) { window.clearTimeout(speakTimer); speakTimer = null; }
     if (speechStartTimer) { window.clearTimeout(speechStartTimer); speechStartTimer = null; }
 
-    var started = false;
-    var clearStartTimer = function () {
-      if (speechStartTimer) { window.clearTimeout(speechStartTimer); speechStartTimer = null; }
-    };
-    var utter = new window.SpeechSynthesisUtterance(text);
-    utter.lang = 'en-GB';
-    applyVoice(utter);
-    utter.rate = 0.85;
-    utter.onstart = function () {
-      started = true;
-      clearStartTimer();
-    };
-    utter.onend = function () {
-      started = true;
-      clearStartTimer();
+    var retried = 0;
+    var finish = function () {
       btn.classList.remove('is-speaking');
       if (speakingBtn === btn) speakingBtn = null;
     };
-    utter.onerror = function (ev) {
-      clearStartTimer();
-      btn.classList.remove('is-speaking');
-      if (speakingBtn === btn) speakingBtn = null;
-      var type = ev && ev.error ? ev.error : '';
-      // interrupted / canceled 是我们主动打断，不代表浏览器不支持
-      if (!started && type !== 'interrupted' && type !== 'canceled') markSpeechBroken(btn);
-    };
+
     var start = function () {
+      if (speechStartTimer) { window.clearTimeout(speechStartTimer); speechStartTimer = null; }
+      var utter = new window.SpeechSynthesisUtterance(text);
+      utter.lang = 'en-GB';
+      applyVoice(utter);
+      utter.rate = 0.9;
+      var voice = utter.voice;
+      var remote = !!(voice && voice.localService === false);
+      var started = false;
+      var clearStartTimer = function () {
+        if (speechStartTimer) { window.clearTimeout(speechStartTimer); speechStartTimer = null; }
+      };
+      utter.onstart = function () {
+        started = true;
+        clearStartTimer();
+      };
+      utter.onend = function () {
+        started = true;
+        clearStartTimer();
+        finish();
+      };
+      utter.onerror = function (ev) {
+        clearStartTimer();
+        var type = ev && ev.error ? ev.error : '';
+        // interrupted / canceled 是我们主动打断，不代表浏览器不支持
+        if (started || type === 'interrupted' || type === 'canceled') { finish(); return; }
+        // 在线自然音失败时，退回本机语音再试
+        if (retried < 2 && markVoiceFailed(voice, type)) {
+          retried += 1;
+          window.setTimeout(function () {
+            try { synth.cancel(); } catch (e) {}
+            start();
+          }, 80);
+          return;
+        }
+        finish();
+        markSpeechBroken(btn);
+      };
       // 部分浏览器（如华为、微信内置内核）接口存在但永远不播放，用超时兜底
       speechStartTimer = window.setTimeout(function () {
-        if (!started) markSpeechBroken(btn);
-      }, 1800);
-      try { synth.speak(utter); } catch (e) { markSpeechBroken(btn); }
+        if (started) return;
+        if (retried < 2 && markVoiceFailed(voice, 'timeout')) {
+          retried += 1;
+          try { synth.cancel(); } catch (e) {}
+          start();
+          return;
+        }
+        finish();
+        markSpeechBroken(btn);
+      }, remote ? 5000 : 1800);
+      try { synth.speak(utter); } catch (e) { markSpeechBroken(btn); finish(); }
     };
+
     if (synth.speaking || synth.pending) {
       synth.cancel();
       speakTimer = window.setTimeout(start, 60);
@@ -983,8 +1199,9 @@
           if (token !== state2.token) return;
           window.setTimeout(next, config.gap);
         };
-        utter.onerror = function () {
+        utter.onerror = function (ev) {
           if (token !== state2.token) return;
+          markVoiceFailed(utter.voice, ev && ev.error ? ev.error : '');
           finishPlayback();
         };
         try { synth.speak(utter); } catch (e) { finishPlayback(); }
@@ -1246,8 +1463,9 @@
         if (token !== storyState.token || !storyState.playing) return;
         storySpeakTimer = setTimeout(function () { playNextSentence(idx + 1); }, 600);
       };
-      utter.onerror = function () {
+      utter.onerror = function (ev) {
         if (token !== storyState.token) return;
+        markVoiceFailed(utter.voice, ev && ev.error ? ev.error : '');
         storyErrors += 1;
         if (storyErrors > 2) { markSpeechBroken(null); stopStory(); return; }
         playNextSentence(idx + 1);
@@ -1282,14 +1500,14 @@
         if (titleStarted || token !== storyState.token || !storyState.playing) return;
         markSpeechBroken(null);
         stopStory();
-      }, 2400);
+      }, Math.max(2400, speechStartTimeout()));
       var clearTitleWatch = function () {
         titleStarted = true;
         window.clearTimeout(titleWatch);
       };
       titleUtter.onstart = clearTitleWatch;
       titleUtter.onend = function () { clearTitleWatch(); startBody(); };
-      titleUtter.onerror = function () { clearTitleWatch(); startBody(); };
+      titleUtter.onerror = function (ev) { markVoiceFailed(titleUtter.voice, ev && ev.error ? ev.error : ''); clearTitleWatch(); startBody(); };
       try { synth.speak(titleUtter); } catch (e) { clearTitleWatch(); startBody(); }
     }
 
@@ -1424,7 +1642,7 @@
         var heard = false;
         var gameWatch = window.setTimeout(function () {
           if (!heard && canSpeak()) markSpeechBroken(null);
-        }, 1800);
+        }, speechStartTimeout());
         var done = function () { heard = true; window.clearTimeout(gameWatch); };
         u.onstart = done;
         u.onend = done;

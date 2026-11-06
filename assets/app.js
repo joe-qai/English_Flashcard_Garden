@@ -465,7 +465,13 @@
       } else {
         var note = document.createElement('p');
         note.className = 'audio-note';
-        note.innerHTML = '<span aria-hidden="true">🎧</span> 纯享版 · 暂无歌词，先听旋律磨耳朵';
+        var noteIcon = document.createElement('span');
+        noteIcon.setAttribute('aria-hidden', 'true');
+        noteIcon.textContent = '🎧';
+        note.appendChild(noteIcon);
+        note.appendChild(document.createTextNode(
+          item.note || '纯享版 · 暂无歌词，先听旋律磨耳朵'
+        ));
         panel.appendChild(note);
       }
       syncTabs();

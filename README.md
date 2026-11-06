@@ -8,7 +8,7 @@
 
 - **27 个主题分类**：水果、颜色、食物、动物、文具、家具、厨具、侏罗纪、海洋生物、植物、军事武器、二十四节气、四季、天气、穿着、身体部位、健康看病、购物付款、交通出行、职业工作、房间家居、工具维修、时间概念、爱好休闲、数字计量、运动综合、节日庆典，共 648 个单词
 - **28 个场景对话**：洗漱、早上、中午、晚上、吃饭、上厕所、上课、运动（足球）、徒步、睡觉、问时间、问路、认一认、问问题、心情，以及侏罗纪、海洋生物、动物园、历史、军事、在商店、在餐厅、看医生、坐公交、过生日、周末计划、修理东西、寄快递
-- **24 首英文歌曲**：童谣 9 首（小星星、划小船、玛丽的小羊羔、伦敦桥、公交车上的轮子、老麦克唐纳、咩咩黑羊、蛋头先生、杰克和吉尔）、动画金曲 7 首（Nobody Like U、Peaches、Surface Pressure、We Don't Talk About Bruno、Sunflower、Enemy、Dance the Night Away）、流行金曲 8 首（500 Miles、Big Big World、Count On Me、Proud of You、Seasons in the Sun、Yesterday Once More、You Are My Sunshine、Let It Be Me）；音频统一放在根目录 `music/`，有歌词的歌曲另配可跟读歌词
+- **24 首英文歌曲**：童谣 9 首（小星星、划小船、玛丽的小羊羔、伦敦桥、公交车上的轮子、老麦克唐纳、咩咩黑羊、蛋头先生、杰克和吉尔）、动画金曲 7 首（Nobody Like U、Peaches、Surface Pressure、We Don't Talk About Bruno、Sunflower、Enemy、Dance the Night Away）、流行金曲 8 首（500 Miles、Big Big World、Count On Me、Proud of You、Seasons in the Sun、Yesterday Once More、You Are My Sunshine、Let It Be Me）；音频统一放在根目录 `music/`。9 首公版童谣配**完整歌词**并可逐句跟读；其余 15 首为版权曲目，只提供音频（纯享版），不摘录歌词
 - **5 个安徒生童话**：丑小鸭、拇指姑娘、皇帝的新装、卖火柴的小女孩、海的女儿，逐句朗读，可单句循环
 - **全局中文开关**：右上角一键隐藏/显示所有中文（卡片释义、对话译文、歌词译文、标题），英文与音标始终保留，状态记忆在 `localStorage`
 - **互动小游戏**：英文→中文、中文→英文两种题型，20 题一轮，记录正确率与最长连对
@@ -122,8 +122,9 @@ window.SONG_LIBRARY = [
     desc: '最经典的哄睡童谣，句子短、重复多',
     audio: 'music/Twinkle Twinkle Little Star.mp3',  // 指向 music/ 下的文件
     rate: 0.78,                     // 整首连读的语速，建议 0.75~0.85
-    lines: [
+    lines: [                       // 完整歌词；没有就写 []
       { en: 'Twinkle, twinkle, little star,', zh: '一闪一闪小星星，', notes: { twinkle: '/ˈtwɪŋkl/' } },
+      // …整首歌词逐句列完
     ],
   },
 ];
@@ -131,9 +132,11 @@ window.SONG_LIBRARY = [
 
 歌曲与场景对话共用同一套播放器样式与交互，多一个 `audio` 字段用于挂载音频、一个 `rate` 字段用于放慢朗读语速；句间停顿比对话更长，方便跟读。
 
-音频放在仓库根目录的 `music/`，文件名原样写进 `audio` 即可（含空格也没问题，路径里出现单引号时用双引号包裹）。`lines` 留空数组时，播放器只展示音频并提示「纯享版」，不会出现朗读按钮。
+音频放在仓库根目录的 `music/`，文件名原样写进 `audio` 即可（含空格也没问题，路径里出现单引号时用双引号包裹）。
 
-> ⚠️ `music/` 里的曲目多为版权作品，仅适合本地自用；公开部署前请先确认授权，或把 `music/` 加入 `.gitignore` 只保留目录说明。
+**歌词规则：要么写完整，要么不写。** `lines` 留空数组时，播放器只展示音频并显示 `note` 提示（默认「纯享版」），不会出现「朗读歌词」按钮。目前 9 首公有领域童谣是完整歌词，15 首版权曲目只放音频——不摘录半首歌词。想给某首歌补歌词，把 `lines` 填成完整版本即可。
+
+> ⚠️ `music/` 里的版权曲目已随仓库提交，公开仓库托管存在被投诉下架的风险；如要长期公开部署，建议换成已授权音源或把 `music/` 移出版本库。
 
 ## 说明
 

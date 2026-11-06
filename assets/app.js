@@ -359,6 +359,205 @@
     return v && v.localService === false ? 5000 : 1800;
   }
 
+  /* ---- 角色化发音：场景按说话人分音色，故事分旁白/对白 ---- */
+  var FEMALE_VOICE_RE = /(libby|sonia|olivia|maisie|bella|hollie|hazel|susan|serena|kate|martha|stephanie|moira|tessa|karen|samantha|victoria|michelle|aria|jenny|emma|ava|allison|joanna|salli|kimberly|ivy|kendra|zira|female|woman|girl)/i;
+  var MALE_VOICE_RE = /(ryan|thomas|george|daniel|arthur|oliver|elliot|ethan|noah|alfie|guy|david|mark|alex|james|eric|steffan|brian|christopher|roger|william|fred|ralph|male|man|boy)/i;
+  var CHILD_VOICE_RE = /(alfie|bella|hollie|maisie|noah|child|kid)/i;
+
+  function voiceGender(v) {
+    var name = String((v && v.name) || '');
+    if (FEMALE_VOICE_RE.test(name)) return 'female';
+    if (MALE_VOICE_RE.test(name)) return 'male';
+    return '';
+  }
+
+  function isChildVoice(v) {
+    return CHILD_VOICE_RE.test(String((v && v.name) || ''));
+  }
+
+  var PROFILE_ADULT_F = { gender: 'female', age: 'adult', rate: 1.0 };
+  var PROFILE_ADULT_M = { gender: 'male', age: 'adult', rate: 1.0 };
+  var PROFILE_CHILD = { gender: '', age: 'child', rate: 1.02 };
+  var PROFILE_CHILD_F = { gender: 'female', age: 'child', rate: 1.02 };
+  var PROFILE_CHILD_M = { gender: 'male', age: 'child', rate: 1.02 };
+  var PROFILE_GROUP = { gender: '', age: 'group', rate: 0.98 };
+  var PROFILE_NEUTRAL = { gender: '', age: 'adult', rate: 1.0 };
+
+  var FEMALE_SPEAKERS = ['mom','mum','mother','grandma','granny','teacher','nurse','lily','amy','lucy','anna','emma','mrs','ms','miss','queen','princess','witch','sister'];
+  var MALE_SPEAKERS = ['tom','ben','dad','father','grandpa','doctor','driver','mr','king','prince','brother','uncle'];
+  var CHILD_FEMALE_SPEAKERS = ['amy','lily','lucy','anna','emma','girl'];
+  var CHILD_MALE_SPEAKERS = ['tom','ben','jack','leo','boy'];
+  var GROUP_SPEAKERS = ['class','everyone','everybody','children','students','family'];
+
+  function speakerProfile(who) {
+    var key = String(who || '').toLowerCase().replace(/[^a-z]/g, '');
+    if (!key) return PROFILE_NEUTRAL;
+    if (GROUP_SPEAKERS.indexOf(key) !== -1) return PROFILE_GROUP;
+    if (CHILD_FEMALE_SPEAKERS.indexOf(key) !== -1) return PROFILE_CHILD_F;
+    if (CHILD_MALE_SPEAKERS.indexOf(key) !== -1) return PROFILE_CHILD_M;
+    if (FEMALE_SPEAKERS.indexOf(key) !== -1) return PROFILE_ADULT_F;
+    if (MALE_SPEAKERS.indexOf(key) !== -1) return PROFILE_ADULT_M;
+    return PROFILE_NEUTRAL;
+  }
+
+  function pickCastVoice(profile, used) {
+    var list = englishVoices();
+    if (!list.length) return null;
+    var pool = list.slice();
+    if (profile.age === 'child') {
+      var kids = pool.filter(isChildVoice);
+      if (kids.length) pool = kids;
+    }
+    if (profile.gender) {
+      var byGender = pool.filter(function (v) { return voiceGender(v) === profile.gender; });
+      if (byGender.length) pool = byGender;
+    }
+    var fresh = pool.filter(function (v) { return !used[voiceKeyOf(v)]; });
+    if (fresh.length) return fresh[0];
+    var anyFresh = list.filter(function (v) { return !used[voiceKeyOf(v)]; });
+    return anyFresh.length ? anyFresh[0] : pool[0];
+  }
+
+  // 音色之外再用音高/语速拉开年龄和性别差异；没有合适音色时也能听出角色变化
+  function castEntry(profile, voice) {
+    var vg = voiceGender(voice);
+    var pitch = 1;
+    if (profile.age === 'child') pitch = isChildVoice(voice) ? 1.0 : 1.16;
+    else if (profile.age === 'group') pitch = 1.04;
+    else if (profile.gender === 'female') pitch = vg === 'male' ? 1.12 : 1.02;
+    else if (profile.gender === 'male') pitch = vg === 'female' ? 0.9 : 0.95;
+    else if (vg === 'female') pitch = 1.02;
+    else if (vg === 'male') pitch = 0.95;
+    return {
+      voice: voice || null,
+      pitch: pitch,
+      rate: profile.rate || 1,
+      gender: profile.gender || vg,
+      age: profile.age || 'adult'
+    };
+  }
+
+  function buildSceneCast(lines) {
+    var cast = {};
+    var used = {};
+    var speakers = [];
+    (lines || []).forEach(function (line) {
+      if (line && line.who && speakers.indexOf(line.who) === -1) speakers.push(line.who);
+    });
+    speakers.forEach(function (who) {
+      var profile = speakerProfile(who);
+      var voice = pickCastVoice(profile, used);
+      if (voice) used[voiceKeyOf(voice)] = true;
+      cast[who] = castEntry(profile, voice);
+    });
+    return cast;
+  }
+
+  function voiceSignature() {
+    return englishVoices().map(voiceKeyOf).join('|');
+  }
+
+  // 音色列表可能晚于首屏到达，按签名判断是否需要重新分配角色音色
+  function getSceneCast(state) {
+    var sig = voiceSignature();
+    if (!state.cast || state.castSig !== sig) {
+      state.cast = buildSceneCast(state.lines);
+      state.castSig = sig;
+    }
+    return state.cast;
+  }
+
+  function applyCastVoice(u, entry) {
+    if (entry && entry.voice && !badVoiceKeys[voiceKeyOf(entry.voice)]) {
+      u.voice = entry.voice;
+      u.lang = entry.voice.lang || 'en-GB';
+      return true;
+    }
+    applyVoice(u);
+    return false;
+  }
+
+  /* ---- 故事朗读：旁白 + 对白分段，读出讲故事的语气 ---- */
+  var STORY_QUOTE_DEFAULT = {
+    'ugly-duckling': 'child', 'lion-and-mouse': 'male', 'fox-and-grapes': 'male',
+    'tortoise-and-hare': 'male', 'ant-and-grasshopper': 'male', 'fox-and-crow': 'male',
+    'town-mouse-country-mouse': 'male', 'golden-eggs': 'male', 'wind-and-sun': 'neutral',
+    'boy-who-cried-wolf': 'male', 'crow-and-pitcher': 'male', 'red-riding-hood': 'child',
+    'hansel-and-gretel': 'child', 'snow-white': 'female', 'cinderella': 'female',
+    'rapunzel': 'female', 'rumpelstiltskin': 'female', 'frog-prince': 'female',
+    'little-match-girl': 'child', 'little-mermaid': 'female', 'thumbelina': 'female',
+    'emperors-new-clothes': 'child', 'bremen-musicians': 'male', 'elves-and-shoemaker': 'male',
+    'sima-guang': 'child', 'kong-rong': 'child', 'cao-chong': 'child',
+    'waiting-by-tree': 'male', 'pulling-seedlings': 'male', 'mending-fold': 'male',
+    'mulan': 'female', 'story-of-nian': 'neutral', 'chang-e': 'female'
+  };
+
+  // 把一句话拆成「旁白 / 引号里的对白」，对白单独换音色和语调
+  function splitStoryParts(text) {
+    var parts = [];
+    var re = /"([^"]*)"|“([^”]*)”/g;
+    var last = 0;
+    var m;
+    while ((m = re.exec(text))) {
+      var pre = text.slice(last, m.index).replace(/^[\s,;:.!?]+/, '').trim();
+      if (pre) parts.push({ text: pre, quote: false });
+      var quoted = (m[1] !== undefined ? m[1] : m[2]).trim();
+      if (quoted) parts.push({ text: quoted, quote: true });
+      last = m.index + m[0].length;
+    }
+    var rest = text.slice(last).replace(/^[\s,;:.!?]+/, '').trim();
+    if (rest) parts.push({ text: rest, quote: false });
+    if (!parts.length) parts.push({ text: text, quote: false });
+    return parts;
+  }
+
+  function storyDialogueKey(sentence, storyId) {
+    var outside = String(sentence || '').replace(/"[^"]*"|“[^”]*”/g, ' ');
+    var t = ' ' + outside.toLowerCase() + ' ';
+    if (/\b(child|children|girl|boy|kids?)\b/.test(t)) return 'child';
+    if (/\b(witch|stepmother|mother|grandmother|queen|princess|snow white|rapunzel|she|her|sister|nurse)\b/.test(t)) return 'female';
+    if (/\b(wolf|father|king|prince|shepherd|hare|fox|ant|frog|tortoise|mouse|neighbour|brothers?|he|his|him|uncle)\b/.test(t)) return 'male';
+    if (/\b(everyone|everybody|class|students|friends)\b/.test(t)) return 'group';
+    return STORY_QUOTE_DEFAULT[storyId] || 'neutral';
+  }
+
+  var STORY_CAST_PROFILES = {
+    female: PROFILE_ADULT_F,
+    male: PROFILE_ADULT_M,
+    child: PROFILE_CHILD,
+    group: PROFILE_GROUP,
+    neutral: PROFILE_NEUTRAL
+  };
+
+  function buildStoryCast(sentences, storyId) {
+    var used = {};
+    var narratorVoice = getActiveVoice();
+    if (narratorVoice) used[voiceKeyOf(narratorVoice)] = true;
+    var narrator = castEntry(PROFILE_NEUTRAL, narratorVoice);
+    narrator.pitch = 1.0;
+    narrator.rate = 0.97;
+    var cast = { narrator: narrator };
+
+    // 先给故事里真正出现的角色分配音色，避免被没用到的角色占掉名额
+    var order = [];
+    (sentences || []).forEach(function (sent) {
+      if (!sent || !/["“]/.test(sent.en)) return;
+      var key = storyDialogueKey(sent.en, storyId);
+      if (order.indexOf(key) === -1) order.push(key);
+    });
+    ['female', 'male', 'child', 'group', 'neutral'].forEach(function (key) {
+      if (order.indexOf(key) === -1) order.push(key);
+    });
+
+    order.forEach(function (key) {
+      var profile = STORY_CAST_PROFILES[key] || PROFILE_NEUTRAL;
+      var voice = pickCastVoice(profile, used);
+      if (voice) used[voiceKeyOf(voice)] = true;
+      cast[key] = castEntry(profile, voice);
+    });
+    return cast;
+  }
+
   function renderVoicePicker() {
     if (!voiceSelectEl) return;
     var list = englishVoices();
@@ -828,7 +1027,7 @@
   var speakTimer = null;
   var speechStartTimer = null;
 
-  function speak(text, btn) {
+  function speak(text, btn, cast) {
     stopAllPlayback();
     if (!canSpeak()) {
       flashButton(btn);
@@ -851,8 +1050,9 @@
       if (speechStartTimer) { window.clearTimeout(speechStartTimer); speechStartTimer = null; }
       var utter = new window.SpeechSynthesisUtterance(text);
       utter.lang = 'en-GB';
-      applyVoice(utter);
-      utter.rate = 0.9;
+      applyCastVoice(utter, cast);
+      utter.rate = Math.min(1.4, Math.max(0.6, 0.9 * (cast && cast.rate ? cast.rate : 1)));
+      utter.pitch = Math.min(1.8, Math.max(0.5, cast && cast.pitch ? cast.pitch : 1));
       var voice = utter.voice;
       var remote = !!(voice && voice.localService === false);
       var started = false;
@@ -1006,6 +1206,8 @@
       state2.id = item.id;
       state2.item = item;
       state2.lines = item.lines || [];
+      state2.cast = null;
+      state2.castSig = '';
       state2.lineEls = [];
       state2.playing = false;
       state2.audioActive = false;
@@ -1062,8 +1264,6 @@
         });
         audio.addEventListener('ended', function () {
           state2.audioActive = false;
-          if (!config.autoNext || state2.id !== item.id) return;
-          advance('audio');
         });
         audioWrap.appendChild(audio);
         panel.appendChild(audioWrap);
@@ -1088,7 +1288,8 @@
         btn.appendChild(en); btn.appendChild(zh);
         btn.addEventListener('click', function () {
           if (state2.playing) stop();
-          speak(line.en, btn);
+          var cast = getSceneCast(state2);
+          speak(line.en, btn, line.who ? cast[line.who] : null);
         });
         li.appendChild(btn);
         listEl.appendChild(li);
@@ -1126,17 +1327,6 @@
       }
     }
 
-    function advance(kind) {
-      if (!list.length) return;
-      var idx = -1;
-      for (var i = 0; i < list.length; i++) {
-        if (list[i].id === state2.id) { idx = i; break; }
-      }
-      var next = list[(idx + 1) % list.length];
-      if (!next) return;
-      render(next.id, kind || 'audio');
-    }
-
     function clearLineHighlight() {
       state2.lineEls.forEach(function (el) { el.classList.remove('is-speaking'); });
     }
@@ -1162,7 +1352,6 @@
       state2.token += 1;
       clearLineHighlight();
       updatePlayBtn();
-      if (config.autoNext) advance('audio');
     }
     function togglePlayback() {
       if (state2.playing) { stop(); return; }
@@ -1181,6 +1370,7 @@
       var rate = state2.item && state2.item.rate ? state2.item.rate : config.rate;
       var mood = state2.item && state2.item.mood ? state2.item.mood : 'normal';
       var moodTone = getMoodTone(mood);
+      var cast = getSceneCast(state2);
       updatePlayBtn();
       function next() {
         if (token !== state2.token || !state2.playing) return;
@@ -1188,13 +1378,15 @@
         var current = index; index += 1;
         clearLineHighlight();
         if (els[current]) els[current].classList.add('is-speaking');
-        var utter = new window.SpeechSynthesisUtterance(lines[current].en);
+        var line = lines[current];
+        var entry = line.who ? cast[line.who] : null;
+        var utter = new window.SpeechSynthesisUtterance(line.en);
         utter.lang = 'en-GB';
-        applyVoice(utter);
-        var lineRate = Math.min(2, Math.max(0.1, rate + moodTone.rateDelta));
-        var linePitch = Math.min(2, Math.max(0, moodTone.pitch));
-        utter.rate = lineRate;
-        utter.pitch = linePitch;
+        applyCastVoice(utter, entry);
+        var lineRate = (rate + moodTone.rateDelta) * (entry && entry.rate ? entry.rate : 1);
+        var linePitch = moodTone.pitch * (entry && entry.pitch ? entry.pitch : 1);
+        utter.rate = Math.min(2, Math.max(0.1, lineRate));
+        utter.pitch = Math.min(2, Math.max(0.1, linePitch));
         utter.onend = function () {
           if (token !== state2.token) return;
           window.setTimeout(next, config.gap);
@@ -1282,7 +1474,6 @@
       rate: 0.78,
       gap: 420,
       audio: true,
-      autoNext: true,
     });
     if (songPlayer) {
       songPlayer._type = 'song';
@@ -1310,7 +1501,7 @@
     if (storyTabCount) storyTabCount.textContent = String(stories.length);
 
     var storyTabs = {};
-    var storyState = { id: '', item: null, playing: false, token: 0, sentences: [], sentenceEls: [], playBtn: null, currentIdx: 0 };
+    var storyState = { id: '', item: null, playing: false, token: 0, sentences: [], sentenceEls: [], playBtn: null, currentIdx: 0, cast: null, castSig: '' };
 
     function buildTabs() {
       var frag = document.createDocumentFragment();
@@ -1370,6 +1561,8 @@
       storyState.id = item.id;
       storyState.item = item;
       storyState.sentences = item.sentences;
+      storyState.cast = null;
+      storyState.castSig = '';
       storyState.sentenceEls = [];
       storyState.playing = false;
       storyState.currentIdx = 0;
@@ -1430,23 +1623,19 @@
       if (autoplay) startStoryPlayback();
     }
 
-    function advanceStory() {
-      if (!stories.length) return;
-      var idx = -1;
-      for (var i = 0; i < stories.length; i++) {
-        if (stories[i].id === storyState.id) { idx = i; break; }
+    function storyFinish() {
+      storyState.playing = false;
+      storyState.sentenceEls.forEach(function (el) { el.classList.remove('is-speaking'); });
+      if (storyState.playBtn) {
+        storyState.playBtn.textContent = '▶ 朗读故事';
+        storyState.playBtn.classList.remove('is-playing');
       }
-      var next = stories[(idx + 1) % stories.length];
-      if (!next) return;
-      renderStory(next.id, true);
     }
 
     function playNextSentence(idx) {
       var token = storyState.token;
       if (idx >= storyState.sentences.length) {
-        storyState.playing = false;
-        storyState.sentenceEls.forEach(function (el) { el.classList.remove('is-speaking'); });
-        advanceStory();
+        storyFinish();
         return;
       }
       storyState.currentIdx = idx;
@@ -1454,23 +1643,52 @@
         el.classList.toggle('is-speaking', i === idx);
       });
       var sent = storyState.sentences[idx];
-      var utter = new window.SpeechSynthesisUtterance(sent.en);
-      utter.lang = 'en-GB';
-      applyVoice(utter);
-      utter.rate = 0.82;
-      utter.onend = function () {
-        storyErrors = 0;
+      var sig = voiceSignature();
+      if (!storyState.cast || storyState.castSig !== sig) {
+        storyState.cast = buildStoryCast(storyState.sentences, storyState.id);
+        storyState.castSig = sig;
+      }
+      var cast = storyState.cast;
+      var parts = splitStoryParts(sent.en);
+      var dialogueKey = storyDialogueKey(sent.en, storyState.id);
+      var partIndex = 0;
+
+      function playPart() {
         if (token !== storyState.token || !storyState.playing) return;
-        storySpeakTimer = setTimeout(function () { playNextSentence(idx + 1); }, 600);
-      };
-      utter.onerror = function (ev) {
-        if (token !== storyState.token) return;
-        markVoiceFailed(utter.voice, ev && ev.error ? ev.error : '');
-        storyErrors += 1;
-        if (storyErrors > 2) { markSpeechBroken(null); stopStory(); return; }
-        playNextSentence(idx + 1);
-      };
-      try { synth.speak(utter); } catch (e) { playNextSentence(idx + 1); }
+        if (partIndex >= parts.length) {
+          storyErrors = 0;
+          storySpeakTimer = setTimeout(function () { playNextSentence(idx + 1); }, 620);
+          return;
+        }
+        var part = parts[partIndex];
+        partIndex += 1;
+        var entry = part.quote ? cast[dialogueKey] : cast.narrator;
+        var utter = new window.SpeechSynthesisUtterance(part.text);
+        utter.lang = 'en-GB';
+        applyCastVoice(utter, entry);
+        var rate = 0.85 * (entry && entry.rate ? entry.rate : 1);
+        var pitch = entry && entry.pitch ? entry.pitch : 1;
+        // 感叹句、疑问句再抬一点语调，避免念得像说明书
+        if (part.quote) {
+          if (/[!！]$/.test(part.text)) { rate += 0.05; pitch += 0.06; }
+          else if (/[?？]$/.test(part.text)) { rate += 0.02; pitch += 0.03; }
+        }
+        utter.rate = Math.min(1.5, Math.max(0.6, rate));
+        utter.pitch = Math.min(1.8, Math.max(0.5, pitch));
+        utter.onend = function () {
+          if (token !== storyState.token || !storyState.playing) return;
+          storySpeakTimer = setTimeout(playPart, part.quote ? 180 : 120);
+        };
+        utter.onerror = function (ev) {
+          if (token !== storyState.token) return;
+          markVoiceFailed(utter.voice, ev && ev.error ? ev.error : '');
+          storyErrors += 1;
+          if (storyErrors > 2) { markSpeechBroken(null); stopStory(); return; }
+          storySpeakTimer = setTimeout(playPart, 80);
+        };
+        try { synth.speak(utter); } catch (e) { storySpeakTimer = setTimeout(playPart, 80); }
+      }
+      playPart();
     }
 
     function startStoryPlayback() {
@@ -1480,6 +1698,8 @@
       storyState.playing = true;
       storyState.token += 1;
       storyErrors = 0;
+      storyState.castSig = voiceSignature();
+      storyState.cast = buildStoryCast(storyState.sentences, storyState.id);
       var token = storyState.token;
       if (storyState.playBtn) {
         storyState.playBtn.textContent = '■ 停止';
@@ -1492,8 +1712,9 @@
       };
       var titleUtter = new window.SpeechSynthesisUtterance(storyState.item ? storyState.item.en : '');
       titleUtter.lang = 'en-GB';
-      applyVoice(titleUtter);
-      titleUtter.rate = 0.85;
+      var titleEntry = storyState.cast.narrator;
+      applyCastVoice(titleUtter, titleEntry);
+      titleUtter.rate = 0.85 * (titleEntry && titleEntry.rate ? titleEntry.rate : 1);
       // 华为/微信内核可能接口存在但永远不触发 start/end，超时后提示并停止
       var titleStarted = false;
       var titleWatch = window.setTimeout(function () {

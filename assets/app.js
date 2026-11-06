@@ -360,9 +360,9 @@
   }
 
   /* ---- 角色化发音：场景按说话人分音色，故事分旁白/对白 ---- */
-  var FEMALE_VOICE_RE = /(libby|sonia|olivia|maisie|bella|hollie|hazel|susan|serena|kate|martha|stephanie|moira|tessa|karen|samantha|victoria|michelle|aria|jenny|emma|ava|allison|joanna|salli|kimberly|ivy|kendra|zira|female|woman|girl)/i;
+  var FEMALE_VOICE_RE = /(libby|sonia|olivia|maisie|bella|hollie|hazel|susan|serena|kate|martha|stephanie|moira|tessa|karen|samantha|victoria|michelle|aria|jenny|emma|ava|allison|joanna|salli|kimberly|ivy|kendra|zira|ana|female|woman|girl)/i;
   var MALE_VOICE_RE = /(ryan|thomas|george|daniel|arthur|oliver|elliot|ethan|noah|alfie|guy|david|mark|alex|james|eric|steffan|brian|christopher|roger|william|fred|ralph|male|man|boy)/i;
-  var CHILD_VOICE_RE = /(alfie|bella|hollie|maisie|noah|child|kid)/i;
+  var CHILD_VOICE_RE = /(alfie|bella|hollie|maisie|noah|\bana\b|child|kid|junior)/i;
 
   function voiceGender(v) {
     var name = String((v && v.name) || '');
@@ -376,10 +376,10 @@
   }
 
   var PROFILE_ADULT_F = { gender: 'female', age: 'adult', rate: 1.0 };
-  var PROFILE_ADULT_M = { gender: 'male', age: 'adult', rate: 1.0 };
-  var PROFILE_CHILD = { gender: '', age: 'child', rate: 1.02 };
-  var PROFILE_CHILD_F = { gender: 'female', age: 'child', rate: 1.02 };
-  var PROFILE_CHILD_M = { gender: 'male', age: 'child', rate: 1.02 };
+  var PROFILE_ADULT_M = { gender: 'male', age: 'adult', rate: 0.98 };
+  var PROFILE_CHILD = { gender: '', age: 'child', rate: 1.05 };
+  var PROFILE_CHILD_F = { gender: 'female', age: 'child', rate: 1.06 };
+  var PROFILE_CHILD_M = { gender: 'male', age: 'child', rate: 1.04 };
   var PROFILE_GROUP = { gender: '', age: 'group', rate: 0.98 };
   var PROFILE_NEUTRAL = { gender: '', age: 'adult', rate: 1.0 };
 
@@ -400,34 +400,51 @@
     return PROFILE_NEUTRAL;
   }
 
-  function pickCastVoice(profile, used) {
-    var list = englishVoices();
-    if (!list.length) return null;
-    var pool = list.slice();
-    if (profile.age === 'child') {
-      var kids = pool.filter(isChildVoice);
-      if (kids.length) pool = kids;
-    }
+  // 音色与角色匹配度：小孩优先童声、女性优先女声、男性优先男声
+  function castVoiceRank(v, profile) {
+    var kid = isChildVoice(v);
+    var g = voiceGender(v);
+    var rank = 0;
+    if (profile.age === 'child') rank += kid ? 120 : -30;
+    else rank += kid ? -70 : 30;
     if (profile.gender) {
-      var byGender = pool.filter(function (v) { return voiceGender(v) === profile.gender; });
-      if (byGender.length) pool = byGender;
+      if (g === profile.gender) rank += 70;
+      else if (g) rank -= 45;
     }
-    var fresh = pool.filter(function (v) { return !used[voiceKeyOf(v)]; });
-    if (fresh.length) return fresh[0];
-    var anyFresh = list.filter(function (v) { return !used[voiceKeyOf(v)]; });
-    return anyFresh.length ? anyFresh[0] : pool[0];
+    return rank;
   }
 
-  // 音色之外再用音高/语速拉开年龄和性别差异；没有合适音色时也能听出角色变化
+  // usage 记录每个音色在本场被用了几次：同一场里不同角色尽量拿到不同音色
+  function pickCastVoice(profile, usage) {
+    var list = englishVoices();
+    if (!list.length) return null;
+    var best = null;
+    var bestRank = -Infinity;
+    for (var i = 0; i < list.length; i++) {
+      var v = list[i];
+      var key = voiceKeyOf(v);
+      var rank = castVoiceRank(v, profile) - (usage[key] || 0) * 400 - i * 0.01;
+      if (rank > bestRank) { bestRank = rank; best = v; }
+    }
+    return best;
+  }
+
+  // 有匹配音色就用本色；缺童声/同性音色时，用音高和语速把音色掰成角色该有的样子
   function castEntry(profile, voice) {
     var vg = voiceGender(voice);
+    var kidVoice = isChildVoice(voice);
     var pitch = 1;
-    if (profile.age === 'child') pitch = isChildVoice(voice) ? 1.0 : 1.16;
-    else if (profile.age === 'group') pitch = 1.04;
-    else if (profile.gender === 'female') pitch = vg === 'male' ? 1.12 : 1.02;
-    else if (profile.gender === 'male') pitch = vg === 'female' ? 0.9 : 0.95;
-    else if (vg === 'female') pitch = 1.02;
-    else if (vg === 'male') pitch = 0.95;
+    if (profile.age === 'child') {
+      pitch = kidVoice ? 1 : (vg === 'male' ? 1.38 : 1.3);
+    } else if (profile.age === 'group') {
+      pitch = kidVoice ? 1.12 : 1.06;
+    } else if (profile.gender === 'female') {
+      pitch = kidVoice ? 1.12 : (vg === 'male' ? 1.14 : 1);
+    } else if (profile.gender === 'male') {
+      pitch = kidVoice ? 0.8 : (vg === 'female' ? 0.8 : 0.94);
+    } else {
+      pitch = kidVoice ? 1.06 : (vg === 'male' ? 0.94 : 1);
+    }
     return {
       voice: voice || null,
       pitch: pitch,
@@ -437,20 +454,46 @@
     };
   }
 
+  function pitchSlotKey(voice, pitch) {
+    return voiceKeyOf(voice) + '@' + Number(pitch).toFixed(2);
+  }
+
+  // 系统只有一两个英语音色时，同音色的角色再按音高错开，避免听起来是同一个人
+  function separateCastPitches(cast) {
+    var taken = {};
+    var offsets = [0, 0.12, -0.12, 0.24, -0.24, 0.36, -0.36];
+    Object.keys(cast).forEach(function (name) {
+      var entry = cast[name];
+      if (!entry) return;
+      var base = Math.min(1.7, Math.max(0.6, entry.pitch || 1));
+      var picked = base;
+      for (var i = 0; i < offsets.length; i++) {
+        var cand = Number(Math.min(1.7, Math.max(0.6, base + offsets[i])).toFixed(2));
+        if (!taken[pitchSlotKey(entry.voice, cand)]) { picked = cand; break; }
+      }
+      entry.pitch = picked;
+      taken[pitchSlotKey(entry.voice, picked)] = true;
+    });
+    return cast;
+  }
+
   function buildSceneCast(lines) {
     var cast = {};
-    var used = {};
+    var usage = {};
     var speakers = [];
     (lines || []).forEach(function (line) {
       if (line && line.who && speakers.indexOf(line.who) === -1) speakers.push(line.who);
     });
     speakers.forEach(function (who) {
       var profile = speakerProfile(who);
-      var voice = pickCastVoice(profile, used);
-      if (voice) used[voiceKeyOf(voice)] = true;
+      var voice = pickCastVoice(profile, usage);
+      if (voice) {
+        var key = voiceKeyOf(voice);
+        usage[key] = (usage[key] || 0) + 1;
+      }
       cast[who] = castEntry(profile, voice);
     });
-    return cast;
+    return separateCastPitches(cast);
   }
 
   function voiceSignature() {
@@ -530,32 +573,32 @@
   };
 
   function buildStoryCast(sentences, storyId) {
-    var used = {};
+    var usage = {};
     var narratorVoice = getActiveVoice();
-    if (narratorVoice) used[voiceKeyOf(narratorVoice)] = true;
+    if (narratorVoice) usage[voiceKeyOf(narratorVoice)] = 1;
     var narrator = castEntry(PROFILE_NEUTRAL, narratorVoice);
     narrator.pitch = 1.0;
     narrator.rate = 0.97;
     var cast = { narrator: narrator };
 
-    // 先给故事里真正出现的角色分配音色，避免被没用到的角色占掉名额
+    // 只给故事里真正出现过的角色分配音色，没用到的角色不占音色名额
     var order = [];
     (sentences || []).forEach(function (sent) {
       if (!sent || !/["“]/.test(sent.en)) return;
       var key = storyDialogueKey(sent.en, storyId);
       if (order.indexOf(key) === -1) order.push(key);
     });
-    ['female', 'male', 'child', 'group', 'neutral'].forEach(function (key) {
-      if (order.indexOf(key) === -1) order.push(key);
-    });
 
     order.forEach(function (key) {
       var profile = STORY_CAST_PROFILES[key] || PROFILE_NEUTRAL;
-      var voice = pickCastVoice(profile, used);
-      if (voice) used[voiceKeyOf(voice)] = true;
+      var voice = pickCastVoice(profile, usage);
+      if (voice) {
+        var vk = voiceKeyOf(voice);
+        usage[vk] = (usage[vk] || 0) + 1;
+      }
       cast[key] = castEntry(profile, voice);
     });
-    return cast;
+    return separateCastPitches(cast);
   }
 
   function renderVoicePicker() {
@@ -1972,4 +2015,19 @@
   }
 
   init();
+
+  // 自动化回归用：?debug=cast 时暴露角色分音结果，正常访问不生效
+  if (/[?&]debug=cast\b/.test(window.location.search)) {
+    window.__castDebug = {
+      scene: function (id) {
+        var scene = (window.DIALOGUE_SCENES || []).filter(function (s) { return s.id === id; })[0];
+        return scene ? buildSceneCast(scene.lines) : null;
+      },
+      story: function (id) {
+        var story = (window.STORY_LIBRARY || []).filter(function (s) { return s.id === id; })[0];
+        return story ? buildStoryCast(story.sentences, story.id) : null;
+      },
+      voiceSignature: voiceSignature
+    };
+  }
 })();

@@ -327,6 +327,18 @@ input { font-family: inherit; }
   padding-bottom: 8px;
   flex-wrap: nowrap;
 }
+/* 桌面端曲目/场景较多时换行，避免横向拉出一条长滚动条 */
+@media (min-width: 760px) {
+  .scene-tabs { flex-wrap: wrap; overflow-x: visible; }
+}
+.audio-note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 2px 4px;
+  font-size: 0.84rem;
+  color: var(--text-muted);
+}
 .scene-top {
   display: flex;
   align-items: flex-start;

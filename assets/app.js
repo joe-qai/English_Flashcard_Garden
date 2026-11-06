@@ -406,11 +406,14 @@
       desc.textContent = item.desc;
       meta.appendChild(title); meta.appendChild(desc);
       var actions = document.createElement('div'); actions.className = 'scene-actions';
-      var playBtn = document.createElement('button');
-      playBtn.type = 'button'; playBtn.className = 'play-btn';
-      playBtn.textContent = config.playLabel;
-      playBtn.addEventListener('click', togglePlayback);
-      actions.appendChild(playBtn);
+      var playBtn = null;
+      if (state2.lines.length) {
+        playBtn = document.createElement('button');
+        playBtn.type = 'button'; playBtn.className = 'play-btn';
+        playBtn.textContent = config.playLabel;
+        playBtn.addEventListener('click', togglePlayback);
+        actions.appendChild(playBtn);
+      }
       top.appendChild(icon); top.appendChild(meta); top.appendChild(actions);
 
       // 音频播放器（歌谣页）
@@ -457,7 +460,14 @@
       });
       state2.playBtn = playBtn;
       panel.appendChild(top);
-      panel.appendChild(listEl);
+      if (state2.lines.length) {
+        panel.appendChild(listEl);
+      } else {
+        var note = document.createElement('p');
+        note.className = 'audio-note';
+        note.innerHTML = '<span aria-hidden="true">🎧</span> 纯享版 · 暂无歌词，先听旋律磨耳朵';
+        panel.appendChild(note);
+      }
       syncTabs();
     }
 

@@ -401,12 +401,17 @@
   }
 
   // 音色与角色匹配度：小孩优先童声、女性优先女声、男性优先男声
-  function castVoiceRank(v, profile) {
+  function castVoiceRank(v, profile, kidVoicesAvailable) {
     var kid = isChildVoice(v);
     var g = voiceGender(v);
-    var rank = 0;
-    if (profile.age === 'child') rank += kid ? 120 : -30;
-    else rank += kid ? -70 : 30;
+    if (profile.age === 'child') {
+      if (kid) return 220;
+      // 没有童声时不再区分男女：挑音色最清楚的那个，靠音高塑成童声
+      if (!kidVoicesAvailable) return 50;
+      if (g === profile.gender) return 60;
+      return g ? 40 : 50;
+    }
+    var rank = kid ? -70 : 30;
     if (profile.gender) {
       if (g === profile.gender) rank += 70;
       else if (g) rank -= 45;
@@ -418,24 +423,29 @@
   function pickCastVoice(profile, usage) {
     var list = englishVoices();
     if (!list.length) return null;
+    var kidVoicesAvailable = false;
+    for (var k = 0; k < list.length; k++) {
+      if (isChildVoice(list[k])) { kidVoicesAvailable = true; break; }
+    }
     var best = null;
     var bestRank = -Infinity;
     for (var i = 0; i < list.length; i++) {
       var v = list[i];
       var key = voiceKeyOf(v);
-      var rank = castVoiceRank(v, profile) - (usage[key] || 0) * 400 - i * 0.01;
+      var rank = castVoiceRank(v, profile, kidVoicesAvailable) - (usage[key] || 0) * 400 - i * 0.01;
       if (rank > bestRank) { bestRank = rank; best = v; }
     }
     return best;
   }
 
   // 有匹配音色就用本色；缺童声/同性音色时，用音高和语速把音色掰成角色该有的样子
+  // 童声变调幅度刻意收窄到 1.2 左右：抬太高会把成年音色读出“含混”的失真感
   function castEntry(profile, voice) {
     var vg = voiceGender(voice);
     var kidVoice = isChildVoice(voice);
     var pitch = 1;
     if (profile.age === 'child') {
-      pitch = kidVoice ? 1 : (vg === 'male' ? 1.38 : 1.3);
+      pitch = kidVoice ? 1 : (vg === 'male' ? 1.2 : 1.26);
     } else if (profile.age === 'group') {
       pitch = kidVoice ? 1.12 : 1.06;
     } else if (profile.gender === 'female') {
@@ -1070,7 +1080,7 @@
   var speakTimer = null;
   var speechStartTimer = null;
 
-  function speak(text, btn, cast) {
+  function speak(text, btn, cast, tone) {
     stopAllPlayback();
     if (!canSpeak()) {
       flashButton(btn);
@@ -1094,8 +1104,12 @@
       var utter = new window.SpeechSynthesisUtterance(text);
       utter.lang = 'en-GB';
       applyCastVoice(utter, cast);
-      utter.rate = Math.min(1.4, Math.max(0.6, 0.9 * (cast && cast.rate ? cast.rate : 1)));
-      utter.pitch = Math.min(1.8, Math.max(0.5, cast && cast.pitch ? cast.pitch : 1));
+      var toneRate = tone ? tone.rateDelta : 0;
+      var tonePitch = tone ? tone.pitch : 1;
+      utter.rate = Math.min(1.6, Math.max(0.55, (0.9 + toneRate) * (cast && cast.rate ? cast.rate : 1)));
+      utter.pitch = Math.min(1.9, Math.max(0.45, tonePitch * (cast && cast.pitch ? cast.pitch : 1)));
+      // 童声抬得过高会失真、听不清，统一压一个上限
+      if (utter.pitch > 1.45) utter.pitch = 1.45;
       var voice = utter.voice;
       var remote = !!(voice && voice.localService === false);
       var started = false;
@@ -1157,20 +1171,53 @@
   /* ============ MOOD TONES ============ */
   function getMoodTone(mood) {
     var map = {
-      calm:       { rateDelta: -0.04, pitch: 0.93 },
-      warm:       { rateDelta:  0.00, pitch: 1.00 },
+      calm:       { rateDelta: -0.03, pitch: 0.95 },
+      warm:       { rateDelta:  0.00, pitch: 1.02 },
       normal:     { rateDelta:  0.00, pitch: 1.00 },
-      energetic:  { rateDelta:  0.06, pitch: 1.08 },
-      wonder:     { rateDelta:  0.02, pitch: 1.10 },
-      sleepy:     { rateDelta: -0.08, pitch: 0.88 },
-      curious:    { rateDelta:  0.02, pitch: 1.06 },
-      emotional:  { rateDelta:  0.03, pitch: 1.05 },
-      serious:    { rateDelta: -0.05, pitch: 0.92 },
-      happy:      { rateDelta:  0.04, pitch: 1.07 },
-      excited:    { rateDelta:  0.08, pitch: 1.12 },
-      concerned:  { rateDelta: -0.03, pitch: 0.95 },
+      energetic:  { rateDelta:  0.08, pitch: 1.10 },
+      wonder:     { rateDelta:  0.03, pitch: 1.12 },
+      sleepy:     { rateDelta: -0.10, pitch: 0.86 },
+      curious:    { rateDelta:  0.02, pitch: 1.07 },
+      emotional:  { rateDelta:  0.02, pitch: 1.06 },
+      serious:    { rateDelta: -0.06, pitch: 0.90 },
+      happy:      { rateDelta:  0.05, pitch: 1.08 },
+      excited:    { rateDelta:  0.10, pitch: 1.15 },
+      concerned:  { rateDelta: -0.04, pitch: 0.94 },
     };
     return map[mood] || map.normal;
+  }
+
+  // 句子的情绪色彩：场景氛围 + 标点 + 常见情绪词，避免整段一个调子干读
+  var TONE_HAPPY_RE = /\b(wow|great|hooray|yay|amazing|wonderful|nice|delicious|love|lovely|happy|fun|thank you|thanks)\b/i;
+  var TONE_URGENT_RE = /\b(hurry|quick|come on|look out|watch out|stop|wait|oh no)\b/i;
+  var TONE_SAD_RE = /\b(sorry|sad|unfortunately|afraid|miss you)\b/i;
+  var TONE_SURPRISE_RE = /^(oh|wow|ah|hey|really)\b/i;
+
+  function sentenceTone(text, mood) {
+    var tone = getMoodTone(mood);
+    var t = String(text || '').trim();
+    var rate = tone.rateDelta;
+    var pitch = tone.pitch;
+    if (/[!！]\s*$/.test(t)) { rate += 0.07; pitch += 0.07; }
+    else if (/[?？]\s*$/.test(t)) { rate += 0.01; pitch += 0.05; }
+    else if (/(\.\.\.|…)/.test(t)) { rate -= 0.07; pitch -= 0.03; }
+    if (TONE_HAPPY_RE.test(t)) { rate += 0.04; pitch += 0.05; }
+    else if (TONE_URGENT_RE.test(t)) { rate += 0.08; pitch += 0.04; }
+    else if (TONE_SAD_RE.test(t)) { rate -= 0.05; pitch -= 0.05; }
+    else if (TONE_SURPRISE_RE.test(t)) { pitch += 0.05; }
+    return {
+      rateDelta: Math.min(0.2, Math.max(-0.16, rate)),
+      pitch: Math.min(1.28, Math.max(0.8, pitch))
+    };
+  }
+
+  // 句间停顿也跟着语气走：感叹句紧一点，迟疑句留白长一点
+  function lineGap(text, base) {
+    var t = String(text || '').trim();
+    if (/(\.\.\.|…)/.test(t)) return base + 300;
+    if (/[!！]\s*$/.test(t)) return Math.max(180, base - 160);
+    if (/[?？]\s*$/.test(t)) return Math.max(220, base - 80);
+    return base;
   }
 
   /* ============ 中文显示开关（全局，只影响中文） ============ */
@@ -1332,7 +1379,7 @@
         btn.addEventListener('click', function () {
           if (state2.playing) stop();
           var cast = getSceneCast(state2);
-          speak(line.en, btn, line.who ? cast[line.who] : null);
+          speak(line.en, btn, line.who ? cast[line.who] : null, sentenceTone(line.en, item.mood));
         });
         li.appendChild(btn);
         listEl.appendChild(li);
@@ -1412,7 +1459,6 @@
       var index = 0;
       var rate = state2.item && state2.item.rate ? state2.item.rate : config.rate;
       var mood = state2.item && state2.item.mood ? state2.item.mood : 'normal';
-      var moodTone = getMoodTone(mood);
       var cast = getSceneCast(state2);
       updatePlayBtn();
       function next() {
@@ -1423,16 +1469,17 @@
         if (els[current]) els[current].classList.add('is-speaking');
         var line = lines[current];
         var entry = line.who ? cast[line.who] : null;
+        var tone = sentenceTone(line.en, mood);
         var utter = new window.SpeechSynthesisUtterance(line.en);
         utter.lang = 'en-GB';
         applyCastVoice(utter, entry);
-        var lineRate = (rate + moodTone.rateDelta) * (entry && entry.rate ? entry.rate : 1);
-        var linePitch = moodTone.pitch * (entry && entry.pitch ? entry.pitch : 1);
+        var lineRate = (rate + tone.rateDelta) * (entry && entry.rate ? entry.rate : 1);
+        var linePitch = tone.pitch * (entry && entry.pitch ? entry.pitch : 1);
         utter.rate = Math.min(2, Math.max(0.1, lineRate));
-        utter.pitch = Math.min(2, Math.max(0.1, linePitch));
+        utter.pitch = Math.min(1.45, Math.max(0.1, linePitch));
         utter.onend = function () {
           if (token !== state2.token) return;
-          window.setTimeout(next, config.gap);
+          window.setTimeout(next, lineGap(line.en, config.gap));
         };
         utter.onerror = function (ev) {
           if (token !== state2.token) return;
@@ -2027,7 +2074,8 @@
         var story = (window.STORY_LIBRARY || []).filter(function (s) { return s.id === id; })[0];
         return story ? buildStoryCast(story.sentences, story.id) : null;
       },
-      voiceSignature: voiceSignature
+      voiceSignature: voiceSignature,
+      tone: sentenceTone
     };
   }
 })();

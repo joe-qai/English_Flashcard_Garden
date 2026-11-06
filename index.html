@@ -27,6 +27,10 @@
       <span class="topbar-en">Flashcard Garden</span>
     </div>
     <div class="topbar-actions">
+      <button id="zh-toggle" class="zh-toggle" type="button" aria-pressed="false" title="显示或隐藏所有中文">
+        <span class="zh-toggle-dot" aria-hidden></span>
+        <span class="zh-toggle-label">显示中文</span>
+      </button>
       <button id="jump-games" class="text-btn" type="button"><span aria-hidden>🎮</span> 开始游戏</button>
       <button id="theme-toggle" class="icon-btn" type="button" aria-label="切换深色模式" title="切换深色模式">
         <span class="icon-moon" aria-hidden>🌙</span>
@@ -50,12 +54,12 @@
     <button class="tab" data-tab="songs" type="button">
       <span class="tab-icon" aria-hidden>🎵</span>
       <span class="tab-label">音乐</span>
-      <span class="tab-count">4</span>
+      <span class="tab-count" id="tab-songs-count">6</span>
     </button>
     <button class="tab" data-tab="stories" type="button">
       <span class="tab-icon" aria-hidden>📖</span>
       <span class="tab-label">故事会</span>
-      <span class="tab-count">4</span>
+      <span class="tab-count" id="tab-stories-count">5</span>
     </button>
     <button class="tab" data-tab="games" type="button">
       <span class="tab-icon" aria-hidden>🎮</span>
@@ -72,9 +76,12 @@
       <button class="pill sub-pill" data-group="life" type="button">🏠 日常生活</button>
       <button class="pill sub-pill" data-group="fun" type="button">🌍 拓展兴趣</button>
     </div>
-      <button id="word-zh-toggle" class="ghost-btn word-zh-btn" type="button" aria-pressed="false">显示中文</button>
     <div id="word-cat-nav" class="cat-nav" aria-label="单词分类"></div>
     <main id="word-grid" class="grid"></main>
+    <div id="word-empty" class="empty-state" hidden>
+      <p class="empty-icon" aria-hidden="true">🌱</p>
+      <p id="word-empty-text">该分类暂无单词</p>
+    </div>
   </section>
 
   <!-- ==================== SCENES TAB ==================== -->
@@ -91,9 +98,6 @@
 
   <!-- ==================== SONGS TAB ==================== -->
   <section id="tab-songs" class="tab-panel" aria-labelledby="tab-songs">
-    <div class="sub-nav" aria-label="歌谣选择">
-      <button class="pill sub-pill is-active" data-song="all" type="button">全部歌曲</button>
-    </div>
     <div id="song-tabs" class="scene-tabs" role="tablist" aria-label="英文歌谣"></div>
     <div id="song-panel" class="scene-panel" role="tabpanel"></div>
   </section>
@@ -140,7 +144,7 @@
   </section>
 
   <footer class="footer">
-    <p>共 <span id="total-count">648</span> 个单词 · <span id="scene-total">28</span> 个场景 · <span id="song-total">4</span> 首歌谣 · <span id="story-total">4</span> 个故事 · 点击卡片听发音</p>
+    <p>共 <span id="total-count">648</span> 个单词 · <span id="scene-total">28</span> 个场景 · <span id="song-total">6</span> 首歌谣 · <span id="story-total">5</span> 个故事 · 点击卡片听发音</p>
     <p class="footer-sub">纯静态页面 · 无需后端服务</p>
   </footer>
 </div>

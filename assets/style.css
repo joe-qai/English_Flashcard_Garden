@@ -11,6 +11,7 @@
   --text: #2A2A2E;
   --text-muted: #6E6A64;
   --border: rgba(0,0,0,0.08);
+  --border-strong: rgba(0,0,0,0.18);
   --ring: #F6A94D;
   --cat: var(--ring);
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
@@ -27,6 +28,7 @@
   --text: #F5F0E8;
   --text-muted: #9A9490;
   --border: rgba(255,255,255,0.08);
+  --border-strong: rgba(255,255,255,0.22);
 }
 
 html, body { height: 100%; }
@@ -69,6 +71,17 @@ input { font-family: inherit; }
 .topbar-name { font-weight: 700; font-size: 1.05rem; }
 .topbar-en { font-size: 0.8rem; color: var(--text-muted); }
 .topbar-actions { display: flex; align-items: center; gap: 8px; }
+
+@media (max-width: 560px) {
+  .topbar { padding: 8px 12px; gap: 8px; }
+  .topbar-logo { font-size: 1.2rem; }
+  .topbar-name { font-size: 0.95rem; white-space: nowrap; }
+  .topbar-en { display: none; }
+  .topbar-actions { gap: 6px; }
+  .zh-toggle { padding: 0 10px; font-size: 0.72rem; white-space: nowrap; }
+  #jump-games { display: none; }
+  .tab { min-width: 64px; padding: 10px 12px; }
+}
 
 /* ---------- 4-Tab Navigation ---------- */
 .tab-nav {
@@ -232,6 +245,18 @@ input { font-family: inherit; }
   .grid { grid-template-columns: repeat(5, 1fr); }
 }
 
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 48px 16px 64px;
+  color: var(--text-soft);
+  font-size: 0.9rem;
+}
+.empty-state[hidden] { display: none; }
+.empty-icon { font-size: 2rem; line-height: 1; }
+
 /* ---------- Word Card ---------- */
 .card {
   display: flex;
@@ -291,7 +316,7 @@ input { font-family: inherit; }
 /* ---------- Scene / Song Panel ---------- */
 .scene-panel {
   padding: 12px 16px 32px;
-  max-width: 720px;
+  max-width: 860px;
   margin: 0 auto;
   width: 100%;
 }
@@ -374,9 +399,6 @@ input { font-family: inherit; }
 .word-note { font-weight: 600; }
 .word-ipa { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted); margin-left: 3px; }
 
-/* ========== Hide Chinese ========== */
-.scene-panel.hide-zh .line-zh { display: none; }
-
 /* ========== Song Audio Link ========== */
 .song-audio-link {
   margin-top: 16px;
@@ -427,8 +449,50 @@ input { font-family: inherit; }
   color: var(--text-muted);
   transition: color 0.15s, background 0.15s;
 }
-.word-zh-btn { margin-left: 8px; }
-#word-grid.hide-zh .card-zh { display: none; }
+/* ========== 全局中文开关（只影响中文） ========== */
+.zh-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1.5px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  font-weight: 600;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+.zh-toggle:hover { border-color: var(--cat, #8FA85E); color: var(--text); }
+.zh-toggle-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--border-strong, #c9c3b6);
+  transition: background 0.15s, box-shadow 0.15s;
+}
+.zh-toggle[data-on="on"] { color: var(--text); border-color: var(--cat, #8FA85E); }
+.zh-toggle[data-on="on"] .zh-toggle-dot {
+  background: var(--cat, #8FA85E);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cat, #8FA85E) 22%, transparent);
+}
+
+/* 中文默认隐藏：只藏中文，英文与音标始终保留 */
+body.hide-zh .card-zh,
+body.hide-zh .line-zh,
+body.hide-zh .zh-aux,
+body.hide-zh .scene-desc,
+body.hide-zh .pill-zh,
+body.hide-zh .title-sep,
+body.hide-zh .sub-note { display: none; }
+
+.sub-note {
+  margin-left: auto;
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
 
 /* ========== Icon Button ========== */
 .icon-btn {
@@ -571,60 +635,20 @@ input { font-family: inherit; }
 }
 
 /* ========== Music Player — Melody Bar ========== */
-.melody-bar {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 16px;
-  margin-bottom: 12px;
-  background: var(--bg-card);
+.audio-card {
+  margin: 4px 0 18px;
+  padding: 12px 14px;
+  border-radius: var(--radius);
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  background: linear-gradient(180deg, var(--bg-card), var(--bg));
+  box-shadow: var(--shadow-sm);
 }
-.melody-play-btn {
-  width: 40px;
+.audio-player {
+  width: 100%;
   height: 40px;
-  border-radius: 50%;
-  background: var(--cat);
-  color: #fff;
-  font-size: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  transition: opacity 0.15s, transform 0.15s;
+  display: block;
+  accent-color: var(--cat, #8FA85E);
 }
-.melody-play-btn:hover { opacity: 0.85; transform: scale(1.05); }
-.melody-play-btn.is-playing { background: #c0392b; }
-.melody-info { flex: 1; min-width: 0; }
-.melody-title {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.melody-subtitle {
-  font-size: 0.72rem;
-  color: var(--text-muted);
-  margin-top: 2px;
-}
-.melody-visual {
-  display: flex;
-  align-items: flex-end;
-  gap: 2px;
-  height: 24px;
-  flex-shrink: 0;
-}
-.melody-bar-segment {
-  width: 3px;
-  background: var(--cat);
-  border-radius: 2px;
-  transition: height 0.1s ease;
-  opacity: 0.4;
-}
-.melody-bar-segment.active { opacity: 1; }
 
 /* ========== Story Tab ========== */
 .story-line.is-speaking {

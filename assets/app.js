@@ -96,28 +96,17 @@
   });
 
   /* ============ WORDS TAB ============ */
-  var searchEl = document.getElementById('search');
-  var searchWrapEl = searchEl ? searchEl.parentNode : null;
   var gridEl = document.getElementById('word-grid');
   var emptyEl = document.getElementById('word-empty');
   var emptyTextEl = document.getElementById('word-empty-text');
   var catNavEl = document.getElementById('word-cat-nav');
-  var inputTimer = null;
 
-  var state = { activeId: CATEGORIES[0].id, query: '', group: 'all' };
+  var state = { activeId: CATEGORIES[0].id, group: 'all' };
   var pills = {};
 
   function getFilteredCats() {
     if (state.group === 'all') return CATEGORIES;
     return CATEGORIES.filter(function (c) { return getCategoryGroup(c.id) === state.group; });
-  }
-
-  function matches(word, q) {
-    return (
-      word.en.toLowerCase().indexOf(q) !== -1 ||
-      word.zh.indexOf(q) !== -1 ||
-      word.ipa.toLowerCase().indexOf(q) !== -1
-    );
   }
 
   function buildCatNav() {
@@ -211,8 +200,7 @@
 
   function renderWords() {
     var cat = findCategory(state.activeId) || CATEGORIES[0];
-    var q = state.query.trim().toLowerCase();
-    var words = q ? cat.words.filter(function (w) { return matches(w, q); }) : cat.words;
+    var words = cat.words;
     rootEl.style.setProperty('--cat', cat.color);
     rootEl.style.setProperty('--ring', cat.color);
     gridEl.textContent = '';
@@ -220,7 +208,7 @@
     if (!words.length) {
       gridEl.hidden = true;
       emptyEl.hidden = false;
-      emptyTextEl.textContent = '没有找到匹配"' + state.query + '"的单词';
+      emptyTextEl.textContent = '该分类暂无单词';
     } else {
       gridEl.hidden = false;
       emptyEl.hidden = true;
@@ -244,32 +232,6 @@
       renderWords();
     });
   });
-
-  if (searchEl) {
-    searchEl.addEventListener('input', function () {
-      state.query = searchEl.value;
-      searchWrapEl.classList.toggle('has-value', searchEl.value.length > 0);
-      if (inputTimer) window.clearTimeout(inputTimer);
-      inputTimer = window.setTimeout(renderWords, 60);
-    });
-    document.addEventListener('keydown', function (event) {
-      var active = document.activeElement;
-      var typing = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable);
-      if (event.key === '/' && !typing) {
-        event.preventDefault();
-        var wordsTab = document.getElementById('tab-words');
-        if (wordsTab && wordsTab.classList.contains('active')) { searchEl.focus(); searchEl.select(); }
-      }
-      if (event.key === 'Escape' && active === searchEl) {
-        if (searchEl.value) {
-          searchEl.value = '';
-          state.query = '';
-          searchWrapEl.classList.remove('has-value');
-          renderWords();
-        } else { searchEl.blur(); }
-      }
-    });
-  }
 
   /* ============ SPEAK ============ */
   var speakingBtn = null;

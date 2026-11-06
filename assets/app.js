@@ -14,6 +14,7 @@
   var SCENES = Array.isArray(window.DIALOGUE_SCENES) ? window.DIALOGUE_SCENES : [];
   var SONGS = Array.isArray(window.SONG_LIBRARY) ? window.SONG_LIBRARY : [];
   var STORIES = Array.isArray(window.STORY_LIBRARY) ? window.STORY_LIBRARY : [];
+  var STORY_GLOSSARY = window.STORY_GLOSSARY || {};
 
   if (!CATEGORIES.length) return;
 
@@ -53,6 +54,44 @@
   }
   function writeStore(key, value) {
     try { window.localStorage.setItem(key, value); } catch (e) {}
+  }
+
+  /* ============ 单词音标标注 ============ */
+  function escapeRegExp(str) {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  /**
+   * 在文本中给命中 dict 的单词加上音标。
+   * once=true：同一行内每个单词只标注一次（场景对话）；
+   * once=false：每次出现都标注（故事会）。
+   */
+  function appendAnnotated(container, text, dict, once) {
+    var words = dict ? Object.keys(dict) : [];
+    if (!words.length) { container.textContent = text; return; }
+    var values = {};
+    words.forEach(function (w) { values[w.toLowerCase()] = dict[w]; });
+    words = words.slice().sort(function (a, b) { return b.length - a.length; });
+    var pattern = words.map(escapeRegExp).join('|');
+    var re = new RegExp('\\b(' + pattern + ')\\b', 'gi');
+    var used = {};
+    var last = 0, match;
+    while ((match = re.exec(text)) !== null) {
+      var lower = match[0].toLowerCase();
+      if (!values[lower]) continue;
+      if (once && used[lower]) continue;
+      if (match.index > last) container.appendChild(document.createTextNode(text.slice(last, match.index)));
+      used[lower] = true;
+      var wrap = document.createElement('span');
+      wrap.className = 'word-note';
+      wrap.appendChild(document.createTextNode(match[0] + ' '));
+      var ipa = document.createElement('span');
+      ipa.className = 'word-ipa'; ipa.lang = 'en'; ipa.textContent = values[lower];
+      wrap.appendChild(ipa);
+      container.appendChild(wrap);
+      last = match.index + match[0].length;
+    }
+    if (last < text.length) container.appendChild(document.createTextNode(text.slice(last)));
   }
 
   /* ============ Theme ============ */
@@ -175,11 +214,30 @@
     card.setAttribute('aria-label', '播放 ' + word.en + '（' + word.zh + '）的发音');
     var figure = document.createElement('span');
     figure.className = 'card-figure';
-    var emoji = document.createElement('span');
-    emoji.className = 'card-emoji';
-    emoji.setAttribute('aria-hidden', 'true');
-    emoji.textContent = word.icon;
-    figure.appendChild(emoji);
+    if (word.swatch) {
+      // 颜色类单词直接用真实色块，比任何 emoji 都准确
+      var swatch = document.createElement('span');
+      swatch.className = 'card-swatch';
+      swatch.style.background = word.swatch;
+      swatch.setAttribute('aria-hidden', 'true');
+      figure.appendChild(swatch);
+    } else if (/\.svg$/i.test(word.icon)) {
+      // 没有对应 emoji 的实物，用本地手绘 SVG，保证图物一致
+      var pic = document.createElement('img');
+      pic.className = 'card-img';
+      pic.src = word.icon;
+      pic.alt = '';
+      pic.width = 56;
+      pic.height = 56;
+      pic.decoding = 'async';
+      figure.appendChild(pic);
+    } else {
+      var emoji = document.createElement('span');
+      emoji.className = 'card-emoji';
+      emoji.setAttribute('aria-hidden', 'true');
+      emoji.textContent = word.icon;
+      figure.appendChild(emoji);
+    }
     var body = document.createElement('span');
     body.className = 'card-body';
     var en = document.createElement('span');
@@ -295,10 +353,8 @@
     var btn = document.getElementById('zh-toggle');
     if (btn) {
       btn.setAttribute('aria-pressed', hideZh ? 'false' : 'true');
-      btn.setAttribute('title', hideZh ? '当前隐藏中文，点击显示' : '当前显示中文，点击隐藏');
+      btn.setAttribute('title', hideZh ? '中文已隐藏，点击显示' : '中文已显示，点击隐藏');
       btn.setAttribute('data-on', hideZh ? 'off' : 'on');
-      var label = btn.querySelector('.zh-toggle-label');
-      if (label) label.textContent = hideZh ? '显示中文' : '隐藏中文';
     }
   }
 
@@ -315,7 +371,7 @@
     var list = Array.isArray(config.items) ? config.items : [];
     if (!list.length || !config.tabsEl || !config.panelEl) return null;
     var tabs = {};
-    var state2 = { id: '', item: null, playing: false, token: 0, lines: [], lineEls: [], playBtn: null };
+    var state2 = { id: '', item: null, playing: false, audioActive: false, token: 0, lines: [], lineEls: [], playBtn: null };
 
     function buildTabs() {
       var frag = document.createDocumentFragment();
@@ -337,7 +393,8 @@
         btn.appendChild(icon); btn.appendChild(zh); btn.appendChild(en);
         btn.addEventListener('click', function () {
           if (state2.id === item.id) return;
-          stop(); render(item.id);
+          var autoplay = state2.playing ? 'speech' : (state2.audioActive ? 'audio' : '');
+          stop(); render(item.id, autoplay);
         });
         frag.appendChild(btn);
         tabs[item.id] = btn;
@@ -354,32 +411,10 @@
     }
 
     function appendWithNotes(container, text, notes) {
-      var words = notes ? Object.keys(notes) : [];
-      if (!words.length) { container.textContent = text; return; }
-      var values = {};
-      words.forEach(function (word) { values[word.toLowerCase()] = notes[word]; });
-      var pattern = words.map(function (w) { return w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('|');
-      var re = new RegExp('\\b(' + pattern + ')\\b', 'gi');
-      var used = {};
-      var last = 0, match;
-      while ((match = re.exec(text)) !== null) {
-        var lower = match[0].toLowerCase();
-        if (used[lower] || !values[lower]) continue;
-        if (match.index > last) container.appendChild(document.createTextNode(text.slice(last, match.index)));
-        used[lower] = true;
-        var wrap = document.createElement('span');
-        wrap.className = 'word-note';
-        wrap.appendChild(document.createTextNode(match[0] + ' '));
-        var ipa = document.createElement('span');
-        ipa.className = 'word-ipa'; ipa.lang = 'en'; ipa.textContent = values[lower];
-        wrap.appendChild(ipa);
-        container.appendChild(wrap);
-        last = match.index + match[0].length;
-      }
-      if (last < text.length) container.appendChild(document.createTextNode(text.slice(last)));
+      appendAnnotated(container, text, notes, true);
     }
 
-    function render(id) {
+    function render(id, autoplay) {
       var item = list.find(function (s) { return s.id === id; }) || list[0];
       if (!item) return;
       state2.id = item.id;
@@ -387,6 +422,7 @@
       state2.lines = item.lines || [];
       state2.lineEls = [];
       state2.playing = false;
+      state2.audioActive = false;
       state2.token += 1;
       var panel = config.panelEl;
       if (state2.audioEl) { try { state2.audioEl.pause(); } catch (e) {} state2.audioEl = null; }
@@ -425,9 +461,20 @@
         audio.preload = 'metadata';
         audio.src = item.audio;
         audio.className = 'audio-player';
+        state2.audioEl = audio;
         audio.addEventListener('play', function () {
-          state2.audioEl = audio;
+          state2.audioActive = true;
+          try { synth.cancel(); } catch (e) {}
           PLAYERS.forEach(function (p) { if (p !== api) p.stop(); });
+        });
+        audio.addEventListener('pause', function () {
+          if (audio.ended) return;
+          state2.audioActive = false;
+        });
+        audio.addEventListener('ended', function () {
+          state2.audioActive = false;
+          if (!config.autoNext || state2.id !== item.id) return;
+          advance('audio');
         });
         audioWrap.appendChild(audio);
         panel.appendChild(audioWrap);
@@ -475,6 +522,25 @@
         panel.appendChild(note);
       }
       syncTabs();
+      if (autoplay === 'audio' && state2.audioEl) {
+        try {
+          var p = state2.audioEl.play();
+          if (p && typeof p.catch === 'function') p.catch(function () {});
+        } catch (e) {}
+      } else if (autoplay === 'speech' && state2.lines.length) {
+        startPlayback();
+      }
+    }
+
+    function advance(kind) {
+      if (!list.length) return;
+      var idx = -1;
+      for (var i = 0; i < list.length; i++) {
+        if (list[i].id === state2.id) { idx = i; break; }
+      }
+      var next = list[(idx + 1) % list.length];
+      if (!next) return;
+      render(next.id, kind || 'audio');
     }
 
     function clearLineHighlight() {
@@ -488,6 +554,7 @@
     function stop() {
       var wasPlaying = state2.playing;
       state2.playing = false;
+      state2.audioActive = false;
       state2.token += 1;
       clearLineHighlight();
       updatePlayBtn();
@@ -501,6 +568,7 @@
       state2.token += 1;
       clearLineHighlight();
       updatePlayBtn();
+      if (config.autoNext) advance('audio');
     }
     function togglePlayback() {
       if (state2.playing) { stop(); return; }
@@ -618,6 +686,7 @@
       rate: 0.78,
       gap: 420,
       audio: true,
+      autoNext: true,
     });
     if (songPlayer) {
       songPlayer._type = 'song';
@@ -666,7 +735,8 @@
         btn.appendChild(icon); btn.appendChild(zh); btn.appendChild(en);
         btn.addEventListener('click', function () {
           if (storyState.id === item.id) return;
-          stopStory(); renderStory(item.id);
+          var wasPlaying = storyState.playing;
+          stopStory(); renderStory(item.id, wasPlaying);
         });
         frag.appendChild(btn);
         storyTabs[item.id] = btn;
@@ -695,8 +765,9 @@
     }
 
     var storySpeakTimer = null;
+    var storyErrors = 0;
 
-    function renderStory(id) {
+    function renderStory(id, autoplay) {
       var item = stories.find(function (s) { return s.id === id; }) || stories[0];
       if (!item) return;
       stopStory();
@@ -740,15 +811,17 @@
         btn.setAttribute('aria-label', '播放第 ' + (idx + 1) + ' 句');
         var en = document.createElement('span');
         en.className = 'line-en'; en.lang = 'en';
-        en.textContent = sent.en;
+        appendAnnotated(en, sent.en, STORY_GLOSSARY, false);
         var zh = document.createElement('span');
         zh.className = 'line-zh'; zh.textContent = sent.zh;
         btn.appendChild(en); btn.appendChild(zh);
         btn.addEventListener('click', function () {
           stopStory();
+          PLAYERS.forEach(function (p) { if (p._type !== 'story') p.stop(); });
+          stopAllAudio();
           storyState.currentIdx = idx;
           storyState.playing = true;
-          playNextSentence(idx);
+          storySpeakTimer = setTimeout(function () { playNextSentence(idx); }, 90);
         });
         li.appendChild(btn);
         listEl.appendChild(li);
@@ -758,17 +831,26 @@
       panel.appendChild(top);
       panel.appendChild(listEl);
       syncTabs();
+      if (autoplay) startStoryPlayback();
+    }
+
+    function advanceStory() {
+      if (!stories.length) return;
+      var idx = -1;
+      for (var i = 0; i < stories.length; i++) {
+        if (stories[i].id === storyState.id) { idx = i; break; }
+      }
+      var next = stories[(idx + 1) % stories.length];
+      if (!next) return;
+      renderStory(next.id, true);
     }
 
     function playNextSentence(idx) {
       var token = storyState.token;
       if (idx >= storyState.sentences.length) {
         storyState.playing = false;
-        if (storyState.playBtn) {
-          storyState.playBtn.textContent = '▶ 朗读故事';
-          storyState.playBtn.classList.remove('is-playing');
-        }
         storyState.sentenceEls.forEach(function (el) { el.classList.remove('is-speaking'); });
+        advanceStory();
         return;
       }
       storyState.currentIdx = idx;
@@ -780,29 +862,47 @@
       utter.lang = 'en-US';
       utter.rate = 0.82;
       utter.onend = function () {
+        storyErrors = 0;
         if (token !== storyState.token || !storyState.playing) return;
         storySpeakTimer = setTimeout(function () { playNextSentence(idx + 1); }, 600);
       };
       utter.onerror = function () {
         if (token !== storyState.token) return;
+        storyErrors += 1;
+        if (storyErrors > 2) { stopStory(); return; }
         playNextSentence(idx + 1);
       };
       try { synth.speak(utter); } catch (e) { playNextSentence(idx + 1); }
     }
 
-    function toggleStoryPlayback() {
-      if (storyState.playing) { stopStory(); return; }
+    function startStoryPlayback() {
       if (!supportsSpeech) return;
-      // Stop other players
       PLAYERS.forEach(function (p) { if (p._type !== 'story') p.stop(); });
       stopAllAudio();
       storyState.playing = true;
       storyState.token += 1;
+      storyErrors = 0;
+      var token = storyState.token;
       if (storyState.playBtn) {
         storyState.playBtn.textContent = '■ 停止';
         storyState.playBtn.classList.add('is-playing');
       }
-      playNextSentence(0);
+      // 先读故事标题，再读正文
+      var startBody = function () {
+        if (token !== storyState.token || !storyState.playing) return;
+        storySpeakTimer = setTimeout(function () { playNextSentence(0); }, 450);
+      };
+      var titleUtter = new window.SpeechSynthesisUtterance(storyState.item ? storyState.item.en : '');
+      titleUtter.lang = 'en-US';
+      titleUtter.rate = 0.85;
+      titleUtter.onend = startBody;
+      titleUtter.onerror = startBody;
+      try { synth.speak(titleUtter); } catch (e) { startBody(); }
+    }
+
+    function toggleStoryPlayback() {
+      if (storyState.playing) { stopStory(); return; }
+      startStoryPlayback();
     }
 
     var api = { buildTabs: buildTabs, render: renderStory, stop: stopStory };
@@ -887,7 +987,11 @@
     if (gameFeedback) gameFeedback.hidden = true;
     if (gameOptions) gameOptions.textContent = '';
     if (gameWord) gameWord.textContent = game.mode === 'en-zh' ? q.en : q.zh;
-    if (gameContext) gameContext.textContent = q.cat + '  ·  ' + q.icon;
+    if (gameContext) {
+      gameContext.textContent = game.mode === 'en-zh'
+        ? '听发音，选出正确的中文意思'
+        : '看中文，选出正确的英文单词';
+    }
     if (gameWord) gameWord.lang = game.mode === 'en-zh' ? 'en' : 'zh';
 
     var pool = getGamePool().filter(function (w) {

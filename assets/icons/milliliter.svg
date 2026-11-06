@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64"><path d="M22 12h20l-3 42H25z" fill="#E4F0F6" stroke="#2A2A2E" stroke-opacity=".14" stroke-width="2"/>
+<path d="M24 20h16M25 28h14M26 36h12M27 44h10" stroke="#93A0A9" stroke-width="1.4" opacity=".7"/>
+<path d="M23 30h18v12H23z" fill="#6BB3F0" opacity=".35"/>
+<text x="32" y="40" font-family="Segoe UI, sans-serif" font-size="9" font-weight="700" fill="#2A2A2E" text-anchor="middle">1 mL</text>
+<path d="M22 12h20" stroke="#93A0A9" stroke-width="3" stroke-linecap="round"/></svg>

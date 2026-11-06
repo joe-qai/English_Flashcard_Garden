@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64"><rect x="8" y="12" width="48" height="44" rx="5" fill="#FDFBF7" stroke="#2A2A2E" stroke-opacity=".16" stroke-width="2"/>
+<rect x="8" y="12" width="48" height="11" rx="5" fill="#6BB3F0"/>
+<g fill="#93A0A9"><circle cx="18" cy="12" r="2.6"/><circle cx="46" cy="12" r="2.6"/></g>
+<g fill="#6BB3F0">
+<rect x="14" y="28" width="8" height="8" rx="1.6"/><rect x="25" y="28" width="8" height="8" rx="1.6"/><rect x="36" y="28" width="8" height="8" rx="1.6"/><rect x="47" y="28" width="6" height="8" rx="1.6"/>
+<rect x="14" y="40" width="8" height="8" rx="1.6"/>
+</g>
+<g fill="#E6E1D6"><rect x="25" y="40" width="8" height="8" rx="1.6"/><rect x="36" y="40" width="8" height="8" rx="1.6"/><rect x="47" y="40" width="6" height="8" rx="1.6"/></g>
+<text x="32" y="22" font-family="Segoe UI, sans-serif" font-size="6.5" font-weight="700" fill="#FDFBF7" text-anchor="middle">MON-FRI</text></svg>

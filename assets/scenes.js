@@ -12,6 +12,7 @@ window.DIALOGUE_SCENES = [
     icon: '🚿',
     color: '#4FA3C7',
     desc: '刷牙、洗脸，早晨的第一件事',
+    mood: 'calm',
     lines: [
       {
         who: 'Mom',
@@ -61,6 +62,7 @@ window.DIALOGUE_SCENES = [
     icon: '🌅',
     color: '#F6A94D',
     desc: '起床、问早、出门前的几句话',
+    mood: 'warm',
     lines: [
       {
         who: 'Mom',
@@ -113,6 +115,7 @@ window.DIALOGUE_SCENES = [
     icon: '☀️',
     color: '#E5A13B',
     desc: '中午放学，约同学一起吃饭',
+    mood: 'normal',
     lines: [
       {
         who: 'Amy',
@@ -163,6 +166,7 @@ window.DIALOGUE_SCENES = [
     icon: '🌆',
     color: '#6F7BD1',
     desc: '傍晚回家，聊聊晚饭和作业',
+    mood: 'calm',
     lines: [
       {
         who: 'Dad',
@@ -217,6 +221,7 @@ window.DIALOGUE_SCENES = [
     icon: '🍽️',
     color: '#EF7E6B',
     desc: '餐桌上的礼貌用语',
+    mood: 'warm',
     lines: [
       {
         who: 'Mom',
@@ -264,6 +269,7 @@ window.DIALOGUE_SCENES = [
     icon: '🚽',
     color: '#5FB8A5',
     desc: '外出或在家，怎么开口说',
+    mood: 'calm',
     lines: [
       {
         who: 'Tom',
@@ -322,6 +328,7 @@ window.DIALOGUE_SCENES = [
     icon: '📚',
     color: '#6BB3F0',
     desc: '课堂问候与提问',
+    mood: 'normal',
     lines: [
       {
         who: 'Teacher',
@@ -381,6 +388,7 @@ window.DIALOGUE_SCENES = [
     icon: '⚽',
     color: '#8FBF6E',
     desc: '约球、传球，球场上的喊话',
+    mood: 'energetic',
     lines: [
       {
         who: 'Jack',
@@ -431,6 +439,7 @@ window.DIALOGUE_SCENES = [
     icon: '🥾',
     color: '#B08968',
     desc: '户外徒步：看天气、认路线、看风景',
+    mood: 'wonder',
     lines: [
       {
         who: 'Leo',
@@ -495,6 +504,7 @@ window.DIALOGUE_SCENES = [
     icon: '😴',
     color: '#9A84D8',
     desc: '睡前对话，互道晚安',
+    mood: 'sleepy',
     lines: [
       {
         who: 'Mom',
@@ -546,6 +556,7 @@ window.DIALOGUE_SCENES = [
     icon: '⏰',
     color: '#E0883C',
     desc: '问几点、说时间、约时间',
+    mood: 'normal',
     lines: [
       {
         who: 'Stranger',
@@ -596,6 +607,7 @@ window.DIALOGUE_SCENES = [
     icon: '🗺️',
     color: '#4F8EDB',
     desc: '问路、指路、确认距离',
+    mood: 'normal',
     lines: [
       {
         who: 'Tourist',
@@ -650,6 +662,7 @@ window.DIALOGUE_SCENES = [
     icon: '🔍',
     color: '#C98A5E',
     desc: '指着东西问：植物、水果、颜色、动物',
+    mood: 'curious',
     lines: [
       {
         who: 'Lily',
@@ -709,6 +722,7 @@ window.DIALOGUE_SCENES = [
     icon: '❓',
     color: '#B98BE8',
     desc: '不会说、不会拼时怎么问',
+    mood: 'normal',
     lines: [
       {
         who: 'Lucy',
@@ -761,6 +775,7 @@ window.DIALOGUE_SCENES = [
     icon: '😊',
     color: '#D2799B',
     desc: '聊聊开心、紧张和累',
+    mood: 'emotional',
     lines: [
       {
         who: 'Amy',
@@ -824,6 +839,7 @@ window.DIALOGUE_SCENES = [
     icon: '🦕',
     color: '#8A7B5C',
     desc: '在博物馆看化石，聊聊恐龙与火山',
+    mood: 'wonder',
     lines: [
       {
         who: 'Lily',
@@ -890,6 +906,7 @@ window.DIALOGUE_SCENES = [
     icon: '🐬',
     color: '#3E9BC4',
     desc: '坐船看海豚、鲸鱼和章鱼',
+    mood: 'wonder',
     lines: [
       {
         who: 'Amy',
@@ -961,6 +978,7 @@ window.DIALOGUE_SCENES = [
     icon: '🦁',
     color: '#6DA36B',
     desc: '逛动物园：看大象、猴子和熊猫',
+    mood: 'happy',
     lines: [
       {
         who: 'Emma',
@@ -1031,6 +1049,7 @@ window.DIALOGUE_SCENES = [
     icon: '🏛️',
     color: '#A0793C',
     desc: '参观历史博物馆，聊聊古人和城堡',
+    mood: 'calm',
     lines: [
       {
         who: 'Teacher',
@@ -1102,6 +1121,7 @@ window.DIALOGUE_SCENES = [
     icon: '🛡️',
     color: '#7A7F8C',
     desc: '看军舰、盾牌和直升机，认识军事装备',
+    mood: 'serious',
     lines: [
       {
         who: 'Jack',
@@ -1174,6 +1194,7 @@ window.DIALOGUE_SCENES = [
     icon: '🛍️',
     color: '#E8A838',
     desc: '挑选衣服、问价、试穿、结账一条龙',
+    mood: 'normal',
     lines: [
       {
         who: 'Shopkeeper',
@@ -1257,6 +1278,7 @@ window.DIALOGUE_SCENES = [
     icon: '🍽️',
     color: '#EF7E6B',
     desc: '入座、点餐、加单、买单',
+    mood: 'warm',
     lines: [
       {
         who: 'Waiter',
@@ -1329,6 +1351,7 @@ window.DIALOGUE_SCENES = [
     icon: '🏥',
     color: '#E06C6C',
     desc: '描述症状、量体温、拿药',
+    mood: 'concerned',
     lines: [
       {
         who: 'Nurse',
@@ -1402,6 +1425,7 @@ window.DIALOGUE_SCENES = [
     icon: '🚌',
     color: '#5B9BD5',
     desc: '等车、问线路、上车、到站提醒',
+    mood: 'normal',
     lines: [
       {
         who: 'Passenger',
@@ -1462,6 +1486,7 @@ window.DIALOGUE_SCENES = [
     icon: '🎂',
     color: '#E85B8A',
     desc: '朋友来家里庆祝，许愿切蛋糕',
+    mood: 'excited',
     lines: [
       {
         who: 'Host',
@@ -1528,6 +1553,7 @@ window.DIALOGUE_SCENES = [
     icon: '🗓️',
     color: '#6DB86B',
     desc: '和朋友约周末去哪玩',
+    mood: 'happy',
     lines: [
       {
         who: 'Amy',
@@ -1595,6 +1621,7 @@ window.DIALOGUE_SCENES = [
     icon: '🔧',
     color: '#A0A0A0',
     desc: '家里东西坏了，打电话报修或自己动手',
+    mood: 'calm',
     lines: [
       {
         who: 'Homeowner',
@@ -1659,6 +1686,7 @@ window.DIALOGUE_SCENES = [
     icon: '📮',
     color: '#4A90D9',
     desc: '寄包裹、填单、称重、查物流',
+    mood: 'normal',
     lines: [
       {
         who: 'Customer',

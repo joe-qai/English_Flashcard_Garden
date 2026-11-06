@@ -847,6 +847,8 @@
       var index = 0;
       var rate =
         state2.item && state2.item.rate ? state2.item.rate : config.rate;
+      var mood = state2.item && state2.item.mood ? state2.item.mood : 'normal';
+      var moodTone = getMoodTone(mood);
       updatePlayBtn();
 
       function next() {
@@ -868,7 +870,12 @@
 
         var utter = new window.SpeechSynthesisUtterance(lines[current].en);
         utter.lang = 'en-US';
-        utter.rate = rate;
+        // 基础语速 + 场景基调微调（±0.05）
+        var lineRate = Math.min(2, Math.max(0.1, rate + moodTone.rateDelta));
+        // 音高随情绪浮动（0.9~1.15）
+        var linePitch = Math.min(2, Math.max(0, moodTone.pitch));
+        utter.rate = lineRate;
+        utter.pitch = linePitch;
         utter.onend = function () {
           if (token !== state2.token) {
             return;
@@ -890,6 +897,29 @@
       }
 
       window.setTimeout(next, 120);
+    }
+
+    /**
+     * 根据场景氛围返回语调偏移量。
+     * rateDelta：对基础语速的加减（通常 ±0.03~0.08）
+     * pitch：绝对音高，范围 0~2（默认 1）
+     */
+    function getMoodTone(mood) {
+      var map = {
+        calm:       { rateDelta: -0.04, pitch: 0.93 },
+        warm:       { rateDelta:  0.00, pitch: 1.00 },
+        normal:     { rateDelta:  0.00, pitch: 1.00 },
+        energetic:  { rateDelta:  0.06, pitch: 1.08 },
+        wonder:     { rateDelta:  0.02, pitch: 1.10 },
+        sleepy:     { rateDelta: -0.08, pitch: 0.88 },
+        curious:    { rateDelta:  0.02, pitch: 1.06 },
+        emotional:  { rateDelta:  0.03, pitch: 1.05 },
+        serious:    { rateDelta: -0.05, pitch: 0.92 },
+        happy:      { rateDelta:  0.04, pitch: 1.07 },
+        excited:    { rateDelta:  0.08, pitch: 1.12 },
+        concerned:  { rateDelta: -0.03, pitch: 0.95 },
+      };
+      return map[mood] || map.normal;
     }
 
     var api = {
@@ -970,7 +1000,7 @@
       tabData: 'scene',
       playLabel: '▶ 播放全部',
       rate: 0.85,
-      gap: 260,
+      gap: 500,
     });
 
     var songPlayer = createPlayer({

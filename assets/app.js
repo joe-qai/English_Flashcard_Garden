@@ -56,6 +56,236 @@
     try { window.localStorage.setItem(key, value); } catch (e) {}
   }
 
+  /* ============ 浏览器兼容 / 语音可用性 ============ */
+  var KEY_COMPAT_DISMISS = 'flashcard:compatTipDismissed';
+  var KEY_COMPAT_SESSION = 'flashcard:compatTipShown';
+  var COMPAT_BROWSERS = 'Chrome / Safari / Edge';
+
+  // 内置浏览器通常缺少英文语音包，表现为“点了没声音”，需要单独提示
+  var WEAK_BROWSERS = [
+    { re: /HuaweiBrowser|HMSCore/i, name: '华为浏览器' },
+    { re: /MicroMessenger/i, name: '微信内置浏览器' },
+    { re: /\bQQ\//i, name: 'QQ 内置浏览器' },
+    { re: /UCBrowser|UBrowser/i, name: 'UC 浏览器' },
+    { re: /Quark/i, name: '夸克浏览器' },
+    { re: /MiuiBrowser/i, name: '小米浏览器' },
+    { re: /baiduboxapp/i, name: '百度 App' },
+    { re: /DingTalk/i, name: '钉钉内置浏览器' },
+    { re: /AlipayClient/i, name: '支付宝内置浏览器' },
+    { re: /Weibo/i, name: '微博内置浏览器' }
+  ];
+
+  function detectWeakBrowser() {
+    var ua = navigator.userAgent || '';
+    for (var i = 0; i < WEAK_BROWSERS.length; i++) {
+      if (WEAK_BROWSERS[i].re.test(ua)) return WEAK_BROWSERS[i].name;
+    }
+    // HarmonyOS 自带浏览器：UA 里没有主流内核标识，同样按弱环境处理
+    if (/HarmonyOS/i.test(ua) && !/(Chrome|CriOS|Edg|Firefox|FxiOS|SamsungBrowser)\//.test(ua)) {
+      return '华为浏览器';
+    }
+    return '';
+  }
+
+  var weakBrowser = detectWeakBrowser();
+  var speechBroken = !supportsSpeech;
+  var compatEl = null;
+  var compatTextEl = null;
+  var compatCopyBtn = null;
+  var compatHideTimer = null;
+
+  function canSpeak() { return supportsSpeech && !speechBroken; }
+
+  function readTipSession() {
+    try { return window.sessionStorage.getItem(KEY_COMPAT_SESSION) || ''; } catch (e) { return ''; }
+  }
+  function tipShownThisSession(reason) {
+    return readTipSession().split('|').indexOf(reason) !== -1;
+  }
+  function markTipShown(reason) {
+    var list = readTipSession().split('|');
+    if (list.indexOf(reason) !== -1) return;
+    list.push(reason);
+    try { window.sessionStorage.setItem(KEY_COMPAT_SESSION, list.join('|')); } catch (e) {}
+  }
+
+  function compatMessage(reason) {
+    if (reason === 'env') {
+      return '当前是' + weakBrowser + '，语音朗读可能没有声音。建议改用 ' + COMPAT_BROWSERS + ' 打开本页。';
+    }
+    if (reason === 'audio') {
+      return '音频加载失败，请先检查网络；如果仍然不行，请改用 ' + COMPAT_BROWSERS + ' 打开本页。';
+    }
+    if (reason === 'autoplay') {
+      return '浏览器拦截了自动播放，请点一下播放器上的 ▶ 再试。';
+    }
+    return '当前浏览器没能朗读出来：可能不支持语音合成，或系统缺少英文语音包。建议改用 ' + COMPAT_BROWSERS + ' 打开本页。';
+  }
+
+  function copyCompatLink() {
+    var url = window.location.href;
+    var done = function () {
+      if (!compatCopyBtn) return;
+      var label = compatCopyBtn.textContent;
+      compatCopyBtn.textContent = '已复制 ✓';
+      window.setTimeout(function () {
+        if (compatCopyBtn) compatCopyBtn.textContent = label;
+      }, 1600);
+    };
+    var fallback = function () {
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = url;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        done();
+      } catch (e) {}
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(done, fallback);
+    } else {
+      fallback();
+    }
+  }
+
+  function buildCompatTip() {
+    if (compatEl) return compatEl;
+    var wrap = document.createElement('div');
+    wrap.className = 'compat-tip';
+    wrap.setAttribute('role', 'status');
+    wrap.setAttribute('aria-live', 'polite');
+    wrap.hidden = true;
+
+    var icon = document.createElement('span');
+    icon.className = 'compat-tip-icon';
+    icon.setAttribute('aria-hidden', 'true');
+    icon.textContent = '🔈';
+
+    var body = document.createElement('div');
+    body.className = 'compat-tip-body';
+
+    var text = document.createElement('p');
+    text.className = 'compat-tip-text';
+
+    var actions = document.createElement('div');
+    actions.className = 'compat-tip-actions';
+
+    var copy = document.createElement('button');
+    copy.type = 'button';
+    copy.className = 'compat-tip-btn is-primary';
+    copy.textContent = '复制本页链接';
+    copy.addEventListener('click', copyCompatLink);
+
+    var know = document.createElement('button');
+    know.type = 'button';
+    know.className = 'compat-tip-btn';
+    know.textContent = '知道了';
+    know.addEventListener('click', function () {
+      writeStore(KEY_COMPAT_DISMISS, '1');
+      hideCompatTip();
+    });
+
+    var close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'compat-tip-close';
+    close.setAttribute('aria-label', '关闭提示');
+    close.textContent = '×';
+    close.addEventListener('click', hideCompatTip);
+
+    actions.appendChild(copy);
+    actions.appendChild(know);
+    body.appendChild(text);
+    body.appendChild(actions);
+    wrap.appendChild(icon);
+    wrap.appendChild(body);
+    wrap.appendChild(close);
+    document.body.appendChild(wrap);
+
+    compatEl = wrap;
+    compatTextEl = text;
+    compatCopyBtn = copy;
+    return wrap;
+  }
+
+  function hideCompatTip() {
+    if (!compatEl) return;
+    if (compatHideTimer) { window.clearTimeout(compatHideTimer); compatHideTimer = null; }
+    compatEl.classList.remove('is-visible');
+    window.setTimeout(function () {
+      if (compatEl && !compatEl.classList.contains('is-visible')) compatEl.hidden = true;
+    }, 220);
+  }
+
+  function showCompatTip(reason) {
+    var proactive = reason === 'env' || reason === 'nospeech';
+    if (proactive && readStore(KEY_COMPAT_DISMISS) === '1') return;
+    if (tipShownThisSession(reason)) return;
+    // 已经提示过整体环境问题，就不再重复弹“朗读失败”
+    if (!proactive && (tipShownThisSession('env') || tipShownThisSession('nospeech'))) return;
+    markTipShown(reason);
+
+    var el = buildCompatTip();
+    if (compatTextEl) compatTextEl.textContent = compatMessage(reason);
+    if (compatHideTimer) { window.clearTimeout(compatHideTimer); compatHideTimer = null; }
+    el.hidden = false;
+    el.classList.remove('is-visible');
+    void el.offsetWidth;
+    el.classList.add('is-visible');
+    // 自动播放被拦截只是一次性提示，看到即可，不打扰阅读
+    if (reason === 'autoplay') compatHideTimer = window.setTimeout(hideCompatTip, 6000);
+  }
+
+  function refreshSpeechVoices() {
+    if (!supportsSpeech) return;
+    var voices = [];
+    try { voices = synth.getVoices() || []; } catch (e) { return; }
+    for (var i = 0; i < voices.length; i++) {
+      if (/^en(-|_|$)/i.test(voices[i].lang || '')) {
+        if (speechBroken) speechBroken = false;
+        return;
+      }
+    }
+  }
+
+  function markSpeechBroken(btn) {
+    speechBroken = true;
+    if (speechStartTimer) { window.clearTimeout(speechStartTimer); speechStartTimer = null; }
+    if (btn) {
+      btn.classList.remove('is-speaking');
+      if (speakingBtn === btn) speakingBtn = null;
+    }
+    showCompatTip('failed');
+  }
+
+  function flashButton(btn) {
+    if (!btn) return;
+    btn.classList.add('is-speaking');
+    window.setTimeout(function () { btn.classList.remove('is-speaking'); }, 600);
+  }
+
+  function initCompat() {
+    if (supportsSpeech) {
+      try {
+        if (typeof synth.addEventListener === 'function') {
+          synth.addEventListener('voiceschanged', refreshSpeechVoices);
+        } else {
+          synth.onvoiceschanged = refreshSpeechVoices;
+        }
+      } catch (e) {}
+      refreshSpeechVoices();
+    }
+    if (weakBrowser || !supportsSpeech) {
+      window.setTimeout(function () {
+        showCompatTip(weakBrowser ? 'env' : 'nospeech');
+      }, 700);
+    }
+  }
+
   /* ============ 单词音标标注 ============ */
   function escapeRegExp(str) {
     return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -292,28 +522,52 @@
   /* ============ SPEAK ============ */
   var speakingBtn = null;
   var speakTimer = null;
+  var speechStartTimer = null;
 
   function speak(text, btn) {
     stopAllPlayback();
-    if (!supportsSpeech) {
-      btn.classList.add('is-speaking');
-      window.setTimeout(function () { btn.classList.remove('is-speaking'); }, 500);
+    if (!canSpeak()) {
+      flashButton(btn);
+      showCompatTip('failed');
       return;
     }
     if (speakingBtn && speakingBtn !== btn) speakingBtn.classList.remove('is-speaking');
     speakingBtn = btn;
     btn.classList.add('is-speaking');
     if (speakTimer) { window.clearTimeout(speakTimer); speakTimer = null; }
+    if (speechStartTimer) { window.clearTimeout(speechStartTimer); speechStartTimer = null; }
+
+    var started = false;
+    var clearStartTimer = function () {
+      if (speechStartTimer) { window.clearTimeout(speechStartTimer); speechStartTimer = null; }
+    };
     var utter = new window.SpeechSynthesisUtterance(text);
     utter.lang = 'en-US';
     utter.rate = 0.85;
+    utter.onstart = function () {
+      started = true;
+      clearStartTimer();
+    };
     utter.onend = function () {
+      started = true;
+      clearStartTimer();
       btn.classList.remove('is-speaking');
       if (speakingBtn === btn) speakingBtn = null;
     };
-    utter.onerror = utter.onend;
+    utter.onerror = function (ev) {
+      clearStartTimer();
+      btn.classList.remove('is-speaking');
+      if (speakingBtn === btn) speakingBtn = null;
+      var type = ev && ev.error ? ev.error : '';
+      // interrupted / canceled 是我们主动打断，不代表浏览器不支持
+      if (!started && type !== 'interrupted' && type !== 'canceled') markSpeechBroken(btn);
+    };
     var start = function () {
-      try { synth.speak(utter); } catch (e) { btn.classList.remove('is-speaking'); }
+      // 部分浏览器（如华为、微信内置内核）接口存在但永远不播放，用超时兜底
+      speechStartTimer = window.setTimeout(function () {
+        if (!started) markSpeechBroken(btn);
+      }, 1800);
+      try { synth.speak(utter); } catch (e) { markSpeechBroken(btn); }
     };
     if (synth.speaking || synth.pending) {
       synth.cancel();
@@ -322,6 +576,7 @@
   }
 
   function stopAllPlayback() {
+    if (speechStartTimer) { window.clearTimeout(speechStartTimer); speechStartTimer = null; }
     PLAYERS.forEach(function (p) { p.stop(); });
   }
 
@@ -462,6 +717,9 @@
         audio.src = item.audio;
         audio.className = 'audio-player';
         state2.audioEl = audio;
+        audio.addEventListener('error', function () {
+          showCompatTip('audio');
+        });
         audio.addEventListener('play', function () {
           state2.audioActive = true;
           try { synth.cancel(); } catch (e) {}
@@ -525,8 +783,13 @@
       if (autoplay === 'audio' && state2.audioEl) {
         try {
           var p = state2.audioEl.play();
-          if (p && typeof p.catch === 'function') p.catch(function () {});
-        } catch (e) {}
+          if (p && typeof p.catch === 'function') {
+            p.catch(function (err) {
+              if (err && err.name === 'NotAllowedError') showCompatTip('autoplay');
+              else showCompatTip('audio');
+            });
+          }
+        } catch (e) { showCompatTip('audio'); }
       } else if (autoplay === 'speech' && state2.lines.length) {
         startPlayback();
       }
@@ -572,7 +835,7 @@
     }
     function togglePlayback() {
       if (state2.playing) { stop(); return; }
-      if (!supportsSpeech) return;
+      if (!canSpeak()) { showCompatTip('failed'); return; }
       PLAYERS.forEach(function (p) { if (p !== api) p.stop(); });
       if (state2.audioEl) { try { state2.audioEl.pause(); } catch (e) {} }
       startPlayback();
@@ -869,14 +1132,14 @@
       utter.onerror = function () {
         if (token !== storyState.token) return;
         storyErrors += 1;
-        if (storyErrors > 2) { stopStory(); return; }
+        if (storyErrors > 2) { markSpeechBroken(null); stopStory(); return; }
         playNextSentence(idx + 1);
       };
       try { synth.speak(utter); } catch (e) { playNextSentence(idx + 1); }
     }
 
     function startStoryPlayback() {
-      if (!supportsSpeech) return;
+      if (!canSpeak()) { showCompatTip('failed'); return; }
       PLAYERS.forEach(function (p) { if (p._type !== 'story') p.stop(); });
       stopAllAudio();
       storyState.playing = true;
@@ -895,9 +1158,21 @@
       var titleUtter = new window.SpeechSynthesisUtterance(storyState.item ? storyState.item.en : '');
       titleUtter.lang = 'en-US';
       titleUtter.rate = 0.85;
-      titleUtter.onend = startBody;
-      titleUtter.onerror = startBody;
-      try { synth.speak(titleUtter); } catch (e) { startBody(); }
+      // 华为/微信内核可能接口存在但永远不触发 start/end，超时后提示并停止
+      var titleStarted = false;
+      var titleWatch = window.setTimeout(function () {
+        if (titleStarted || token !== storyState.token || !storyState.playing) return;
+        markSpeechBroken(null);
+        stopStory();
+      }, 2400);
+      var clearTitleWatch = function () {
+        titleStarted = true;
+        window.clearTimeout(titleWatch);
+      };
+      titleUtter.onstart = clearTitleWatch;
+      titleUtter.onend = function () { clearTitleWatch(); startBody(); };
+      titleUtter.onerror = function () { clearTitleWatch(); startBody(); };
+      try { synth.speak(titleUtter); } catch (e) { clearTitleWatch(); startBody(); }
     }
 
     function toggleStoryPlayback() {
@@ -1011,10 +1286,22 @@
       if (gameOptions) gameOptions.appendChild(btn);
     });
 
-    if (supportsSpeech && game.mode === 'en-zh') {
-      var u = new window.SpeechSynthesisUtterance(q.en);
-      u.lang = 'en-US'; u.rate = 0.8;
-      synth.speak(u);
+    if (game.mode === 'en-zh') {
+      if (!canSpeak()) {
+        showCompatTip('failed');
+      } else {
+        var u = new window.SpeechSynthesisUtterance(q.en);
+        u.lang = 'en-US'; u.rate = 0.8;
+        var heard = false;
+        var gameWatch = window.setTimeout(function () {
+          if (!heard && canSpeak()) markSpeechBroken(null);
+        }, 1800);
+        var done = function () { heard = true; window.clearTimeout(gameWatch); };
+        u.onstart = done;
+        u.onend = done;
+        u.onerror = done;
+        try { synth.speak(u); } catch (e) { window.clearTimeout(gameWatch); markSpeechBroken(null); }
+      }
     }
   }
 
@@ -1094,6 +1381,7 @@
     updateHash(initial.id);
     buildCatNav(); syncPills(); renderWords();
     syncThemeUi(currentTheme());
+    initCompat();
     initScenePlayer();
     initSongPlayer();
     initStories();

@@ -1,184 +1,165 @@
 <!doctype html>
 <html lang="zh-CN" data-theme="light">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>英文闪卡园 · Flashcard Garden</title>
-    <meta
-      name="description"
-      content="按生活场景分类的常见英文单词闪卡，配图（图标）、国际音标与中文释义。覆盖水果、颜色、食物、动物、文具、家具、厨具，以及侏罗纪、海洋生物、植物、军事武器、二十四节气、四季、天气、穿着、身体部位、健康看病、购物付款、交通出行、职业工作、房间家居、工具维修、时间概念、爱好休闲、数字计量、运动综合、节日庆典等类别；另含 28 个场景对话与 4 首英文歌谣，点击即可听发音。"
-    />
-    <meta name="theme-color" content="#FAF7F0" />
-    <meta name="color-scheme" content="light dark" />
-
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="英文闪卡园 · Flashcard Garden" />
-    <meta
-      property="og:description"
-      content="二十七类主题、六百多个常见英文单词，配 emoji 图标、国际音标与中文释义；含场景对话、英文歌谣，点一下就能听发音。"
-    />
-    <meta property="og:locale" content="zh_CN" />
-
-    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="assets/style.css" />
-
-    <script>
-      // 在首屏渲染前确定主题，避免深色模式闪白
-      (function () {
-        try {
-          var t = localStorage.getItem('flashcard:theme');
-          if (!t) {
-            t = window.matchMedia('(prefers-color-scheme: dark)').matches
-              ? 'dark'
-              : 'light';
-          }
-          document.documentElement.setAttribute('data-theme', t);
-        } catch (e) {}
-      })();
-    </script>
-  </head>
-
-  <body>
-    <div class="page">
-      <div class="topbar">
-        <div class="topbar-links">
-          <button id="jump-scenes" class="text-btn" type="button">
-            <span aria-hidden="true">💬</span> 场景对话 ↓
-          </button>
-          <button id="jump-songs" class="text-btn" type="button">
-            <span aria-hidden="true">🎵</span> 英文歌谣 ↓
-          </button>
-        </div>
-        <button
-          id="theme-toggle"
-          class="icon-btn"
-          type="button"
-          aria-label="切换深色模式"
-          title="切换深色模式"
-        >
-          <span class="icon-moon" aria-hidden="true">🌙</span>
-          <span class="icon-sun" aria-hidden="true">☀️</span>
-        </button>
-      </div>
-
-      <header class="hero">
-        <p class="hero-badge"><span aria-hidden="true">💬</span> 常见单词中英对照 · 附音标</p>
-        <h1 class="hero-title">英文闪卡园</h1>
-        <p class="hero-en" lang="en">Flashcard Garden</p>
-        <p class="hero-desc">
-          按主题挑选常见英文单词，配图、音标与中文释义。点击卡片即可播放发音；下面还有场景对话和英文歌谣，可以逐句跟读。
-        </p>
-      </header>
-
-      <nav id="category-nav" class="nav" aria-label="单词分类"></nav>
-
-      <div class="toolbar">
-        <div class="toolbar-title">
-          <span id="cat-icon" class="cat-icon" aria-hidden="true"></span>
-          <h2 id="cat-title" class="cat-title"></h2>
-          <span id="cat-count" class="cat-count" aria-live="polite"></span>
-        </div>
-
-        <div class="search">
-          <svg
-            class="search-icon"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            aria-hidden="true"
-          >
-            <circle cx="11" cy="11" r="7" />
-            <path d="M20 20l-3.6-3.6" />
-          </svg>
-          <input
-            id="search"
-            class="search-input"
-            type="search"
-            placeholder="搜索英文 / 音标 / 中文…"
-            aria-label="搜索单词"
-            autocomplete="off"
-            spellcheck="false"
-          />
-          <kbd class="search-kbd" aria-hidden="true">/</kbd>
-        </div>
-      </div>
-
-      <main>
-        <div id="grid" class="grid"></div>
-
-        <div id="carousel-bar" class="carousel-bar">
-          <button
-            id="car-prev"
-            class="car-btn"
-            type="button"
-            aria-label="上一个单词"
-          >
-            ‹
-          </button>
-          <span id="car-count" class="car-count" aria-hidden="true"></span>
-          <button
-            id="car-next"
-            class="car-btn"
-            type="button"
-            aria-label="下一个单词"
-          >
-            ›
-          </button>
-        </div>
-
-        <div id="empty" class="empty" hidden>
-          <span class="empty-emoji" aria-hidden="true">🔍</span>
-          <p id="empty-text" class="empty-text"></p>
-        </div>
-
-        <noscript>
-          <div class="empty">
-            <p class="empty-text">这个页面需要启用 JavaScript 才能渲染单词卡片。</p>
-          </div>
-        </noscript>
-      </main>
-
-      <section id="scenes" class="scenes" aria-labelledby="scenes-title">
-        <div class="scenes-head">
-          <h2 id="scenes-title" class="scenes-title">
-            场景对话 <span>Dialogues</span>
-          </h2>
-          <p class="scenes-desc">按生活场景练一练：点句子听单句，点「播放全部」连续跟读</p>
-        </div>
-
-        <div id="scene-tabs" class="scene-tabs" role="tablist" aria-label="对话场景"></div>
-        <div id="scene-panel" class="scene-panel" role="tabpanel"></div>
-      </section>
-
-      <section id="songs" class="scenes songs" aria-labelledby="songs-title">
-        <div class="scenes-head">
-          <h2 id="songs-title" class="scenes-title">
-            英文歌谣 <span>Nursery Rhymes</span>
-          </h2>
-          <p class="scenes-desc">
-            用慢速朗读跟读歌词：点句子听单句，点「播放整首」连续跟读（无伴奏）
-          </p>
-        </div>
-
-        <div id="song-tabs" class="scene-tabs" role="tablist" aria-label="英文歌谣"></div>
-        <div id="song-panel" class="scene-panel" role="tabpanel"></div>
-      </section>
-
-      <footer class="footer">
-        <p>
-          共 <span id="total-count">0</span> 个单词 ·
-          <span id="scene-total">0</span> 个场景对话 ·
-          <span id="song-total">0</span> 首歌谣 · 点击卡片听发音 · 音标为英式读音
-        </p>
-        <p class="footer-sub">纯静态页面 · 无需后端服务</p>
-      </footer>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>英文闪卡园 · Flashcard Garden</title>
+  <meta name="description" content="按生活场景分类的常见英文单词闪卡，配图、音标与中文释义。覆盖学校、日常生活及拓展主题；另含场景对话、英文歌谣、故事会与互动游戏。" />
+  <meta name="theme-color" content="#FAF7F0" />
+  <meta name="color-scheme" content="light dark" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="英文闪卡园 · Flashcard Garden" />
+  <meta property="og:description" content="二十七类主题、六百多个常见英文单词，配 emoji 图标、国际音标与中文释义；含场景对话、英文歌谣、故事会与互动游戏。" />
+  <meta property="og:locale" content="zh_CN" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="assets/style.css" />
+  <script>
+    (function(){try{var t=localStorage.getItem('flashcard:theme');if(!t){t=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+  </script>
+</head>
+<body>
+<div class="page">
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="topbar-title">
+      <span class="topbar-logo" aria-hidden>🌿</span>
+      <span class="topbar-name">英文闪卡园</span>
+      <span class="topbar-en">Flashcard Garden</span>
     </div>
+    <div class="topbar-actions">
+      <button id="jump-games" class="text-btn" type="button"><span aria-hidden>🎮</span> 开始游戏</button>
+      <button id="theme-toggle" class="icon-btn" type="button" aria-label="切换深色模式" title="切换深色模式">
+        <span class="icon-moon" aria-hidden>🌙</span>
+        <span class="icon-sun" aria-hidden>☀️</span>
+      </button>
+    </div>
+  </div>
 
-    <script src="assets/words.js"></script>
-    <script src="assets/scenes.js"></script>
-    <script src="assets/songs.js"></script>
-    <script src="assets/app.js"></script>
-  </body>
+  <!-- 5 Tab Navigation -->
+  <nav class="tab-nav" aria-label="主导航">
+    <button class="tab active" data-tab="words" type="button">
+      <span class="tab-icon" aria-hidden>📚</span>
+      <span class="tab-label">单词</span>
+      <span class="tab-count" id="tab-words-count">648</span>
+    </button>
+    <button class="tab" data-tab="scenes" type="button">
+      <span class="tab-icon" aria-hidden>💬</span>
+      <span class="tab-label">情景</span>
+      <span class="tab-count" id="tab-scenes-count">28</span>
+    </button>
+    <button class="tab" data-tab="songs" type="button">
+      <span class="tab-icon" aria-hidden>🎵</span>
+      <span class="tab-label">音乐</span>
+      <span class="tab-count">4</span>
+    </button>
+    <button class="tab" data-tab="stories" type="button">
+      <span class="tab-icon" aria-hidden>📖</span>
+      <span class="tab-label">故事会</span>
+      <span class="tab-count">4</span>
+    </button>
+    <button class="tab" data-tab="games" type="button">
+      <span class="tab-icon" aria-hidden>🎮</span>
+      <span class="tab-label">游戏</span>
+      <span class="tab-count" id="tab-games-score">0</span>
+    </button>
+  </nav>
+
+  <!-- ==================== WORDS TAB ==================== -->
+  <section id="tab-words" class="tab-panel active" aria-labelledby="tab-words">
+    <div class="sub-nav" aria-label="单词场景分组">
+      <button class="pill sub-pill is-active" data-group="all" type="button">全部</button>
+      <button class="pill sub-pill" data-group="school" type="button">🏫 学校高频</button>
+      <button class="pill sub-pill" data-group="life" type="button">🏠 日常生活</button>
+      <button class="pill sub-pill" data-group="fun" type="button">🌍 拓展兴趣</button>
+    </div>
+    <div class="search-wrap">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden>
+        <circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/>
+      </svg>
+      <input id="search" class="search-input" type="search" placeholder="搜索英文 / 音标 / 中文…" aria-label="搜索单词" autocomplete="off" spellcheck="false" />
+      <kbd class="search-kbd" aria-hidden>/</kbd>
+    </div>
+    <div id="word-cat-nav" class="cat-nav" aria-label="单词分类"></div>
+    <main id="word-grid" class="grid"></main>
+    <div id="word-empty" class="empty" hidden>
+      <span class="empty-emoji" aria-hidden>🔍</span>
+      <p id="word-empty-text" class="empty-text"></p>
+    </div>
+  </section>
+
+  <!-- ==================== SCENES TAB ==================== -->
+  <section id="tab-scenes" class="tab-panel" aria-labelledby="tab-scenes">
+    <div class="sub-nav" aria-label="情景分组">
+      <button class="pill sub-pill is-active" data-scene-group="all" type="button">全部</button>
+      <button class="pill sub-pill" data-scene-group="school" type="button">🏫 学校场景</button>
+      <button class="pill sub-pill" data-scene-group="life" type="button">🏠 生活场景</button>
+      <button class="pill sub-pill" data-scene-group="fun" type="button">🌍 拓展场景</button>
+    </div>
+    <div id="scene-tabs" class="scene-tabs" role="tablist" aria-label="对话场景"></div>
+    <div id="scene-panel" class="scene-panel" role="tabpanel"></div>
+  </section>
+
+  <!-- ==================== SONGS TAB ==================== -->
+  <section id="tab-songs" class="tab-panel" aria-labelledby="tab-songs">
+    <div class="sub-nav" aria-label="歌谣选择">
+      <button class="pill sub-pill is-active" data-song="all" type="button">全部歌曲</button>
+    </div>
+    <div id="song-tabs" class="scene-tabs" role="tablist" aria-label="英文歌谣"></div>
+    <div id="song-panel" class="scene-panel" role="tabpanel"></div>
+  </section>
+
+  <!-- ==================== STORIES TAB ==================== -->
+  <section id="tab-stories" class="tab-panel" aria-labelledby="tab-stories">
+    <div id="story-tabs" class="scene-tabs" role="tablist" aria-label="故事列表"></div>
+    <div id="story-panel" class="scene-panel" role="tabpanel"></div>
+  </section>
+
+  <!-- ==================== GAMES TAB ==================== -->
+  <section id="tab-games" class="tab-panel" aria-labelledby="tab-games">
+    <div class="game-header">
+      <div class="game-stats">
+        <span class="stat"><span class="stat-val" id="game-correct">0</span><span class="stat-lbl">正确</span></span>
+        <span class="stat"><span class="stat-val" id="game-total">0</span><span class="stat-lbl">答题</span></span>
+        <span class="stat"><span class="stat-val" id="game-streak">0</span><span class="stat-lbl">连续</span></span>
+      </div>
+      <div class="game-controls">
+        <select id="game-mode" class="game-select">
+          <option value="en-zh">英文 → 中文</option>
+          <option value="zh-en">中文 → 英文</option>
+        </select>
+        <select id="game-cat" class="game-select">
+          <option value="all">全部分类</option>
+        </select>
+        <button id="game-start" class="play-btn" type="button">▶ 开始游戏</button>
+      </div>
+    </div>
+    <div id="game-area" class="game-area">
+      <div class="game-prompt" id="game-prompt">
+        <span class="game-context" id="game-context">选择「开始游戏」开始挑战</span>
+        <span class="game-word" id="game-word">🎮</span>
+      </div>
+      <div class="game-options" id="game-options"></div>
+      <div id="game-feedback" class="game-feedback" hidden></div>
+    </div>
+    <div id="game-scoreboard" class="scoreboard" hidden>
+      <h3>🏆 本轮结束</h3>
+      <p>正确率：<span id="score-pct">0</span>%</p>
+      <p>最长连对：<span id="score-streak">0</span> 题</p>
+      <button id="game-restart" class="play-btn" type="button">再来一局</button>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p>共 <span id="total-count">648</span> 个单词 · <span id="scene-total">28</span> 个场景 · <span id="song-total">4</span> 首歌谣 · <span id="story-total">4</span> 个故事 · 点击卡片听发音</p>
+    <p class="footer-sub">纯静态页面 · 无需后端服务</p>
+  </footer>
+</div>
+
+<!-- Data files -->
+<script src="assets/words.js"></script>
+<script src="assets/scenes.js"></script>
+<script src="assets/songs.js"></script>
+<script src="assets/stories.js"></script>
+<script src="assets/app.js"></script>
+</body>
 </html>

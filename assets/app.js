@@ -1,212 +1,115 @@
 /**
  * 英文闪卡园 · 交互逻辑（无依赖、无构建）
- * - 分类切换 + 站内搜索 + hash 深链
- * - 点击卡片调用浏览器语音合成朗读
- * - 场景对话 / 英文歌谣共用一套播放器（连读、单句朗读、隐藏中文）
+ * - 5 Tab：单词 / 情景 / 音乐 / 故事会 / 游戏
+ * - 单词按学校/生活/拓展分组排序
+ * - 场景对话 & 英文歌谣播放器（Web Audio 旋律 + 文字跟读）
+ * - 故事会：逐句朗读，支持单句/连续播放
+ * - 互动游戏：听音选词 + 看中文选英文
  * - 深浅色主题，记忆在 localStorage
  */
 (function () {
   'use strict';
 
-  var CATEGORIES = Array.isArray(window.WORD_CATEGORIES)
-    ? window.WORD_CATEGORIES
-    : [];
+  var CATEGORIES = Array.isArray(window.WORD_CATEGORIES) ? window.WORD_CATEGORIES : [];
+  var SCENES = Array.isArray(window.DIALOGUE_SCENES) ? window.DIALOGUE_SCENES : [];
+  var SONGS = Array.isArray(window.SONG_LIBRARY) ? window.SONG_LIBRARY : [];
+  var STORIES = Array.isArray(window.STORY_LIBRARY) ? window.STORY_LIBRARY : [];
 
-  if (!CATEGORIES.length) {
-    return;
-  }
+  if (!CATEGORIES.length) return;
 
   var KEY_THEME = 'flashcard:theme';
   var KEY_CATEGORY = 'flashcard:category';
   var KEY_HIDE_ZH = 'flashcard:hideZh';
+  var KEY_GAME_SCORE = 'flashcard:gameScore';
 
   var rootEl = document.documentElement;
-  var navEl = document.getElementById('category-nav');
-  var gridEl = document.getElementById('grid');
-  var emptyEl = document.getElementById('empty');
-  var emptyTextEl = document.getElementById('empty-text');
-  var catIconEl = document.getElementById('cat-icon');
-  var catTitleEl = document.getElementById('cat-title');
-  var catCountEl = document.getElementById('cat-count');
-  var searchEl = document.getElementById('search');
-  var searchWrapEl = searchEl.parentNode;
-  var themeBtn = document.getElementById('theme-toggle');
-  var totalEl = document.getElementById('total-count');
-  var sceneTabsEl = document.getElementById('scene-tabs');
-  var scenePanelEl = document.getElementById('scene-panel');
-  var sceneTotalEl = document.getElementById('scene-total');
-  var songTabsEl = document.getElementById('song-tabs');
-  var songPanelEl = document.getElementById('song-panel');
-  var songTotalEl = document.getElementById('song-total');
-  var jumpScenesBtn = document.getElementById('jump-scenes');
-  var jumpSongsBtn = document.getElementById('jump-songs');
-  var carouselBarEl = document.getElementById('carousel-bar');
-  var carCountEl = document.getElementById('car-count');
-  var carPrevBtn = document.getElementById('car-prev');
-  var carNextBtn = document.getElementById('car-next');
-  var mobileQuery = window.matchMedia('(max-width: 639px)');
-
-  var state = { activeId: CATEGORIES[0].id, query: '' };
-  var pills = {};
-  var speakingBtn = null;
-  var speakTimer = null;
   var synth = window.speechSynthesis;
   var supportsSpeech = !!synth && typeof window.SpeechSynthesisUtterance === 'function';
-  var inputTimer = null;
-  var carTotal = 0;
-  var carIndex = 0;
-  var carScrollTimer = null;
-  var resizeTimer = null;
-  var PLAYERS = [];
-  var hideZh = readStore(KEY_HIDE_ZH) === '1';
 
-  /* ---------------- 存储 ---------------- */
+  /* ============ Category context tags ============ */
+  var SCHOOL_IDS = ['stationery','food','colors','measure','jobs','time','weather','seasons','sports-general'];
+  var LIFE_IDS   = ['body','health','clothing','transport','shopping','rooms','tools','furniture','kitchenware'];
 
+  function getCategoryGroup(id) {
+    if (SCHOOL_IDS.indexOf(id) !== -1) return 'school';
+    if (LIFE_IDS.indexOf(id) !== -1)  return 'life';
+    return 'fun';
+  }
+
+  /* ============ Scene context tags ============ */
+  var SCHOOL_SCENE_IDS = ['class','asking','identify','time','sports','weekend','bedtime'];
+  var LIFE_SCENE_IDS   = ['washup','morning','noon','evening','eating','toilet','feelings',
+                          'transport-bus','restaurant','doctor','shopping-store','post-office','fix-thing',
+                          'directions','birthday'];
+
+  function getSceneGroup(id) {
+    if (SCHOOL_SCENE_IDS.indexOf(id) !== -1) return 'school';
+    if (LIFE_SCENE_IDS.indexOf(id) !== -1)  return 'life';
+    return 'fun';
+  }
+
+  /* ============ Storage ============ */
   function readStore(key) {
-    try {
-      return window.localStorage.getItem(key);
-    } catch (e) {
-      return null;
-    }
+    try { return window.localStorage.getItem(key); } catch (e) { return null; }
   }
-
   function writeStore(key, value) {
-    try {
-      window.localStorage.setItem(key, value);
-    } catch (e) {
-      /* 隐私模式或 file:// 限制，忽略即可 */
+    try { window.localStorage.setItem(key, value); } catch (e) {}
+  }
+
+  /* ============ Theme ============ */
+  function currentTheme() {
+    return rootEl.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+  }
+  function syncThemeUi(theme) {
+    var isDark = theme === 'dark';
+    var label = isDark ? '切换到浅色模式' : '切换到深色模式';
+    var themeBtn = document.getElementById('theme-toggle');
+    if (themeBtn) {
+      themeBtn.setAttribute('aria-label', label);
+      themeBtn.title = label;
     }
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', isDark ? '#1C1B19' : '#FAF7F0');
   }
 
-  /* ---------------- 工具 ---------------- */
-
-  function getActive() {
-    for (var i = 0; i < CATEGORIES.length; i += 1) {
-      if (CATEGORIES[i].id === state.activeId) {
-        return CATEGORIES[i];
-      }
-    }
-    return CATEGORIES[0];
-  }
-
-  function findCategory(id) {
-    for (var i = 0; i < CATEGORIES.length; i += 1) {
-      if (CATEGORIES[i].id === id) {
-        return CATEGORIES[i];
-      }
-    }
-    return null;
-  }
-
-  function updateHash(id) {
-    try {
-      window.history.replaceState(null, '', '#' + id);
-    } catch (e) {
-      /* file:// 下部分浏览器不允许，忽略 */
-    }
-  }
-
-  function hashId() {
-    return String(window.location.hash || '').replace(/^#\/?/, '');
-  }
-
-  /* ---------------- 渲染：分类导航 ---------------- */
-
-  function buildNav() {
-    var frag = document.createDocumentFragment();
-
-    CATEGORIES.forEach(function (cat) {
-      var btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'pill';
-      btn.dataset.id = cat.id;
-      btn.style.setProperty('--cat', cat.color);
-      btn.setAttribute('aria-pressed', 'false');
-      btn.setAttribute('aria-label', cat.zh + ' ' + cat.en);
-
-      var icon = document.createElement('span');
-      icon.className = 'pill-icon';
-      icon.setAttribute('aria-hidden', 'true');
-      icon.textContent = cat.icon;
-
-      var zh = document.createElement('span');
-      zh.textContent = cat.zh;
-
-      var en = document.createElement('span');
-      en.className = 'pill-en';
-      en.textContent = cat.en;
-
-      btn.appendChild(icon);
-      btn.appendChild(zh);
-      btn.appendChild(en);
-      btn.addEventListener('click', function () {
-        setCategory(cat.id, true);
-      });
-
-      frag.appendChild(btn);
-      pills[cat.id] = btn;
-    });
-
-    navEl.appendChild(frag);
-  }
-
-  function syncPills() {
-    Object.keys(pills).forEach(function (id) {
-      var isActive = id === state.activeId;
-      pills[id].classList.toggle('is-active', isActive);
-      pills[id].setAttribute('aria-pressed', isActive ? 'true' : 'false');
+  var themeBtn = document.getElementById('theme-toggle');
+  if (themeBtn) {
+    themeBtn.addEventListener('click', function () {
+      var next = currentTheme() === 'dark' ? 'light' : 'dark';
+      rootEl.setAttribute('data-theme', next);
+      writeStore(KEY_THEME, next);
+      syncThemeUi(next);
     });
   }
 
-  /* ---------------- 渲染：卡片 ---------------- */
-
-  function createCard(word, cat, index) {
-    var card = document.createElement('button');
-    card.type = 'button';
-    card.className = 'card';
-    card.style.setProperty('--cat', cat.color);
-    card.style.animationDelay = Math.min(index, 11) * 22 + 'ms';
-    card.title = '点击播放发音：' + word.en;
-    card.setAttribute('aria-label', '播放 ' + word.en + '（' + word.zh + '）的发音');
-
-    var figure = document.createElement('span');
-    figure.className = 'card-figure';
-
-    var emoji = document.createElement('span');
-    emoji.className = 'card-emoji';
-    emoji.setAttribute('aria-hidden', 'true');
-    emoji.textContent = word.icon;
-    figure.appendChild(emoji);
-
-    var body = document.createElement('span');
-    body.className = 'card-body';
-
-    var en = document.createElement('span');
-    en.className = 'card-en';
-    en.lang = 'en';
-    en.textContent = word.en;
-
-    var ipa = document.createElement('span');
-    ipa.className = 'card-ipa';
-    ipa.lang = 'en';
-    ipa.textContent = word.ipa;
-
-    var zh = document.createElement('span');
-    zh.className = 'card-zh';
-    zh.textContent = word.zh;
-
-    body.appendChild(en);
-    body.appendChild(ipa);
-    body.appendChild(zh);
-
-    card.appendChild(figure);
-    card.appendChild(body);
-
-    card.addEventListener('click', function () {
-      speak(word.en, card);
+  /* ============ TABS ============ */
+  var tabs = document.querySelectorAll('.tab');
+  var panels = document.querySelectorAll('.tab-panel');
+  tabs.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      tabs.forEach(function (t) { t.classList.remove('active'); });
+      panels.forEach(function (p) { p.classList.remove('active'); });
+      btn.classList.add('active');
+      var target = document.getElementById('tab-' + btn.dataset.tab);
+      if (target) target.classList.add('active');
     });
+  });
 
-    return card;
+  /* ============ WORDS TAB ============ */
+  var searchEl = document.getElementById('search');
+  var searchWrapEl = searchEl ? searchEl.parentNode : null;
+  var gridEl = document.getElementById('word-grid');
+  var emptyEl = document.getElementById('word-empty');
+  var emptyTextEl = document.getElementById('word-empty-text');
+  var catNavEl = document.getElementById('word-cat-nav');
+  var inputTimer = null;
+
+  var state = { activeId: CATEGORIES[0].id, query: '', group: 'all' };
+  var pills = {};
+
+  function getFilteredCats() {
+    if (state.group === 'all') return CATEGORIES;
+    return CATEGORIES.filter(function (c) { return getCategoryGroup(c.id) === state.group; });
   }
 
   function matches(word, q) {
@@ -217,388 +120,223 @@
     );
   }
 
-  function render() {
-    var cat = getActive();
-    var query = state.query.trim();
-    var q = query.toLowerCase();
-    var words = q ? cat.words.filter(function (w) { return matches(w, q); }) : cat.words;
-
-    rootEl.style.setProperty('--cat', cat.color);
-    rootEl.style.setProperty('--ring', cat.color);
-
-    catIconEl.textContent = cat.icon;
-    catTitleEl.textContent = cat.zh + ' · ' + cat.en;
-    catCountEl.textContent = words.length + ' 词';
-
-    gridEl.textContent = '';
-
-    if (!words.length) {
-      gridEl.hidden = true;
-      emptyEl.hidden = false;
-      emptyTextEl.textContent = '没有找到匹配“' + query + '”的单词';
-      carTotal = 0;
-    } else {
-      gridEl.hidden = false;
-      emptyEl.hidden = true;
-
-      var frag = document.createDocumentFragment();
-      words.forEach(function (word, index) {
-        frag.appendChild(createCard(word, cat, index));
-      });
-      gridEl.appendChild(frag);
-
-      carTotal = words.length;
-      carIndex = 0;
-      gridEl.scrollLeft = 0;
-    }
-
-    syncPills();
-    syncCarousel();
+  function buildCatNav() {
+    if (!catNavEl) return;
+    catNavEl.textContent = '';
+    var frag = document.createDocumentFragment();
+    var cats = getFilteredCats();
+    cats.forEach(function (cat) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'pill cat-pill';
+      btn.dataset.id = cat.id;
+      btn.style.setProperty('--cat', cat.color);
+      btn.setAttribute('aria-pressed', cat.id === state.activeId ? 'true' : 'false');
+      var icon = document.createElement('span');
+      icon.className = 'pill-icon';
+      icon.setAttribute('aria-hidden', 'true');
+      icon.textContent = cat.icon;
+      var zh = document.createElement('span'); zh.textContent = cat.zh;
+      var count = document.createElement('span');
+      count.className = 'pill-count';
+      count.textContent = cat.words.length;
+      btn.appendChild(icon);
+      btn.appendChild(zh);
+      btn.appendChild(count);
+      btn.addEventListener('click', function () { setCategory(cat.id); });
+      frag.appendChild(btn);
+      pills[cat.id] = btn;
+    });
+    catNavEl.appendChild(frag);
   }
 
-  function setCategory(id, clearQuery) {
-    if (!findCategory(id)) {
-      return;
-    }
+  function syncPills() {
+    Object.keys(pills).forEach(function (id) {
+      var isActive = id === state.activeId;
+      pills[id].classList.toggle('is-active', isActive);
+      pills[id].setAttribute('aria-pressed', isActive ? 'true' : 'false');
+    });
+  }
 
+  function setCategory(id) {
+    if (!findCategory(id)) return;
     state.activeId = id;
-
-    if (clearQuery) {
-      state.query = '';
-      searchEl.value = '';
-      searchWrapEl.classList.remove('has-value');
-    }
-
     writeStore(KEY_CATEGORY, id);
     updateHash(id);
-    render();
+    renderWords();
   }
 
-  /* ---------------- 发音 ---------------- */
-
-  function speak(text, btn) {
-    stopAllPlayback();
-
-    if (!supportsSpeech) {
-      btn.classList.add('is-speaking');
-      window.setTimeout(function () {
-        btn.classList.remove('is-speaking');
-      }, 500);
-      return;
-    }
-
-    if (speakingBtn && speakingBtn !== btn) {
-      speakingBtn.classList.remove('is-speaking');
-    }
-    speakingBtn = btn;
-    btn.classList.add('is-speaking');
-
-    if (speakTimer) {
-      window.clearTimeout(speakTimer);
-      speakTimer = null;
-    }
-
-    var utter = new window.SpeechSynthesisUtterance(text);
-    utter.lang = 'en-US';
-    utter.rate = 0.85;
-
-    utter.onend = function () {
-      btn.classList.remove('is-speaking');
-      if (speakingBtn === btn) {
-        speakingBtn = null;
-      }
-    };
-    utter.onerror = utter.onend;
-
-    var start = function () {
-      try {
-        synth.speak(utter);
-      } catch (e) {
-        btn.classList.remove('is-speaking');
-      }
-    };
-
-    if (synth.speaking || synth.pending) {
-      // Chrome 在 cancel 后立刻 speak 偶尔不出声，稍微让出一帧
-      synth.cancel();
-      speakTimer = window.setTimeout(function () {
-        speakTimer = null;
-        start();
-      }, 60);
-    } else {
-      start();
-    }
-  }
-
-  /* ---------------- 搜索 ---------------- */
-
-  function scheduleRender() {
-    if (inputTimer) {
-      window.clearTimeout(inputTimer);
-    }
-    // 输入防抖，避免连续敲键时反复重建卡片
-    inputTimer = window.setTimeout(function () {
-      inputTimer = null;
-      render();
-    }, 60);
-  }
-
-  searchEl.addEventListener('input', function () {
-    state.query = searchEl.value;
-    searchWrapEl.classList.toggle('has-value', searchEl.value.length > 0);
-    scheduleRender();
-  });
-
-  document.addEventListener('keydown', function (event) {
-    var active = document.activeElement;
-    var typing =
-      active &&
-      (active.tagName === 'INPUT' ||
-        active.tagName === 'TEXTAREA' ||
-        active.isContentEditable);
-
-    if (event.key === '/' && !typing) {
-      event.preventDefault();
-      searchEl.focus();
-      searchEl.select();
-      return;
-    }
-
-    if (event.key === 'Escape' && active === searchEl) {
-      if (searchEl.value) {
-        searchEl.value = '';
-        state.query = '';
-        searchWrapEl.classList.remove('has-value');
-        render();
-      } else {
-        searchEl.blur();
-      }
-    }
-  });
-
-  /* ---------------- 移动端卡片左右滑动 ---------------- */
-
-  function carStep() {
-    var first = gridEl.firstElementChild;
-    if (!first) {
-      return 0;
-    }
-    var styles = window.getComputedStyle(gridEl);
-    var gap = parseFloat(styles.columnGap) || 0;
-    return first.getBoundingClientRect().width + gap;
-  }
-
-  function setCarLabel(index) {
-    if (carCountEl) {
-      carCountEl.textContent = index + 1 + ' / ' + carTotal;
-    }
-    if (carPrevBtn) {
-      carPrevBtn.disabled = index <= 0;
-    }
-    if (carNextBtn) {
-      carNextBtn.disabled = index >= carTotal - 1;
-    }
-  }
-
-  function syncCarousel() {
-    if (!carouselBarEl) {
-      return;
-    }
-
-    var active = mobileQuery.matches && carTotal > 1 && !gridEl.hidden;
-    carouselBarEl.classList.toggle('is-active', active);
-    if (!active) {
-      return;
-    }
-
-    var step = carStep();
-    if (!step) {
-      return;
-    }
-
-    var index = Math.round(gridEl.scrollLeft / step);
-    index = Math.max(0, Math.min(carTotal - 1, index));
-    carIndex = index;
-    setCarLabel(index);
-  }
-
-  function carGoTo(index) {
-    var step = carStep();
-    if (!step) {
-      return;
-    }
-
-    var target = Math.max(0, Math.min(carTotal - 1, index));
-    var reduceMotion = window.matchMedia(
-      '(prefers-reduced-motion: reduce)',
-    ).matches;
-    var left = target * step;
-
-    if ('scrollBehavior' in document.documentElement.style) {
-      gridEl.scrollTo({
-        left: left,
-        behavior: reduceMotion ? 'auto' : 'smooth',
-      });
-    } else {
-      gridEl.scrollLeft = left;
-    }
-
-    carIndex = target;
-    setCarLabel(target);
-  }
-
-  if (carPrevBtn) {
-    carPrevBtn.addEventListener('click', function () {
-      carGoTo(carIndex - 1);
-    });
-  }
-
-  if (carNextBtn) {
-    carNextBtn.addEventListener('click', function () {
-      carGoTo(carIndex + 1);
-    });
-  }
-
-  gridEl.addEventListener(
-    'scroll',
-    function () {
-      if (!mobileQuery.matches) {
-        return;
-      }
-      if (carScrollTimer) {
-        return;
-      }
-      carScrollTimer = window.setTimeout(function () {
-        carScrollTimer = null;
-        syncCarousel();
-      }, 80);
-    },
-    { passive: true },
-  );
-
-  function onViewportChange() {
-    syncCarousel();
-  }
-
-  if (mobileQuery.addEventListener) {
-    mobileQuery.addEventListener('change', onViewportChange);
-  } else if (mobileQuery.addListener) {
-    mobileQuery.addListener(onViewportChange);
-  }
-
-  window.addEventListener('resize', function () {
-    if (resizeTimer) {
-      window.clearTimeout(resizeTimer);
-    }
-    resizeTimer = window.setTimeout(syncCarousel, 150);
-  });
-
-  /* ---------------- 播放器：场景对话 / 英文歌谣 ---------------- */
-
-  function findItem(list, id) {
-    for (var i = 0; i < list.length; i += 1) {
-      if (list[i].id === id) {
-        return list[i];
-      }
+  function findCategory(id) {
+    for (var i = 0; i < CATEGORIES.length; i++) {
+      if (CATEGORIES[i].id === id) return CATEGORIES[i];
     }
     return null;
   }
 
-  /**
-   * 把带音标的词渲染成「词 /音标/」的内联组合。
-   * 同一个词在句子里只标首次出现，避免整行过于花哨。
-   */
-  function appendWithNotes(container, text, notes) {
-    var words = notes ? Object.keys(notes) : [];
+  function updateHash(id) {
+    try { window.history.replaceState(null, '', '#' + id); } catch (e) {}
+  }
+
+  function createCard(word, cat, index) {
+    var card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'card';
+    card.style.setProperty('--cat', cat.color);
+    card.style.animationDelay = Math.min(index, 11) * 22 + 'ms';
+    card.title = '点击播放发音：' + word.en;
+    card.setAttribute('aria-label', '播放 ' + word.en + '（' + word.zh + '）的发音');
+    var figure = document.createElement('span');
+    figure.className = 'card-figure';
+    var emoji = document.createElement('span');
+    emoji.className = 'card-emoji';
+    emoji.setAttribute('aria-hidden', 'true');
+    emoji.textContent = word.icon;
+    figure.appendChild(emoji);
+    var body = document.createElement('span');
+    body.className = 'card-body';
+    var en = document.createElement('span');
+    en.className = 'card-en'; en.lang = 'en'; en.textContent = word.en;
+    var ipa = document.createElement('span');
+    ipa.className = 'card-ipa'; ipa.lang = 'en'; ipa.textContent = word.ipa;
+    var zh = document.createElement('span');
+    zh.className = 'card-zh'; zh.textContent = word.zh;
+    body.appendChild(en);
+    body.appendChild(ipa);
+    body.appendChild(zh);
+    card.appendChild(figure);
+    card.appendChild(body);
+    card.addEventListener('click', function () { speak(word.en, card); });
+    return card;
+  }
+
+  function renderWords() {
+    var cat = findCategory(state.activeId) || CATEGORIES[0];
+    var q = state.query.trim().toLowerCase();
+    var words = q ? cat.words.filter(function (w) { return matches(w, q); }) : cat.words;
+    rootEl.style.setProperty('--cat', cat.color);
+    rootEl.style.setProperty('--ring', cat.color);
+    gridEl.textContent = '';
     if (!words.length) {
-      container.textContent = text;
+      gridEl.hidden = true;
+      emptyEl.hidden = false;
+      emptyTextEl.textContent = '没有找到匹配"' + state.query + '"的单词';
+    } else {
+      gridEl.hidden = false;
+      emptyEl.hidden = true;
+      var frag = document.createDocumentFragment();
+      words.forEach(function (word, i) { frag.appendChild(createCard(word, cat, i)); });
+      gridEl.appendChild(frag);
+    }
+    syncPills();
+  }
+
+  var subPills = document.querySelectorAll('.sub-pill[data-group]');
+  subPills.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('.sub-pill[data-group]').forEach(function (b) { b.classList.remove('is-active'); });
+      btn.classList.add('is-active');
+      state.group = btn.dataset.group;
+      state.activeId = getFilteredCats()[0] ? getFilteredCats()[0].id : CATEGORIES[0].id;
+      writeStore(KEY_CATEGORY, state.activeId);
+      buildCatNav();
+      syncPills();
+      renderWords();
+    });
+  });
+
+  if (searchEl) {
+    searchEl.addEventListener('input', function () {
+      state.query = searchEl.value;
+      searchWrapEl.classList.toggle('has-value', searchEl.value.length > 0);
+      if (inputTimer) window.clearTimeout(inputTimer);
+      inputTimer = window.setTimeout(renderWords, 60);
+    });
+    document.addEventListener('keydown', function (event) {
+      var active = document.activeElement;
+      var typing = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable);
+      if (event.key === '/' && !typing) {
+        event.preventDefault();
+        var wordsTab = document.getElementById('tab-words');
+        if (wordsTab && wordsTab.classList.contains('active')) { searchEl.focus(); searchEl.select(); }
+      }
+      if (event.key === 'Escape' && active === searchEl) {
+        if (searchEl.value) {
+          searchEl.value = '';
+          state.query = '';
+          searchWrapEl.classList.remove('has-value');
+          renderWords();
+        } else { searchEl.blur(); }
+      }
+    });
+  }
+
+  /* ============ SPEAK ============ */
+  var speakingBtn = null;
+  var speakTimer = null;
+
+  function speak(text, btn) {
+    stopAllPlayback();
+    if (!supportsSpeech) {
+      btn.classList.add('is-speaking');
+      window.setTimeout(function () { btn.classList.remove('is-speaking'); }, 500);
       return;
     }
-
-    var values = {};
-    words.forEach(function (word) {
-      values[word.toLowerCase()] = notes[word];
-    });
-
-    var pattern = words
-      .map(function (word) {
-        return word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      })
-      .join('|');
-    var re = new RegExp('\\b(' + pattern + ')\\b', 'gi');
-    var used = {};
-    var last = 0;
-    var match;
-
-    while ((match = re.exec(text)) !== null) {
-      var lower = match[0].toLowerCase();
-      if (used[lower] || !values[lower]) {
-        continue;
-      }
-      if (match.index > last) {
-        container.appendChild(
-          document.createTextNode(text.slice(last, match.index)),
-        );
-      }
-      used[lower] = true;
-
-      var wrap = document.createElement('span');
-      wrap.className = 'word-note';
-      wrap.appendChild(document.createTextNode(match[0] + ' '));
-
-      var ipa = document.createElement('span');
-      ipa.className = 'word-ipa';
-      ipa.lang = 'en';
-      ipa.textContent = values[lower];
-      wrap.appendChild(ipa);
-
-      container.appendChild(wrap);
-      last = match.index + match[0].length;
-    }
-
-    if (last < text.length) {
-      container.appendChild(document.createTextNode(text.slice(last)));
-    }
+    if (speakingBtn && speakingBtn !== btn) speakingBtn.classList.remove('is-speaking');
+    speakingBtn = btn;
+    btn.classList.add('is-speaking');
+    if (speakTimer) { window.clearTimeout(speakTimer); speakTimer = null; }
+    var utter = new window.SpeechSynthesisUtterance(text);
+    utter.lang = 'en-US';
+    utter.rate = 0.85;
+    utter.onend = function () {
+      btn.classList.remove('is-speaking');
+      if (speakingBtn === btn) speakingBtn = null;
+    };
+    utter.onerror = utter.onend;
+    var start = function () {
+      try { synth.speak(utter); } catch (e) { btn.classList.remove('is-speaking'); }
+    };
+    if (synth.speaking || synth.pending) {
+      synth.cancel();
+      speakTimer = window.setTimeout(start, 60);
+    } else { start(); }
   }
 
   function stopAllPlayback() {
-    PLAYERS.forEach(function (player) {
-      player.stop();
-    });
+    PLAYERS.forEach(function (p) { p.stop(); });
   }
 
-  function syncZhEverywhere() {
-    PLAYERS.forEach(function (player) {
-      player.syncZh();
-    });
+  /* ============ MOOD TONES ============ */
+  function getMoodTone(mood) {
+    var map = {
+      calm:       { rateDelta: -0.04, pitch: 0.93 },
+      warm:       { rateDelta:  0.00, pitch: 1.00 },
+      normal:     { rateDelta:  0.00, pitch: 1.00 },
+      energetic:  { rateDelta:  0.06, pitch: 1.08 },
+      wonder:     { rateDelta:  0.02, pitch: 1.10 },
+      sleepy:     { rateDelta: -0.08, pitch: 0.88 },
+      curious:    { rateDelta:  0.02, pitch: 1.06 },
+      emotional:  { rateDelta:  0.03, pitch: 1.05 },
+      serious:    { rateDelta: -0.05, pitch: 0.92 },
+      happy:      { rateDelta:  0.04, pitch: 1.07 },
+      excited:    { rateDelta:  0.08, pitch: 1.12 },
+      concerned:  { rateDelta: -0.03, pitch: 0.95 },
+    };
+    return map[mood] || map.normal;
   }
 
-  function toggleZh() {
-    hideZh = !hideZh;
-    writeStore(KEY_HIDE_ZH, hideZh ? '1' : '0');
-    syncZhEverywhere();
-  }
+  /* ============ Common player factory ============ */
+  var PLAYERS = [];
+  var hideZh = readStore(KEY_HIDE_ZH) === '1';
 
   function createPlayer(config) {
     var list = Array.isArray(config.items) ? config.items : [];
-    if (!list.length || !config.tabsEl || !config.panelEl) {
-      return null;
-    }
-
+    if (!list.length || !config.tabsEl || !config.panelEl) return null;
     var tabs = {};
-    var state2 = {
-      id: '',
-      item: null,
-      playing: false,
-      token: 0,
-      lines: [],
-      lineEls: [],
-      playBtn: null,
-    };
+    var state2 = { id: '', item: null, playing: false, token: 0, lines: [], lineEls: [], playBtn: null };
 
     function buildTabs() {
       var frag = document.createDocumentFragment();
-
       list.forEach(function (item) {
         var btn = document.createElement('button');
         btn.type = 'button';
@@ -608,34 +346,20 @@
         btn.setAttribute('role', 'tab');
         btn.setAttribute('aria-selected', 'false');
         btn.setAttribute('aria-controls', config.panelEl.id);
-
         var icon = document.createElement('span');
         icon.className = 'pill-icon';
         icon.setAttribute('aria-hidden', 'true');
         icon.textContent = item.icon;
-
-        var zh = document.createElement('span');
-        zh.textContent = item.zh;
-
-        var en = document.createElement('span');
-        en.className = 'pill-en';
-        en.textContent = item.en;
-
-        btn.appendChild(icon);
-        btn.appendChild(zh);
-        btn.appendChild(en);
+        var zh = document.createElement('span'); zh.textContent = item.zh;
+        var en = document.createElement('span'); en.className = 'pill-en'; en.textContent = item.en;
+        btn.appendChild(icon); btn.appendChild(zh); btn.appendChild(en);
         btn.addEventListener('click', function () {
-          if (state2.id === item.id) {
-            return;
-          }
-          stop();
-          render(item.id);
+          if (state2.id === item.id) return;
+          stop(); render(item.id);
         });
-
         frag.appendChild(btn);
         tabs[item.id] = btn;
       });
-
       config.tabsEl.appendChild(frag);
     }
 
@@ -649,350 +373,206 @@
 
     function syncZh() {
       config.panelEl.classList.toggle('hide-zh', hideZh);
-      var zhBtn = config.panelEl.querySelector('.ghost-btn');
-      if (zhBtn) {
-        zhBtn.textContent = hideZh ? '显示中文' : '隐藏中文';
-        zhBtn.setAttribute('aria-pressed', hideZh ? 'true' : 'false');
+    }
+
+    function appendWithNotes(container, text, notes) {
+      var words = notes ? Object.keys(notes) : [];
+      if (!words.length) { container.textContent = text; return; }
+      var values = {};
+      words.forEach(function (word) { values[word.toLowerCase()] = notes[word]; });
+      var pattern = words.map(function (w) { return w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('|');
+      var re = new RegExp('\\b(' + pattern + ')\\b', 'gi');
+      var used = {};
+      var last = 0, match;
+      while ((match = re.exec(text)) !== null) {
+        var lower = match[0].toLowerCase();
+        if (used[lower] || !values[lower]) continue;
+        if (match.index > last) container.appendChild(document.createTextNode(text.slice(last, match.index)));
+        used[lower] = true;
+        var wrap = document.createElement('span');
+        wrap.className = 'word-note';
+        wrap.appendChild(document.createTextNode(match[0] + ' '));
+        var ipa = document.createElement('span');
+        ipa.className = 'word-ipa'; ipa.lang = 'en'; ipa.textContent = values[lower];
+        wrap.appendChild(ipa);
+        container.appendChild(wrap);
+        last = match.index + match[0].length;
       }
+      if (last < text.length) container.appendChild(document.createTextNode(text.slice(last)));
     }
 
     function render(id) {
-      var item = findItem(list, id) || list[0];
-      if (!item) {
-        return;
-      }
-
+      var item = list.find(function (s) { return s.id === id; }) || list[0];
+      if (!item) return;
       state2.id = item.id;
       state2.item = item;
-      state2.lines = item.lines;
+      state2.lines = item.lines || [];
       state2.lineEls = [];
       state2.playing = false;
       state2.token += 1;
-
       var panel = config.panelEl;
       panel.textContent = '';
       panel.style.setProperty('--cat', item.color);
       panel.classList.toggle('hide-zh', hideZh);
 
-      var top = document.createElement('div');
-      top.className = 'scene-top';
-
-      var icon = document.createElement('span');
-      icon.className = 'scene-icon';
-      icon.setAttribute('aria-hidden', 'true');
-      icon.textContent = item.icon;
-
-      var meta = document.createElement('div');
-      meta.className = 'scene-meta';
-
-      var title = document.createElement('h3');
-      title.className = 'scene-title';
+      var top = document.createElement('div'); top.className = 'scene-top';
+      var icon = document.createElement('span'); icon.className = 'scene-icon';
+      icon.setAttribute('aria-hidden', 'true'); icon.textContent = item.icon;
+      var meta = document.createElement('div'); meta.className = 'scene-meta';
+      var title = document.createElement('h3'); title.className = 'scene-title';
       title.textContent = item.zh + ' · ' + item.en;
-
-      var desc = document.createElement('p');
-      desc.className = 'scene-desc';
+      var desc = document.createElement('p'); desc.className = 'scene-desc';
       desc.textContent = item.desc;
-
-      meta.appendChild(title);
-      meta.appendChild(desc);
-
-      var actions = document.createElement('div');
-      actions.className = 'scene-actions';
-
+      meta.appendChild(title); meta.appendChild(desc);
+      var actions = document.createElement('div'); actions.className = 'scene-actions';
       var zhBtn = document.createElement('button');
-      zhBtn.type = 'button';
-      zhBtn.className = 'ghost-btn';
+      zhBtn.type = 'button'; zhBtn.className = 'ghost-btn';
       zhBtn.textContent = hideZh ? '显示中文' : '隐藏中文';
-      zhBtn.setAttribute('aria-pressed', hideZh ? 'true' : 'false');
-      zhBtn.addEventListener('click', toggleZh);
-
+      zhBtn.addEventListener('click', function () {
+        hideZh = !hideZh;
+        writeStore(KEY_HIDE_ZH, hideZh ? '1' : '0');
+        syncZhEverywhere();
+      });
       var playBtn = document.createElement('button');
-      playBtn.type = 'button';
-      playBtn.className = 'play-btn';
+      playBtn.type = 'button'; playBtn.className = 'play-btn';
       playBtn.textContent = config.playLabel;
       playBtn.addEventListener('click', togglePlayback);
+      actions.appendChild(zhBtn); actions.appendChild(playBtn);
+      top.appendChild(icon); top.appendChild(meta); top.appendChild(actions);
 
-      actions.appendChild(zhBtn);
-      actions.appendChild(playBtn);
-
-      top.appendChild(icon);
-      top.appendChild(meta);
-      top.appendChild(actions);
-
-      var listEl = document.createElement('ol');
-      listEl.className = 'dialog';
-
-      item.lines.forEach(function (line) {
+      var listEl = document.createElement('ol'); listEl.className = 'dialog';
+      state2.lines.forEach(function (line) {
         var li = document.createElement('li');
         var btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'line';
-        btn.setAttribute(
-          'aria-label',
-          '播放 ' + (line.who ? line.who + '：' : '') + line.en,
-        );
-
+        btn.type = 'button'; btn.className = 'line';
+        btn.setAttribute('aria-label', '播放 ' + (line.who ? line.who + '：' : '') + line.en);
         if (line.who) {
           var who = document.createElement('span');
-          who.className = 'line-who';
-          who.textContent = line.who;
+          who.className = 'line-who'; who.textContent = line.who;
           btn.appendChild(who);
         }
-
         var en = document.createElement('span');
-        en.className = 'line-en';
-        en.lang = 'en';
+        en.className = 'line-en'; en.lang = 'en';
         appendWithNotes(en, line.en, line.notes);
-
         var zh = document.createElement('span');
-        zh.className = 'line-zh';
-        zh.textContent = line.zh;
-
-        btn.appendChild(en);
-        btn.appendChild(zh);
+        zh.className = 'line-zh'; zh.textContent = line.zh;
+        btn.appendChild(en); btn.appendChild(zh);
         btn.addEventListener('click', function () {
-          if (state2.playing) {
-            stop();
-          }
+          if (state2.playing) stop();
           speak(line.en, btn);
         });
-
         li.appendChild(btn);
         listEl.appendChild(li);
         state2.lineEls.push(btn);
       });
 
       state2.playBtn = playBtn;
-
       panel.appendChild(top);
       panel.appendChild(listEl);
-
       syncTabs();
     }
 
     function clearLineHighlight() {
-      state2.lineEls.forEach(function (el) {
-        el.classList.remove('is-speaking');
-      });
+      state2.lineEls.forEach(function (el) { el.classList.remove('is-speaking'); });
     }
-
     function updatePlayBtn() {
-      if (!state2.playBtn) {
-        return;
-      }
+      if (!state2.playBtn) return;
       state2.playBtn.textContent = state2.playing ? '■ 停止' : config.playLabel;
       state2.playBtn.classList.toggle('is-playing', state2.playing);
     }
-
     function stop() {
       var wasPlaying = state2.playing;
       state2.playing = false;
       state2.token += 1;
       clearLineHighlight();
       updatePlayBtn();
-
-      if (!wasPlaying) {
-        return;
-      }
-      if (speakTimer) {
-        window.clearTimeout(speakTimer);
-        speakTimer = null;
-      }
-      if (synth) {
-        try {
-          synth.cancel();
-        } catch (e) {
-          /* 忽略 */
-        }
-      }
-      if (speakingBtn) {
-        speakingBtn.classList.remove('is-speaking');
-        speakingBtn = null;
-      }
+      if (!wasPlaying) return;
+      if (speakTimer) { window.clearTimeout(speakTimer); speakTimer = null; }
+      try { synth.cancel(); } catch (e) {}
     }
-
     function finishPlayback() {
       state2.playing = false;
       state2.token += 1;
       clearLineHighlight();
       updatePlayBtn();
     }
-
     function togglePlayback() {
-      if (state2.playing) {
-        stop();
-        return;
-      }
-      if (!supportsSpeech) {
-        return;
-      }
-      // 另一块（歌谣 / 对话）先静音，避免两条声音叠在一起
-      PLAYERS.forEach(function (player) {
-        if (player !== api) {
-          player.stop();
-        }
-      });
+      if (state2.playing) { stop(); return; }
+      if (!supportsSpeech) return;
+      PLAYERS.forEach(function (p) { if (p !== api) p.stop(); });
       startPlayback();
     }
-
     function startPlayback() {
       var lines = state2.lines;
       var els = state2.lineEls;
-      if (!lines.length) {
-        return;
-      }
-
+      if (!lines.length) return;
       state2.playing = true;
       var token = (state2.token += 1);
       var index = 0;
-      var rate =
-        state2.item && state2.item.rate ? state2.item.rate : config.rate;
+      var rate = state2.item && state2.item.rate ? state2.item.rate : config.rate;
       var mood = state2.item && state2.item.mood ? state2.item.mood : 'normal';
       var moodTone = getMoodTone(mood);
       updatePlayBtn();
-
       function next() {
-        if (token !== state2.token || !state2.playing) {
-          return;
-        }
-        if (index >= lines.length) {
-          finishPlayback();
-          return;
-        }
-
-        var current = index;
-        index += 1;
-
+        if (token !== state2.token || !state2.playing) return;
+        if (index >= lines.length) { finishPlayback(); return; }
+        var current = index; index += 1;
         clearLineHighlight();
-        if (els[current]) {
-          els[current].classList.add('is-speaking');
-        }
-
+        if (els[current]) els[current].classList.add('is-speaking');
         var utter = new window.SpeechSynthesisUtterance(lines[current].en);
         utter.lang = 'en-US';
-        // 基础语速 + 场景基调微调（±0.05）
         var lineRate = Math.min(2, Math.max(0.1, rate + moodTone.rateDelta));
-        // 音高随情绪浮动（0.9~1.15）
         var linePitch = Math.min(2, Math.max(0, moodTone.pitch));
         utter.rate = lineRate;
         utter.pitch = linePitch;
         utter.onend = function () {
-          if (token !== state2.token) {
-            return;
-          }
+          if (token !== state2.token) return;
           window.setTimeout(next, config.gap);
         };
         utter.onerror = function () {
-          if (token !== state2.token) {
-            return;
-          }
+          if (token !== state2.token) return;
           finishPlayback();
         };
-
-        try {
-          synth.speak(utter);
-        } catch (e) {
-          finishPlayback();
-        }
+        try { synth.speak(utter); } catch (e) { finishPlayback(); }
       }
-
       window.setTimeout(next, 120);
     }
 
-    /**
-     * 根据场景氛围返回语调偏移量。
-     * rateDelta：对基础语速的加减（通常 ±0.03~0.08）
-     * pitch：绝对音高，范围 0~2（默认 1）
-     */
-    function getMoodTone(mood) {
-      var map = {
-        calm:       { rateDelta: -0.04, pitch: 0.93 },
-        warm:       { rateDelta:  0.00, pitch: 1.00 },
-        normal:     { rateDelta:  0.00, pitch: 1.00 },
-        energetic:  { rateDelta:  0.06, pitch: 1.08 },
-        wonder:     { rateDelta:  0.02, pitch: 1.10 },
-        sleepy:     { rateDelta: -0.08, pitch: 0.88 },
-        curious:    { rateDelta:  0.02, pitch: 1.06 },
-        emotional:  { rateDelta:  0.03, pitch: 1.05 },
-        serious:    { rateDelta: -0.05, pitch: 0.92 },
-        happy:      { rateDelta:  0.04, pitch: 1.07 },
-        excited:    { rateDelta:  0.08, pitch: 1.12 },
-        concerned:  { rateDelta: -0.03, pitch: 0.95 },
-      };
-      return map[mood] || map.normal;
-    }
-
-    var api = {
-      buildTabs: buildTabs,
-      render: render,
-      syncZh: syncZh,
-      stop: stop,
-    };
-
+    var api = { buildTabs: buildTabs, render: render, syncZh: syncZh, stop: stop };
     PLAYERS.push(api);
     return api;
   }
 
-  /* ---------------- 主题 ---------------- */
-
-  function currentTheme() {
-    return rootEl.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+  function syncZhEverywhere() {
+    PLAYERS.forEach(function (player) { player.syncZh(); });
   }
 
-  function syncThemeUi(theme) {
-    var isDark = theme === 'dark';
-    var label = isDark ? '切换到浅色模式' : '切换到深色模式';
-    themeBtn.setAttribute('aria-label', label);
-    themeBtn.title = label;
+  /* ============ SCENES TAB ============ */
+  var sceneTabsEl = document.getElementById('scene-tabs');
+  var scenePanelEl = document.getElementById('scene-panel');
+  var sceneTotalEl = document.getElementById('scene-total');
+  var sceneGroup = 'all';
 
-    var meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) {
-      meta.setAttribute('content', isDark ? '#1C1B19' : '#FAF7F0');
-    }
-  }
-
-  themeBtn.addEventListener('click', function () {
-    var next = currentTheme() === 'dark' ? 'light' : 'dark';
-    rootEl.setAttribute('data-theme', next);
-    writeStore(KEY_THEME, next);
-    syncThemeUi(next);
+  document.querySelectorAll('[data-scene-group]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('[data-scene-group]').forEach(function (b) { b.classList.remove('is-active'); });
+      btn.classList.add('is-active');
+      sceneGroup = btn.dataset.sceneGroup;
+      initScenePlayer();
+    });
   });
 
-  /* ---------------- 初始化 ---------------- */
-
-  function bindJump(btn, targetId) {
-    if (!btn) {
-      return;
-    }
-    btn.addEventListener('click', function () {
-      var target = document.getElementById(targetId);
-      if (!target) {
-        return;
-      }
-      var reduceMotion = window.matchMedia(
-        '(prefers-reduced-motion: reduce)',
-      ).matches;
-      target.scrollIntoView({
-        behavior: reduceMotion ? 'auto' : 'smooth',
-        block: 'start',
-      });
-    });
+  function getFilteredScenes() {
+    if (sceneGroup === 'all') return SCENES;
+    return SCENES.filter(function (s) { return getSceneGroup(s.id) === sceneGroup; });
   }
 
-  function init() {
-    buildNav();
-
-    totalEl.textContent = String(
-      CATEGORIES.reduce(function (sum, cat) {
-        return sum + cat.words.length;
-      }, 0),
-    );
-
-    var scenes = Array.isArray(window.DIALOGUE_SCENES)
-      ? window.DIALOGUE_SCENES
-      : [];
-    var songs = Array.isArray(window.SONG_LIBRARY) ? window.SONG_LIBRARY : [];
-
+  function initScenePlayer() {
+    if (sceneTabsEl) sceneTabsEl.textContent = '';
+    if (scenePanelEl) scenePanelEl.textContent = '';
+    // Keep PLAYERS but only clear scene players
+    PLAYERS = PLAYERS.filter(function (p) { return p._type !== 'scene'; });
+    var scenes = getFilteredScenes();
     var scenePlayer = createPlayer({
       items: scenes,
       tabsEl: sceneTabsEl,
@@ -1002,59 +582,590 @@
       rate: 0.85,
       gap: 500,
     });
+    scenePlayer._type = 'scene';
+    if (scenePlayer) {
+      scenePlayer.buildTabs();
+      scenePlayer.render(scenes[0] ? scenes[0].id : '');
+    }
+    if (sceneTotalEl) sceneTotalEl.textContent = String(scenes.length);
+  }
 
+  /* ============ SONGS TAB — Web Audio Melody + Lyrics ============ */
+  var songTabsEl = document.getElementById('song-tabs');
+  var songPanelEl = document.getElementById('song-panel');
+  var songTotalEl = document.getElementById('song-total');
+  var audioCtx = null;
+  var currentMelodyNode = null;
+
+  // Note definitions for melodies (C major scale + others)
+  var NOTE_FREQS = {
+    'C4':262,'D4':294,'E4':330,'F4':349,'G4':392,'A4':440,'B4':494,
+    'C5':523,'D5':587,'E5':659,'F5':698,'G5':784,'A5':880,'B5':988,
+    'rest':0
+  };
+
+  // Melody data: [note, duration_in_beats] × tempo
+  var MELODIES = {
+    twinkle: [
+      ['C4',1],['C4',1],['G4',1],['G4',1],['A4',1],['A4',1],['G4',2],
+      ['F4',1],['F4',1],['E4',1],['E4',1],['D4',1],['D4',1],['C4',2],
+      ['G4',1],['G4',1],['F4',1],['F4',1],['E4',1],['E4',1],['D4',2],
+      ['G4',1],['G4',1],['F4',1],['F4',1],['E4',1],['E4',1],['D4',2],
+      ['C4',1],['C4',1],['G4',1],['G4',1],['A4',1],['A4',1],['G4',2],
+      ['F4',1],['F4',1],['E4',1],['E4',1],['D4',1],['D4',1],['C4',2],
+    ],
+    row: [
+      ['G4',1.5],['G4',0.5],['A4',1],['G4',1],['C4',1],['C4',1],
+      ['D4',1.5],['D4',0.5],['E4',2],['C4',1],['C4',1],['D4',1],['E4',1],['D4',2],
+    ],
+    bus: [
+      ['G4',1],['G4',1],['A4',1],['G4',1],['C4',0.5],['C4',0.5],
+      ['D4',2],['C4',2],
+      ['G4',1],['G4',1],['A4',1],['G4',1],['C4',0.5],['C4',0.5],
+      ['D4',2],['C4',2],
+      ['D4',0.5],['D4',0.5],['D4',1],['D4',1],['E4',1],['E4',1],['F4',1],['F4',1],
+      ['G4',2],['G4',2],
+    ],
+    farm: [
+      ['G4',1],['G4',1],['A4',1],['G4',1],['C4',0.5],['C4',0.5],
+      ['D4',2],['C4',2],
+      ['G4',1],['G4',1],['A4',1],['G4',1],['C4',0.5],['C4',0.5],
+      ['D4',2],['C4',2],
+    ]
+  };
+
+  function getAudioContext() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    return audioCtx;
+  }
+
+  function playMelody(songId, tempo) {
+    stopAllMelody();
+    var melody = MELODIES[songId];
+    if (!melody) return;
+    var ctx = getAudioContext();
+    var beatDur = 60 / (tempo || 120);
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.type = 'sine';
+    gain.gain.value = 0.15;
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    currentMelodyNode = { osc: osc, gain: gain, ctx: ctx };
+    osc.start();
+    var time = ctx.currentTime + 0.05;
+    melody.forEach(function (noteData) {
+      var note = noteData[0];
+      var dur = noteData[1] * beatDur;
+      if (note === 'rest') {
+        gain.gain.setValueAtTime(0, time);
+      } else {
+        var freq = NOTE_FREQS[note];
+        if (freq) {
+          gain.gain.setValueAtTime(0.15, time);
+          osc.frequency.setValueAtTime(freq, time);
+        }
+      }
+      time += dur;
+    });
+    osc.stop(time);
+    osc.onended = function () { currentMelodyNode = null; };
+  }
+
+  function stopAllMelody() {
+    if (currentMelodyNode) {
+      try {
+        currentMelodyNode.osc.onended = null;
+        currentMelodyNode.osc.stop();
+      } catch (e) {}
+      currentMelodyNode = null;
+    }
+  }
+
+  function initSongPlayer() {
+    if (songTabsEl) songTabsEl.textContent = '';
+    if (songPanelEl) songPanelEl.textContent = '';
+    PLAYERS = PLAYERS.filter(function (p) { return p._type !== 'song'; });
+    var songs = SONGS;
     var songPlayer = createPlayer({
       items: songs,
       tabsEl: songTabsEl,
       panelEl: songPanelEl,
       tabData: 'song',
-      playLabel: '▶ 播放整首',
+      playLabel: '▶ 朗读歌词',
       rate: 0.78,
       gap: 420,
     });
-
-    if (scenePlayer) {
-      scenePlayer.buildTabs();
-      scenePlayer.render(scenes[0].id);
-    }
-    if (sceneTotalEl) {
-      sceneTotalEl.textContent = String(scenes.length);
-    }
-
+    songPlayer._type = 'song';
     if (songPlayer) {
       songPlayer.buildTabs();
-      songPlayer.render(songs[0].id);
+      songPlayer.render(songs[0] ? songs[0].id : '');
     }
-    if (songTotalEl) {
-      songTotalEl.textContent = String(songs.length);
+    if (songTotalEl) songTotalEl.textContent = String(songs.length);
+
+    // Patch: add melody bar to song panel on render
+    var origRender = songPlayer && songPlayer.render;
+    if (origRender) {
+      songPlayer.render = function (id) {
+        origRender.call(this, id);
+        var item = songs.find(function (s) { return s.id === id; }) || songs[0];
+        if (!item) return;
+        // Remove old melody bar
+        var oldBar = songPanelEl ? songPanelEl.querySelector('.melody-bar') : null;
+        if (oldBar) oldBar.remove();
+        // Build melody bar
+        var bar = document.createElement('div');
+        bar.className = 'melody-bar';
+        var playBtn = document.createElement('button');
+        playBtn.type = 'button';
+        playBtn.className = 'melody-play-btn';
+        playBtn.setAttribute('aria-label', '播放旋律');
+        playBtn.textContent = '▶';
+        playBtn.addEventListener('click', function () {
+          if (playBtn.classList.contains('is-playing')) {
+            stopAllMelody();
+            playBtn.textContent = '▶';
+            playBtn.classList.remove('is-playing');
+            document.querySelectorAll('.melody-bar-segment').forEach(function (s) { s.classList.remove('active'); });
+          } else {
+            PLAYERS.forEach(function (p) { if (p._type !== 'song' && p._type !== 'story') p.stop(); });
+            stopAllMelody();
+            var tempo = item.rate ? Math.round(120 / item.rate) : 120;
+            playMelody(item.id, tempo);
+            playBtn.textContent = '■';
+            playBtn.classList.add('is-playing');
+            // Animate bars
+            var bars = bar.querySelectorAll('.melody-bar-segment');
+            var melody = MELODIES[item.id] || [];
+            var beatDur = 60 / (tempo || 120);
+            var idx = 0;
+            var animateTimer = setInterval(function () {
+              bars.forEach(function (b) { b.classList.remove('active'); });
+              if (idx < melody.length) {
+                bars[idx] && bars[idx].classList.add('active');
+                idx++;
+              } else {
+                clearInterval(animateTimer);
+                bars.forEach(function (b) { b.classList.remove('active'); });
+              }
+            }, beatDur * 1000);
+            playBtn._animTimer = animateTimer;
+          }
+        });
+        var info = document.createElement('div');
+        info.className = 'melody-info';
+        var title = document.createElement('div');
+        title.className = 'melody-title';
+        title.textContent = item.en;
+        var subtitle = document.createElement('div');
+        subtitle.className = 'melody-subtitle';
+        subtitle.textContent = item.zh + '  ·  点击播放旋律';
+        info.appendChild(title);
+        info.appendChild(subtitle);
+        var visual = document.createElement('div');
+        visual.className = 'melody-visual';
+        var barsCount = 12;
+        for (var b = 0; b < barsCount; b++) {
+          var seg = document.createElement('div');
+          seg.className = 'melody-bar-segment';
+          seg.style.height = (4 + Math.random() * 16) + 'px';
+          visual.appendChild(seg);
+        }
+        bar.appendChild(playBtn);
+        bar.appendChild(info);
+        bar.appendChild(visual);
+        if (songPanelEl) songPanelEl.insertBefore(bar, songPanelEl.firstChild);
+      };
+    }
+  }
+
+  /* Override song render to add melody button */
+  var _origSongRender = null;
+  function patchSongRender() {
+    var origBuild = songPlayer && songPlayer.buildTabs;
+    // We patch after initSongPlayer runs by adding melody buttons to the panel
+  }
+  // Patch applied in initSongPlayer below via appendMelodyBar
+
+  /* ============ STORIES TAB ============ */
+  var storyTabsEl = document.getElementById('story-tabs');
+  var storyPanelEl = document.getElementById('story-panel');
+  var storyTotalEl = document.getElementById('story-total');
+  var storyPlayers = [];
+
+  function initStoryPlayer() {
+    if (storyTabsEl) storyTabsEl.textContent = '';
+    if (storyPanelEl) storyPanelEl.textContent = '';
+    storyPlayers = [];
+    var stories = STORIES;
+    if (storyTotalEl) storyTotalEl.textContent = String(stories.length);
+
+    var storyTabs = {};
+    var storyState = { id: '', item: null, playing: false, token: 0, sentences: [], sentenceEls: [], playBtn: null, currentIdx: 0 };
+
+    function buildTabs() {
+      var frag = document.createDocumentFragment();
+      stories.forEach(function (item) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'pill';
+        btn.dataset.story = item.id;
+        btn.style.setProperty('--cat', item.color);
+        btn.setAttribute('role', 'tab');
+        btn.setAttribute('aria-selected', 'false');
+        var icon = document.createElement('span');
+        icon.className = 'pill-icon';
+        icon.setAttribute('aria-hidden', 'true');
+        icon.textContent = item.icon;
+        var zh = document.createElement('span'); zh.textContent = item.zh;
+        btn.appendChild(icon); btn.appendChild(zh);
+        btn.addEventListener('click', function () {
+          if (storyState.id === item.id) return;
+          stopStory(); renderStory(item.id);
+        });
+        frag.appendChild(btn);
+        storyTabs[item.id] = btn;
+      });
+      storyTabsEl.appendChild(frag);
     }
 
-    var initial =
-      findCategory(hashId()) ||
-      findCategory(readStore(KEY_CATEGORY)) ||
-      CATEGORIES[0];
+    function syncTabs() {
+      Object.keys(storyTabs).forEach(function (id) {
+        var isActive = id === storyState.id;
+        storyTabs[id].classList.toggle('is-active', isActive);
+        storyTabs[id].setAttribute('aria-selected', isActive ? 'true' : 'false');
+      });
+    }
+
+    function stopStory() {
+      storyState.playing = false;
+      storyState.token += 1;
+      storyState.sentenceEls.forEach(function (el) { el.classList.remove('is-speaking'); });
+      if (storyState.playBtn) {
+        storyState.playBtn.textContent = '▶ 朗读故事';
+        storyState.playBtn.classList.remove('is-playing');
+      }
+      if (storySpeakTimer) { clearTimeout(storySpeakTimer); storySpeakTimer = null; }
+      try { synth.cancel(); } catch (e) {}
+    }
+
+    var storySpeakTimer = null;
+
+    function renderStory(id) {
+      var item = stories.find(function (s) { return s.id === id; }) || stories[0];
+      if (!item) return;
+      stopStory();
+      storyState.id = item.id;
+      storyState.item = item;
+      storyState.sentences = item.sentences;
+      storyState.sentenceEls = [];
+      storyState.playing = false;
+      storyState.currentIdx = 0;
+      storyState.token += 1;
+
+      var panel = storyPanelEl;
+      panel.textContent = '';
+      panel.style.setProperty('--cat', item.color);
+
+      var top = document.createElement('div'); top.className = 'scene-top';
+      var icon = document.createElement('span'); icon.className = 'scene-icon';
+      icon.setAttribute('aria-hidden', 'true'); icon.textContent = item.icon;
+      var meta = document.createElement('div'); meta.className = 'scene-meta';
+      var title = document.createElement('h3'); title.className = 'scene-title';
+      title.textContent = item.zh + ' · ' + item.en;
+      var desc = document.createElement('p'); desc.className = 'scene-desc';
+      desc.textContent = item.desc;
+      meta.appendChild(title); meta.appendChild(desc);
+      var actions = document.createElement('div'); actions.className = 'scene-actions';
+      var zhBtn = document.createElement('button');
+      zhBtn.type = 'button'; zhBtn.className = 'ghost-btn';
+      zhBtn.textContent = hideZh ? '显示中文' : '隐藏中文';
+      zhBtn.addEventListener('click', function () {
+        hideZh = !hideZh;
+        writeStore(KEY_HIDE_ZH, hideZh ? '1' : '0');
+        syncZhEverywhere();
+      });
+      var playBtn = document.createElement('button');
+      playBtn.type = 'button'; playBtn.className = 'play-btn';
+      playBtn.textContent = '▶ 朗读故事';
+      playBtn.addEventListener('click', toggleStoryPlayback);
+      actions.appendChild(zhBtn); actions.appendChild(playBtn);
+      top.appendChild(icon); top.appendChild(meta); top.appendChild(actions);
+
+      var listEl = document.createElement('ol'); listEl.className = 'dialog';
+      item.sentences.forEach(function (sent, idx) {
+        var li = document.createElement('li');
+        var btn = document.createElement('button');
+        btn.type = 'button'; btn.className = 'line story-line';
+        btn.setAttribute('aria-label', '播放第 ' + (idx + 1) + ' 句');
+        var en = document.createElement('span');
+        en.className = 'line-en'; en.lang = 'en';
+        en.textContent = sent.en;
+        var zh = document.createElement('span');
+        zh.className = 'line-zh'; zh.textContent = sent.zh;
+        btn.appendChild(en); btn.appendChild(zh);
+        btn.addEventListener('click', function () {
+          stopStory();
+          storyState.currentIdx = idx;
+          storyState.playing = true;
+          playNextSentence(idx);
+        });
+        li.appendChild(btn);
+        listEl.appendChild(li);
+        storyState.sentenceEls.push(btn);
+      });
+
+      storyState.playBtn = playBtn;
+      panel.appendChild(top);
+      panel.appendChild(listEl);
+      syncTabs();
+    }
+
+    function playNextSentence(idx) {
+      var token = storyState.token;
+      if (idx >= storyState.sentences.length) {
+        storyState.playing = false;
+        if (storyState.playBtn) {
+          storyState.playBtn.textContent = '▶ 朗读故事';
+          storyState.playBtn.classList.remove('is-playing');
+        }
+        storyState.sentenceEls.forEach(function (el) { el.classList.remove('is-speaking'); });
+        return;
+      }
+      storyState.currentIdx = idx;
+      storyState.sentenceEls.forEach(function (el, i) {
+        el.classList.toggle('is-speaking', i === idx);
+      });
+      var sent = storyState.sentences[idx];
+      var utter = new window.SpeechSynthesisUtterance(sent.en);
+      utter.lang = 'en-US';
+      utter.rate = 0.82;
+      utter.onend = function () {
+        if (token !== storyState.token || !storyState.playing) return;
+        storySpeakTimer = setTimeout(function () { playNextSentence(idx + 1); }, 600);
+      };
+      utter.onerror = function () {
+        if (token !== storyState.token) return;
+        playNextSentence(idx + 1);
+      };
+      try { synth.speak(utter); } catch (e) { playNextSentence(idx + 1); }
+    }
+
+    function toggleStoryPlayback() {
+      if (storyState.playing) { stopStory(); return; }
+      if (!supportsSpeech) return;
+      // Stop other players
+      PLAYERS.forEach(function (p) { if (p._type !== 'story') p.stop(); });
+      stopAllMelody();
+      storyState.playing = true;
+      storyState.token += 1;
+      if (storyState.playBtn) {
+        storyState.playBtn.textContent = '■ 停止';
+        storyState.playBtn.classList.add('is-playing');
+      }
+      playNextSentence(0);
+    }
+
+    var api = { buildTabs: buildTabs, render: renderStory, syncZh: function(){}, stop: stopStory };
+    storyPlayers.push(api);
+    return api;
+  }
+
+  function initStories() {
+    var player = initStoryPlayer();
+    if (player) {
+      player.buildTabs();
+      player.render(STORIES[0] ? STORIES[0].id : '');
+    }
+  }
+
+  /* ============ GAMES TAB ============ */
+  var gameArea = document.getElementById('game-area');
+  var gamePrompt = document.getElementById('game-prompt');
+  var gameWord = document.getElementById('game-word');
+  var gameContext = document.getElementById('game-context');
+  var gameOptions = document.getElementById('game-options');
+  var gameFeedback = document.getElementById('game-feedback');
+  var gameScoreboard = document.getElementById('game-scoreboard');
+  var gameStartBtn = document.getElementById('game-start');
+  var gameRestartBtn = document.getElementById('game-restart');
+  var gameModeSelect = document.getElementById('game-mode');
+  var gameCatSelect = document.getElementById('game-cat');
+  var gameCorrectEl = document.getElementById('game-correct');
+  var gameTotalEl2 = document.getElementById('game-total');
+  var gameStreakEl = document.getElementById('game-streak');
+  var tabGamesScore = document.getElementById('tab-games-score');
+
+  var game = { mode: 'en-zh', cat: 'all', queue: [], index: 0, correct: 0, total: 0, streak: 0, maxStreak: 0, active: false };
+
+  if (gameCatSelect) {
+    var optAll = document.createElement('option');
+    optAll.value = 'all'; optAll.textContent = '全部分类';
+    gameCatSelect.appendChild(optAll);
+    CATEGORIES.forEach(function (cat) {
+      var opt = document.createElement('option');
+      opt.value = cat.id; opt.textContent = cat.icon + ' ' + cat.zh;
+      gameCatSelect.appendChild(opt);
+    });
+  }
+
+  function getGamePool() {
+    var cats = game.cat === 'all' ? CATEGORIES : CATEGORIES.filter(function (c) { return c.id === game.cat; });
+    var pool = [];
+    cats.forEach(function (cat) {
+      cat.words.forEach(function (w) { pool.push(Object.assign({}, w, { cat: cat.zh, catColor: cat.color })); });
+    });
+    return pool;
+  }
+
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+    }
+    return a;
+  }
+
+  function startGame() {
+    var pool = getGamePool();
+    if (pool.length < 4) { alert('该分类单词不足，请选择其他分类'); return; }
+    game.mode = gameModeSelect ? gameModeSelect.value : 'en-zh';
+    game.queue = shuffle(pool).slice(0, 20);
+    game.index = 0; game.correct = 0; game.total = 0;
+    game.streak = 0; game.maxStreak = 0; game.active = true;
+    if (gameScoreboard) gameScoreboard.hidden = true;
+    if (gameArea) gameArea.hidden = false;
+    updateGameStats();
+    showQuestion();
+  }
+
+  function showQuestion() {
+    if (!game.active || game.index >= game.queue.length) { endGame(); return; }
+    var q = game.queue[game.index];
+    if (gameFeedback) gameFeedback.hidden = true;
+    if (gameOptions) gameOptions.textContent = '';
+    if (gameWord) gameWord.textContent = game.mode === 'en-zh' ? q.en : q.zh;
+    if (gameContext) gameContext.textContent = q.cat + '  ·  ' + q.icon;
+    if (gameWord) gameWord.lang = game.mode === 'en-zh' ? 'en' : 'zh';
+
+    var pool = getGamePool().filter(function (w) {
+      return game.mode === 'en-zh' ? w.en !== q.en : w.zh !== q.zh;
+    });
+    var opts = shuffle(pool).slice(0, 3).map(function (w) {
+      return game.mode === 'en-zh' ? w.zh : w.en;
+    });
+    opts.push(game.mode === 'en-zh' ? q.zh : q.en);
+    opts = shuffle(opts);
+
+    opts.forEach(function (opt) {
+      var btn = document.createElement('button');
+      btn.type = 'button'; btn.className = 'game-opt';
+      btn.textContent = opt;
+      btn.addEventListener('click', function () { checkAnswer(opt); });
+      if (gameOptions) gameOptions.appendChild(btn);
+    });
+
+    if (supportsSpeech && game.mode === 'en-zh') {
+      var u = new window.SpeechSynthesisUtterance(q.en);
+      u.lang = 'en-US'; u.rate = 0.8;
+      synth.speak(u);
+    }
+  }
+
+  function checkAnswer(selected) {
+    if (!game.active) return;
+    var q = game.queue[game.index];
+    var correct = game.mode === 'en-zh' ? q.zh : q.en;
+    game.total++;
+    var isCorrect = selected === correct;
+    if (isCorrect) {
+      game.correct++; game.streak++;
+      if (game.streak > game.maxStreak) game.maxStreak = game.streak;
+    } else { game.streak = 0; }
+    // Highlight buttons
+    var allBtns = gameOptions ? gameOptions.querySelectorAll('.game-opt') : [];
+    allBtns.forEach(function (b) {
+      if (b.textContent === correct) b.classList.add('correct');
+      else if (b.textContent === selected && !isCorrect) b.classList.add('wrong');
+    });
+    updateGameStats();
+    if (gameFeedback) {
+      gameFeedback.hidden = false;
+      gameFeedback.textContent = isCorrect ? '✓ 正确！' : '✗ 正确答案：' + correct;
+      gameFeedback.className = 'game-feedback ' + (isCorrect ? 'feedback-correct' : 'feedback-wrong');
+    }
+    setTimeout(function () {
+      game.index++;
+      showQuestion();
+    }, isCorrect ? 800 : 1500);
+  }
+
+  function updateGameStats() {
+    if (gameCorrectEl) gameCorrectEl.textContent = game.correct;
+    if (gameTotalEl2) gameTotalEl2.textContent = game.total;
+    if (gameStreakEl) gameStreakEl.textContent = game.streak;
+    if (tabGamesScore) tabGamesScore.textContent = game.total > 0 ? game.streak + '🔥' : '0';
+  }
+
+  function endGame() {
+    game.active = false;
+    if (gameArea) gameArea.hidden = true;
+    if (gameScoreboard) {
+      gameScoreboard.hidden = false;
+      var pct = game.total > 0 ? Math.round(game.correct / game.total * 100) : 0;
+      var pctEl = document.getElementById('score-pct');
+      var streakEl = document.getElementById('score-streak');
+      if (pctEl) pctEl.textContent = pct;
+      if (streakEl) streakEl.textContent = game.maxStreak;
+    }
+    var prev = parseInt(readStore(KEY_GAME_SCORE) || '0', 10);
+    if (game.total > 0) writeStore(KEY_GAME_SCORE, String(Math.max(prev, game.correct)));
+  }
+
+  if (gameStartBtn) gameStartBtn.addEventListener('click', startGame);
+  if (gameRestartBtn) gameRestartBtn.addEventListener('click', startGame);
+
+  /* ============ Jump to games ============ */
+  var jumpGamesBtn = document.getElementById('jump-games');
+  if (jumpGamesBtn) {
+    jumpGamesBtn.addEventListener('click', function () {
+      tabs.forEach(function (t) { t.classList.remove('active'); });
+      panels.forEach(function (p) { p.classList.remove('active'); });
+      var g = document.querySelector('[data-tab="games"]');
+      var gp = document.getElementById('tab-games');
+      if (g) g.classList.add('active');
+      if (gp) gp.classList.add('active');
+    });
+  }
+
+  /* ============ INIT ============ */
+  function init() {
+    buildCatNav(); syncPills(); renderWords();
+    var hash = String(window.location.hash || '').replace(/^#\/?/, '');
+    var saved = readStore(KEY_CATEGORY);
+    var initial = findCategory(hash) || findCategory(saved) || CATEGORIES[0];
     state.activeId = initial.id;
     updateHash(initial.id);
-
+    buildCatNav(); syncPills(); renderWords();
     syncThemeUi(currentTheme());
-    render();
-
+    initScenePlayer();
+    initSongPlayer();
+    initStories();
     window.addEventListener('hashchange', function () {
-      var cat = findCategory(hashId());
+      var cat = findCategory(hash);
       if (cat && cat.id !== state.activeId) {
         state.activeId = cat.id;
         writeStore(KEY_CATEGORY, cat.id);
-        render();
+        buildCatNav(); syncPills(); renderWords();
       }
     });
-
-    bindJump(jumpScenesBtn, 'scenes');
-    bindJump(jumpSongsBtn, 'songs');
-
     window.addEventListener('pagehide', function () {
-      if (synth && synth.speaking) {
-        synth.cancel();
-      }
+      if (synth && synth.speaking) synth.cancel();
+      stopAllMelody();
     });
   }
 

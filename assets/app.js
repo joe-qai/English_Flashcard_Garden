@@ -1815,6 +1815,8 @@
   }
 
   function startGame() {
+    // 收起点按「开始游戏」留下的焦点，避免按钮/选项出现像「已选中」的高亮
+    if (document.activeElement && typeof document.activeElement.blur === 'function') document.activeElement.blur();
     var pool = getGamePool();
     if (pool.length < 4) { alert('该分类单词不足，请选择其他分类'); return; }
     game.mode = gameModeSelect ? gameModeSelect.value : 'en-zh';
@@ -1900,6 +1902,8 @@
       if (b.textContent === correct) b.classList.add('correct');
       else if (b.textContent === selected && !isCorrect) b.classList.add('wrong');
     });
+    // 点过的选项立即失焦，下一题不会残留焦点环/悬停高亮
+    if (document.activeElement && typeof document.activeElement.blur === 'function') document.activeElement.blur();
     updateGameStats();
     if (gameFeedback) {
       gameFeedback.hidden = false;

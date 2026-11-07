@@ -662,7 +662,9 @@ body.hide-zh .sub-note { display: none; }
   font-weight: 600;
   transition: all 0.15s;
 }
-.game-opt:hover { border-color: var(--cat); transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+/* 作答时不要用高亮边框暗示「已选中」，避免被误认为预选项 */
+.game-opt:focus { outline: none; }
+.game-opt:focus-visible { outline: 2px solid var(--text-muted); outline-offset: 2px; }
 .game-opt.correct {
   border-color: #27ae60;
   background: color-mix(in srgb, #27ae60 15%, var(--bg-card));

@@ -1,7 +1,7 @@
 /**
  * 英文闪卡园 · 交互逻辑（无依赖、无构建）
  * - 5 Tab：单词 / 情景 / 音乐 / 故事会 / 游戏
- * - 单词按学校/生活/拓展分组，并按教材年级（1–6 / 拓展）筛选
+ * - 单词只按教材年级（1–6 / 拓展）筛选，不再按主题分类
  * - 音标默认隐藏，点击卡片显示音标并朗读；未读词高亮
  * - 场景对话 & 英文歌谣播放器（Web Audio 旋律 + 文字跟读）
  * - 故事会：逐句朗读，支持单句/连续播放
@@ -21,18 +21,11 @@
   if (!CATEGORIES.length) return;
 
   var KEY_THEME = 'flashcard:theme';
-  var KEY_CATEGORY = 'flashcard:category';
   var KEY_GAME_SCORE = 'flashcard:gameScore';
 
   var rootEl = document.documentElement;
   var synth = window.speechSynthesis;
   var supportsSpeech = !!synth && typeof window.SpeechSynthesisUtterance === 'function';
-
-  /* ============ Category context tags ============ */
-  function getCategoryGroup(id) {
-    var cat = findCategory(id);
-    return cat && cat.group ? cat.group : 'fun';
-  }
 
   /* ============ Scene context tags ============ */
   var SCHOOL_SCENE_IDS = ['class','asking','identify','time','sports','weekend','bedtime'];
@@ -828,10 +821,9 @@
   var gridEl = document.getElementById('word-grid');
   var emptyEl = document.getElementById('word-empty');
   var emptyTextEl = document.getElementById('word-empty-text');
-  var catNavEl = document.getElementById('word-cat-nav');
 
-  var state = { activeId: CATEGORIES[0].id, group: 'all', grade: readStore('flashcard:grade') || 'all' };
-  var pills = {};
+  // 单词只按教材年级（1–6 / 拓展）筛选，不再保留场景分组与主题分类
+  var state = { grade: readStore('flashcard:grade') || 'all' };
 
   var KEY_SEEN = 'flashcard:seen';
   var seenWords = {};
@@ -843,56 +835,32 @@
     return w.grade === Number(state.grade);
   }
 
-  function getFilteredCats() {
-    return CATEGORIES.filter(function (c) {
-      if (state.group !== 'all' && getCategoryGroup(c.id) !== state.group) return false;
-      return c.words.some(wordPassesGrade);
-    });
+  // 全部年级时按「年级 → 学期 → 单元」排列，拓展词排在最后；同单元再按英文排序
+  function wordSortKey(w) {
+    var isCore = w.level === 'core' && w.grade;
+    return [isCore ? w.grade : 99, isCore ? (w.term || 99) : 99, isCore ? (w.unit || 99) : 99];
   }
 
-  function buildCatNav() {
-    if (!catNavEl) return;
-    catNavEl.textContent = '';
-    var frag = document.createDocumentFragment();
-    var cats = getFilteredCats();
-    cats.forEach(function (cat) {
-      var btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'pill cat-pill';
-      btn.dataset.id = cat.id;
-      btn.style.setProperty('--cat', cat.color);
-      btn.setAttribute('aria-pressed', cat.id === state.activeId ? 'true' : 'false');
-      var icon = document.createElement('span');
-      icon.className = 'pill-icon';
-      icon.setAttribute('aria-hidden', 'true');
-      icon.textContent = cat.icon;
-      var zh = document.createElement('span'); zh.textContent = cat.zh;
-      var count = document.createElement('span');
-      count.className = 'pill-count';
-      count.textContent = cat.words.filter(wordPassesGrade).length;
-      btn.appendChild(icon);
-      btn.appendChild(zh);
-      btn.appendChild(count);
-      btn.addEventListener('click', function () { setCategory(cat.id); });
-      frag.appendChild(btn);
-      pills[cat.id] = btn;
+  function collectWords() {
+    var items = [];
+    CATEGORIES.forEach(function (cat) {
+      cat.words.forEach(function (w) {
+        if (wordPassesGrade(w)) items.push({ word: w, cat: cat });
+      });
     });
-    catNavEl.appendChild(frag);
+    items.sort(function (a, b) {
+      var ka = wordSortKey(a.word);
+      var kb = wordSortKey(b.word);
+      for (var i = 0; i < ka.length; i++) {
+        if (ka[i] !== kb[i]) return ka[i] - kb[i];
+      }
+      if (a.word.en === b.word.en) return 0;
+      return a.word.en < b.word.en ? -1 : 1;
+    });
+    return items;
   }
 
-  function syncPills() {
-    Object.keys(pills).forEach(function (id) {
-      var isActive = id === state.activeId;
-      pills[id].classList.toggle('is-active', isActive);
-      pills[id].setAttribute('aria-pressed', isActive ? 'true' : 'false');
-    });
-  }
-
-  function updateCounts() {
-    var filtered = 0;
-    getFilteredCats().forEach(function (c) {
-      c.words.forEach(function (w) { if (wordPassesGrade(w)) filtered += 1; });
-    });
+  function updateCounts(filtered) {
     var totalVisible = 0;
     CATEGORIES.forEach(function (c) { totalVisible += c.words.length; });
     var tabWordCount = document.getElementById('tab-words-count');
@@ -911,25 +879,6 @@
       var el = document.getElementById(p[0]);
       if (el) el.textContent = String(p[1]);
     });
-  }
-
-  function setCategory(id) {
-    if (!findCategory(id)) return;
-    state.activeId = id;
-    writeStore(KEY_CATEGORY, id);
-    updateHash(id);
-    renderWords();
-  }
-
-  function findCategory(id) {
-    for (var i = 0; i < CATEGORIES.length; i++) {
-      if (CATEGORIES[i].id === id) return CATEGORIES[i];
-    }
-    return null;
-  }
-
-  function updateHash(id) {
-    try { window.history.replaceState(null, '', '#' + id); } catch (e) {}
   }
 
   function createCard(word, cat, index) {
@@ -1016,30 +965,20 @@
   }
 
   function renderWords() {
-    var cat = findCategory(state.activeId);
-    if (!cat || !cat.words.some(wordPassesGrade)) {
-      var available = getFilteredCats();
-      cat = available[0] || findCategory(CATEGORIES[0].id) || CATEGORIES[0];
-      state.activeId = cat.id;
-      updateHash(cat.id);
-    }
-    var words = cat.words.filter(wordPassesGrade);
-    rootEl.style.setProperty('--cat', cat.color);
-    rootEl.style.setProperty('--ring', cat.color);
+    var items = collectWords();
     gridEl.textContent = '';
-    if (!words.length) {
+    if (!items.length) {
       gridEl.hidden = true;
       emptyEl.hidden = false;
-      emptyTextEl.textContent = state.grade === 'ext' ? '该分类暂无拓展词' : '该分类在本年级暂无单词';
+      emptyTextEl.textContent = state.grade === 'ext' ? '暂无拓展词' : '该年级暂无单词';
     } else {
       gridEl.hidden = false;
       emptyEl.hidden = true;
       var frag = document.createDocumentFragment();
-      words.forEach(function (word, i) { frag.appendChild(createCard(word, cat, i)); });
+      items.forEach(function (item, i) { frag.appendChild(createCard(item.word, item.cat, i)); });
       gridEl.appendChild(frag);
     }
-    syncPills();
-    updateCounts();
+    updateCounts(items.length);
   }
 
   var gradePills = document.querySelectorAll('.grade-pill[data-grade]');
@@ -1053,25 +992,6 @@
       state.grade = btn.dataset.grade;
       writeStore('flashcard:grade', state.grade);
       syncGradePills();
-      var available = getFilteredCats();
-      state.activeId = available[0] ? available[0].id : CATEGORIES[0].id;
-      writeStore(KEY_CATEGORY, state.activeId);
-      buildCatNav();
-      syncPills();
-      renderWords();
-    });
-  });
-
-  var subPills = document.querySelectorAll('.sub-pill[data-group]');
-  subPills.forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      document.querySelectorAll('.sub-pill[data-group]').forEach(function (b) { b.classList.remove('is-active'); });
-      btn.classList.add('is-active');
-      state.group = btn.dataset.group;
-      state.activeId = getFilteredCats()[0] ? getFilteredCats()[0].id : CATEGORIES[0].id;
-      writeStore(KEY_CATEGORY, state.activeId);
-      buildCatNav();
-      syncPills();
       renderWords();
     });
   });
@@ -2032,13 +1952,8 @@
 
   /* ============ INIT ============ */
   function init() {
-    buildCatNav(); syncPills(); syncGradePills(); renderWords();
-    var hash = String(window.location.hash || '').replace(/^#\/?/, '');
-    var saved = readStore(KEY_CATEGORY);
-    var initial = findCategory(hash) || findCategory(saved) || CATEGORIES[0];
-    state.activeId = initial.id;
-    updateHash(initial.id);
-    buildCatNav(); syncPills(); renderWords();
+    syncGradePills();
+    renderWords();
     syncThemeUi(currentTheme());
     initCompat();
     initScenePlayer();
@@ -2048,14 +1963,6 @@
     var zhToggle = document.getElementById('zh-toggle');
     if (zhToggle) zhToggle.addEventListener('click', toggleZh);
     applyZhPreference();
-    window.addEventListener('hashchange', function () {
-      var cat = findCategory(hash);
-      if (cat && cat.id !== state.activeId) {
-        state.activeId = cat.id;
-        writeStore(KEY_CATEGORY, cat.id);
-        buildCatNav(); syncPills(); renderWords();
-      }
-    });
     window.addEventListener('pagehide', function () {
       if (synth && synth.speaking) synth.cancel();
       stopAllAudio();

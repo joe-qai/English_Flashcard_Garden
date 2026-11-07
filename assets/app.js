@@ -904,7 +904,7 @@
       // 没有对应 emoji 的实物，用本地手绘 SVG，保证图物一致
       var pic = document.createElement('img');
       pic.className = 'card-img';
-      pic.src = word.icon;
+      pic.src = word.icon + (word.icon.indexOf('?') === -1 ? '?v=textbook4' : '&v=textbook4');
       pic.alt = '';
       pic.width = 56;
       pic.height = 56;

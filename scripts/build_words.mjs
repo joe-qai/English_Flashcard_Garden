@@ -116,6 +116,15 @@ function cleanGloss(raw, en) {
   return zh;
 }
 
+/* ---------- 释义收尾整理 ---------- */
+function tidyZh(zh) {
+  const out = String(zh || '')
+    .replace(/^\s*\/\s*(?:n|v|adj|adv|pron|prep|conj|num|art|int|phr|sent)\.\s*/i, '')
+    .replace(/\.{5,}/g, '...')
+    .trim();
+  return out || zh;
+}
+
 function detectPos(raw, en) {
   const m = String(raw || '').match(POS_PREFIX);
   if (!m) return undefined;
@@ -148,25 +157,37 @@ function countSyllables(ipa) {
     if (DIPHTHONGS.includes(pair)) i += 1;
     n += 1;
   }
+  // 词尾成音节 /l/、/n/（apple、table、 cousin、station）也算一个音节
+  if (/[^aeiouɑɒɔəɜɪʊʌæ][ln]$/.test(ipa)) n += 1;
   return n;
 }
 
 function normalizeIpa(raw) {
   let ipa = String(raw || '').trim().replace(/^\/|\/$/g, '');
+  // 页面词表用 ' / " / : 记调号与长音，先转成标准 IPA 字符
+  ipa = ipa.replace(/'/g, 'ˈ').replace(/"/g, 'ˌ').replace(/:/g, 'ː');
   ipa = ipa.replace(/ɹ/g, 'r').replace(/ɐ/g, 'ə').replace(/ɛ/g, 'e');
   ipa = ipa.replace(/ɚ/g, 'ə').replace(/ɝ/g, 'ɜː').replace(/oʊ/g, 'əʊ');
   ipa = ipa.replace(/\([^)]*\)/g, '').replace(/ˌ/g, '');
   ipa = ipa.split(/[,;]/)[0].trim();
   let out = '';
-  for (const ch of ipa) {
+  for (let i = 0; i < ipa.length; i++) {
+    const ch = ipa[i];
     if (ch === 'ˈ') {
-      let j = out.length;
-      while (j > 0) {
-        const prev = out[j - 1];
-        if (isVowel(prev) || prev === 'ˈ' || prev === ' ' || prev === 'ː' || prev === "'") break;
-        j -= 1;
+      const next = ipa[i + 1] || '';
+      // 只在「重音符紧跟元音」时把重音移到音节起首（如 wˈɒn → ˈwɒn）；
+      // 已经写在辅音前的正确音标（kənˈdɪʃənə）保持不动
+      if (isVowel(next) || DIPHTHONGS.includes(ipa.slice(i + 1, i + 3))) {
+        let j = out.length;
+        while (j > 0) {
+          const prev = out[j - 1];
+          if (isVowel(prev) || prev === 'ˈ' || prev === ' ' || prev === 'ː') break;
+          j -= 1;
+        }
+        out = out.slice(0, j) + 'ˈ' + out.slice(j);
+      } else {
+        out += ch;
       }
-      out = out.slice(0, j) + 'ˈ' + out.slice(j);
     } else out += ch;
   }
   ipa = out.replace(/\s+/g, ' ').trim();
@@ -235,12 +256,12 @@ for (const key of textbookOrder) {
   const tw = textbookWords.get(key);
   const old = deck.get(key);
   const ipa = (ipaOverride.has(key) ? normalizeIpa(ipaOverride.get(key)) : '')
-    || tw.pageIpa
     || (old && old.ipa ? normalizeIpa(old.ipa) : '')
+    || tw.pageIpa
     || (supplement.has(key) ? normalizeIpa(supplement.get(key)) : '');
   if (!ipa) missingIpa.push(tw.en);
 
-  let icon = iconOverride.get(key) || iconMap.get(key) || iconMap.get(key.replace(/[.!?]+$/g, '')) || (old && old.icon) || '';
+  let icon = iconOverride.get(key) || (old && old.icon) || iconMap.get(key) || iconMap.get(key.replace(/[.!?]+$/g, '')) || '';
   if (!icon) {
     const parts = key.split(' ').filter(Boolean).reverse();
     for (const p of parts) {
@@ -255,6 +276,7 @@ for (const key of textbookOrder) {
   // 旧词库的释义可能带「（英文）」，与英文完全重复的去重后缀可以直接去掉
   const suffixRe = new RegExp('\\s*（\\s*' + tw.en.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*）\\s*$', 'i');
   zh = zh.replace(suffixRe, '').trim() || zh;
+  zh = tidyZh(zh);
   const word = {
     en: tw.en,
     ipa,
@@ -287,10 +309,11 @@ for (const cat of currentCats) {
     const key = norm(old.en);
     if (textKeys.has(key) || extSeen.has(key)) continue;
     extSeen.add(key);
-    const icon = iconOverride.get(key) || iconMap.get(key) || old.icon;
+    const icon = iconOverride.get(key) || old.icon || iconMap.get(key);
     let zhExt = glossOverride.get(key) || old.zh;
     const suffixRe = new RegExp('\\s*（\\s*' + old.en.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*）\\s*$', 'i');
     zhExt = zhExt.replace(suffixRe, '').trim() || zhExt;
+    zhExt = tidyZh(zhExt);
     words.push({
       en: old.en,
       ipa: ipaOverride.get(key) || normalizeIpa(old.ipa),

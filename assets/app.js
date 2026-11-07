@@ -835,7 +835,7 @@
     return w.grade === Number(state.grade);
   }
 
-  // 全部年级时按「年级 → 学期 → 单元」排列，拓展词排在最后；同单元再按英文排序
+  // 按「年级 → 学期 → 单元」排列，拓展词排在最后
   function wordSortKey(w) {
     var isCore = w.level === 'core' && w.grade;
     return [isCore ? w.grade : 99, isCore ? (w.term || 99) : 99, isCore ? (w.unit || 99) : 99];
@@ -845,17 +845,18 @@
     var items = [];
     CATEGORIES.forEach(function (cat) {
       cat.words.forEach(function (w) {
-        if (wordPassesGrade(w)) items.push({ word: w, cat: cat });
+        if (wordPassesGrade(w)) items.push({ word: w, cat: cat, order: items.length });
       });
     });
+    // 同一单元内保持教材原始顺序（words.js 里的顺序），不再按字母重排，
+    // 否则「三年级第 2 个词」会变成 I，而教材里是 sad。
     items.sort(function (a, b) {
       var ka = wordSortKey(a.word);
       var kb = wordSortKey(b.word);
       for (var i = 0; i < ka.length; i++) {
         if (ka[i] !== kb[i]) return ka[i] - kb[i];
       }
-      if (a.word.en === b.word.en) return 0;
-      return a.word.en < b.word.en ? -1 : 1;
+      return a.order - b.order;
     });
     return items;
   }

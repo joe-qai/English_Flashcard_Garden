@@ -120,7 +120,18 @@ function cleanGloss(raw, en) {
 function tidyZh(zh) {
   const out = String(zh || '')
     .replace(/^\s*\/\s*(?:n|v|adj|adv|pron|prep|conj|num|art|int|phr|sent)\.\s*/i, '')
-    .replace(/\.{5,}/g, '...')
+    // 释义中夹带的词性（如「展示；显示 n. 演出」）统一改成分号
+    .replace(/\s+(?:n|v|adj|adv|pron|prep|conj|num|art|int|phr|sent)\.\s*/gi, '；')
+    .replace(/⋯+/g, '…')
+    .replace(/\.{3,}/g, '…')
+    // 中文释义统一全角括号与标点
+    .replace(/\s*\(\s*/g, '（')
+    .replace(/\s*\)\s*/g, '）')
+    .replace(/!/g, '！')
+    .replace(/\?/g, '？')
+    .replace(/\s*([，。；！？、：（）])\s*/g, '$1')
+    .replace(/；{2,}/g, '；')
+    .replace(/^；+|；+$/g, '')
     .trim();
   return out || zh;
 }

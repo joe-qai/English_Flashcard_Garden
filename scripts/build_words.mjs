@@ -1,34 +1,39 @@
 /**
  * 生成 assets/words.js
  *
- * 输入：
- *  - assets/words.js（现有 648 词，作为基础词库）
- *  - data/word-additions.json（新增主题、补词、英式拼写与释义修正）
- *  - data/textbook-index.json（沪教牛津版深圳用公开词表，用于打年级/学期/单元标签）
+ * 教材优先（textbook-first）：
+ *  - 以 data/textbook-index.json 为词表底稿，按 12 册（一年级上 … 六年级下）建分类；
+ *  - 每条词按首次出现位置打 grade / term / unit / unitTitle，重复词只保留一次；
+ *  - 页面音标 → 现有词库音标 → data/ipa-supplement.json 依次兜底，统一为英式音标；
+ *  - 现有词库中未被教材收录的词保留为「拓展」，沿用原主题分类、图标与释义；
+ *  - 人工修正集中在 data/word-overrides.json（跳过、英文名、释义、音标、图标）。
  *
- * 规则：
- *  - 与教材词表匹配的词标 core，并带 grade/term/unit/unitTitle；
- *  - 新增核心主题没有匹配到教材的词，落到该主题的 defaultGrade，仍算 core；
- *  - 其余词标 extension，默认不在「教材核心」视图展示。
+ * 输入：
+ *  - data/textbook-index.json
+ *  - assets/words.js（现有词库：图标、音标、释义、拓展词）
+ *  - data/ipa-supplement.json
+ *  - data/word-overrides.json
+ *
+ * 输出：assets/words.js
  */
 import fs from 'node:fs';
 import vm from 'node:vm';
 import path from 'node:path';
 
 const root = process.cwd();
-const loadWindow = (file) => {
-  const sandbox = { window: {} };
-  vm.createContext(sandbox);
-  vm.runInContext(fs.readFileSync(path.join(root, file), 'utf8'), sandbox);
-  return sandbox.window;
-};
+const readJson = (file) => JSON.parse(fs.readFileSync(path.join(root, file), 'utf8'));
 
-const win = loadWindow('data/words.base.js');
-const baseCats = win.WORD_CATEGORIES;
-const add = JSON.parse(fs.readFileSync(path.join(root, 'data/word-additions.json'), 'utf8'));
-const textbook = JSON.parse(fs.readFileSync(path.join(root, 'data/textbook-index.json'), 'utf8'));
+const textbook = readJson('data/textbook-index.json');
+const supplementRaw = readJson('data/ipa-supplement.json');
+const overrides = readJson('data/word-overrides.json');
+const iconMapRaw = readJson('data/word-icons.json');
 
-const norm = (s) => String(s).toLowerCase().replace(/[’']/g, "'").replace(/\s+/g, ' ').trim();
+const sandbox = { window: {} };
+vm.createContext(sandbox);
+vm.runInContext(fs.readFileSync(path.join(root, 'assets/words.js'), 'utf8'), sandbox);
+const currentCats = sandbox.window.WORD_CATEGORIES;
+
+const norm = (s) => String(s).toLowerCase().replace(/[’']/g, "'").replace(/…/g, '...').replace(/\s+/g, ' ').trim();
 
 /* ---------- 教材单元标题修正（公开词表未给出主题，或空格粘连） ---------- */
 const UNIT_TITLE_FIX = {
@@ -60,199 +65,267 @@ const UNIT_TITLE_FIX = {
   '5-1-8': 'How does music make us feel?',
 };
 
-/* ---------- 英式拼写对应的音标修正 ---------- */
-const IPA_FIX = {
-  grey: '/ɡreɪ/',
-  pyjamas: '/pəˈdʒɑːməz/',
-  trainers: '/ˈtreɪnəz/',
-  biscuit: '/ˈbɪskɪt/',
-  chips: '/tʃɪps/',
-  underground: '/ˈʌndəɡraʊnd/',
-  zip: '/zɪp/',
-  armour: '/ˈɑːmə/',
-  metre: '/ˈmiːtə/',
-  litre: '/ˈliːtə/',
-  rubber: '/ˈrʌbə/',
-  'school bag': '/skuːl bæɡ/',
-  fridge: '/frɪdʒ/',
-  'police officer': '/pəˈliːs ˈɒfɪsə/',
-};
+/* ---------- 12 册教材分类 ---------- */
+const BOOK_META = [
+  { grade: 1, term: 1, icon: '📙', color: '#F6A94D' },
+  { grade: 1, term: 2, icon: '📙', color: '#E9973D' },
+  { grade: 2, term: 1, icon: '📘', color: '#6BB3F0' },
+  { grade: 2, term: 2, icon: '📘', color: '#4F86D9' },
+  { grade: 3, term: 1, icon: '📗', color: '#3E9C52' },
+  { grade: 3, term: 2, icon: '📗', color: '#2F8F6B' },
+  { grade: 4, term: 1, icon: '📕', color: '#E58B7B' },
+  { grade: 4, term: 2, icon: '📕', color: '#D96A6A' },
+  { grade: 5, term: 1, icon: '📔', color: '#7B4FA8' },
+  { grade: 5, term: 2, icon: '📔', color: '#9B6BC4' },
+  { grade: 6, term: 1, icon: '📚', color: '#0E8C8C' },
+  { grade: 6, term: 2, icon: '📚', color: '#0B6E6E' },
+];
+const GRADE_CN = ['', '一', '二', '三', '四', '五', '六'];
+const bookId = (grade, term) => `book-g${grade}t${term}`;
 
-const UNCOUNTABLE = new Set([
-  'bread', 'rice', 'milk', 'juice', 'meat', 'water', 'soup', 'cheese', 'chocolate',
-  'paper', 'hair', 'money', 'luggage', 'homework', 'information', 'news', 'music',
-  'art', 'tea', 'coffee', 'sugar', 'salt', 'rain', 'wind', 'snow',
-]);
-const PLURAL_ONLY = new Set([
-  'noodles', 'chopsticks', 'scissors', 'trousers', 'glasses', 'socks', 'shorts',
-  'jeans', 'clothes', 'parents',
-]);
-
-/* ---------- 1. 整理基础分类 ---------- */
-const GROUP = {
-  school: ['stationery', 'colors', 'food', 'measure', 'jobs', 'time', 'weather', 'seasons', 'sports-general', 'family', 'feelings', 'school', 'chinese-festivals'],
-  life: ['body', 'health', 'clothing', 'transport', 'shopping', 'rooms', 'tools', 'furniture', 'kitchenware', 'routines'],
-};
-
-const cats = baseCats.map((c) => ({
-  id: c.id,
-  en: c.en,
-  zh: c.zh,
-  icon: c.icon,
-  color: c.color,
-  group: GROUP.school.includes(c.id) ? 'school' : GROUP.life.includes(c.id) ? 'life' : 'fun',
-  hidden: add.hiddenCategories.includes(c.id),
-  words: c.words.map((w) => ({ ...w })),
-}));
-
-const byId = new Map(cats.map((c) => [c.id, c]));
-const seenEn = new Map();
-
-/* 颜色类补 orange：从水果类移出，避免同一英文出现两次 */
-const fruits = byId.get('fruits');
-if (fruits) fruits.words = fruits.words.filter((w) => norm(w.en) !== 'orange');
-
-/* 个别词放错分类时在这里搬到更合适的位置（保持英文唯一） */
-const MOVED_WORDS = {
-  helmet: 'clothing',
-};
-for (const [en, targetId] of Object.entries(MOVED_WORDS)) {
-  const target = byId.get(targetId);
-  if (!target) continue;
-  for (const c of cats) {
-    if (c.id === targetId) continue;
-    const idx = c.words.findIndex((w) => norm(w.en) === norm(en));
-    if (idx !== -1) {
-      const moved = c.words.splice(idx, 1)[0];
-      target.words.push(moved);
-      break;
-    }
-  }
-}
-
-/* ---------- 2. 英式拼写 / 英文名 / 释义修正 ---------- */
-const ipaFix = new Map(Object.entries(IPA_FIX).map(([k, v]) => [k, v]));
-for (const c of cats) {
-  for (const w of c.words) {
-    const key = norm(w.en);
-    if (add.rename[key]) w.en = add.rename[key];
-    if (add.enRename[w.en]) w.en = add.enRename[w.en];
-    if (add.glossFix[w.en]) w.zh = add.glossFix[w.en];
-    if (ipaFix.has(norm(w.en))) w.ipa = ipaFix.get(norm(w.en));
-  }
-}
-
-/* ---------- 3. 新增分类与补词 ---------- */
-cats.forEach((c) => c.words.forEach((w) => seenEn.set(norm(w.en), c.id)));
-const addedWords = [];
-for (const cat of add.categories) {
-  if (byId.has(cat.id)) continue;
-  const words = [];
+/* ---------- 现有词库：图标 / 音标 / 释义 / 拓展词 ---------- */
+const deck = new Map();
+const tokenIcon = new Map();
+for (const cat of currentCats) {
   for (const w of cat.words) {
-    const key = norm(w.en);
-    if (seenEn.has(key)) {
-      console.warn(`skip duplicate en: ${w.en} (already in ${seenEn.get(key)})`);
-      continue;
-    }
-    seenEn.set(key, cat.id);
-    words.push({ ...w });
-    addedWords.push(w.en);
-  }
-  const entry = {
-    id: cat.id,
-    en: cat.en,
-    zh: cat.zh,
-    icon: cat.icon,
-    color: cat.color,
-    group: cat.group,
-    defaultGrade: cat.defaultGrade,
-    words,
-  };
-  cats.push(entry);
-  byId.set(cat.id, entry);
-}
-
-for (const [catId, list] of Object.entries(add.addTo)) {
-  const cat = byId.get(catId);
-  if (!cat) continue;
-  for (const w of list) {
-    const key = norm(w.en);
-    if (seenEn.has(key)) {
-      console.warn(`skip duplicate en: ${w.en} (already in ${seenEn.get(key)})`);
-      continue;
-    }
-    seenEn.set(key, catId);
-    cat.words.push({ ...w });
-    addedWords.push(w.en);
+    deck.set(norm(w.en), { ...w, catId: cat.id });
+    if (!/\s/.test(w.en) && w.icon && !tokenIcon.has(norm(w.en))) tokenIcon.set(norm(w.en), w.icon);
   }
 }
 
-const PLURAL_ALIAS = { socks: 'sock' };
+/* ---------- 释义清理 ---------- */
+const POS_PREFIX = /^(?:(?:n|v|adj|adv|pron|prep|conj|num|art|int|phr|phra|sent)\.\s*)+/i;
+function cleanGloss(raw, en) {
+  let zh = String(raw || '')
+    .replace(/\s+/g, ' ')
+    .replace(/\s*（复数）\s*/g, '')
+    .replace(/\s*\(复数\)\s*/g, '')
+    .replace(POS_PREFIX, '')
+    .replace(/^n\.X\s*/i, '')
+    .replace(/…/g, '...')
+    .replace(/\s*\.\.\.\s*/g, '...')
+    .replace(/^[.\s]+|[.\s]+$/g, '')
+    .replace(/\s*([，。；！？、：])\s*/g, '$1')
+    .replace(/\s*([（【])\s*/g, '$1')
+    .replace(/\s*([）】])\s*/g, '$1')
+    .replace(/;+/g, '；')
+    .replace(/,+/g, '，')
+    .replace(/，?(?:等等|等)$/g, '')
+    .trim();
+  if (!zh) zh = en;
+  return zh;
+}
 
-const FORCE_PLACE = {
-  grey: { grade: 3, term: 2, unit: 5, unitTitle: 'Where can we see colours?' },
-};
+function detectPos(raw, en) {
+  const m = String(raw || '').match(POS_PREFIX);
+  if (!m) return undefined;
+  const s = m[0].toLowerCase();
+  if (s.includes('phr')) return 'phr.';
+  if (/\s/.test(en.trim())) return 'phr.';
+  if (s.includes('adj')) return 'adj.';
+  if (s.includes('adv')) return 'adv.';
+  if (s.includes('pron')) return 'pron.';
+  if (s.includes('prep')) return 'prep.';
+  if (s.includes('conj')) return 'conj.';
+  if (s.includes('num')) return 'num.';
+  if (s.includes('art')) return 'art.';
+  if (s.includes('int')) return 'int.';
+  if (s.includes('n')) return 'n.';
+  if (s.includes('v')) return 'v.';
+  return undefined;
+}
 
-/* ---------- 4. 教材位置索引 ---------- */
-const place = new Map();
+/* ---------- 英式音标规范化 ---------- */
+const VOWELS = 'aeiouɑɒɔəɜɪʊʌæ';
+const DIPHTHONGS = ['eɪ', 'aɪ', 'ɔɪ', 'aʊ', 'əʊ', 'ɪə', 'eə', 'ʊə', 'iə', 'uə'];
+const isVowel = (ch) => VOWELS.includes(ch);
+
+function countSyllables(ipa) {
+  let n = 0;
+  for (let i = 0; i < ipa.length; i++) {
+    if (!isVowel(ipa[i])) continue;
+    const pair = ipa.slice(i, i + 2);
+    if (DIPHTHONGS.includes(pair)) i += 1;
+    n += 1;
+  }
+  return n;
+}
+
+function normalizeIpa(raw) {
+  let ipa = String(raw || '').trim().replace(/^\/|\/$/g, '');
+  ipa = ipa.replace(/ɹ/g, 'r').replace(/ɐ/g, 'ə').replace(/ɛ/g, 'e');
+  ipa = ipa.replace(/ɚ/g, 'ə').replace(/ɝ/g, 'ɜː').replace(/oʊ/g, 'əʊ');
+  ipa = ipa.replace(/\([^)]*\)/g, '').replace(/ˌ/g, '');
+  ipa = ipa.split(/[,;]/)[0].trim();
+  let out = '';
+  for (const ch of ipa) {
+    if (ch === 'ˈ') {
+      let j = out.length;
+      while (j > 0) {
+        const prev = out[j - 1];
+        if (isVowel(prev) || prev === 'ˈ' || prev === ' ' || prev === 'ː' || prev === "'") break;
+        j -= 1;
+      }
+      out = out.slice(0, j) + 'ˈ' + out.slice(j);
+    } else out += ch;
+  }
+  ipa = out.replace(/\s+/g, ' ').trim();
+  if (countSyllables(ipa) <= 1) ipa = ipa.replace(/ˈ/g, '');
+  ipa = ipa.replace(/a(?![ɪʊ])/g, 'æ');
+  return '/' + ipa + '/';
+}
+
+/* ---------- 合并教材词条 ---------- */
+const overridesSkip = new Set((overrides.skip || []).map(norm));
+const rename = new Map(Object.entries(overrides.rename || {}).map(([k, v]) => [norm(k), v]));
+const ipaOverride = new Map(Object.entries(overrides.ipa || {}).map(([k, v]) => [norm(k), v]));
+const glossOverride = new Map(Object.entries(overrides.gloss || {}).map(([k, v]) => [norm(k), v]));
+const iconOverride = new Map(Object.entries(overrides.icon || {}).map(([k, v]) => [norm(k), v]));
+const iconMap = new Map(Object.entries(iconMapRaw).map(([k, v]) => [norm(k), v]));
+const supplement = new Map(Object.entries(supplementRaw).map(([k, v]) => [norm(k), v]));
+const posOverride = new Map(Object.entries(overrides.pos || {}).map(([k, v]) => [norm(k), v]));
+
+function resolveEn(raw) {
+  const cleaned = String(raw || '')
+    .replace(/\s+/g, ' ')
+    .replace(/\s*(?:\.\.\.|…)\s*$/, '')
+    .replace(/^\(be\)\s*/i, 'be ')
+    .trim();
+  return rename.get(norm(cleaned)) || cleaned;
+}
+
+const textbookWords = new Map();
+const textbookOrder = [];
 for (const book of textbook) {
+  const unitTitleByUnit = new Map();
   for (const unit of book.units) {
-    for (const w of unit.words) {
-      const key = norm(w.en);
-      const info = {
+    const title = UNIT_TITLE_FIX[`${book.grade}-${book.term}-${unit.unit}`]
+      || unit.title.replace(/^unit\s*\d+\s*/i, '').trim()
+      || null;
+    unitTitleByUnit.set(unit.unit, title);
+    for (const entry of unit.words) {
+      const en = resolveEn(entry.en);
+      if (!en || overridesSkip.has(norm(en))) continue;
+      const key = norm(en);
+      const existing = textbookWords.get(key);
+      if (existing) {
+        if (!existing.ipa && entry.ipa) existing.ipa = normalizeIpa(entry.ipa);
+        continue;
+      }
+      textbookWords.set(key, {
+        en,
+        key,
+        textbookZh: entry.zh,
+        pageIpa: entry.ipa ? normalizeIpa(entry.ipa) : '',
         grade: book.grade,
         term: book.term,
         unit: unit.unit,
-        unitTitle: UNIT_TITLE_FIX[`${book.grade}-${book.term}-${unit.unit}`] || unit.title.replace(/^unit\s*\d+\s*/i, '').trim() || null,
-      };
-      if (!place.has(key)) place.set(key, info);
-      const renamed = add.rename[key];
-      if (renamed && !place.has(norm(renamed))) place.set(norm(renamed), info);
+        unitTitle: unitTitleByUnit.get(unit.unit),
+      });
+      textbookOrder.push(key);
     }
   }
 }
 
-/* ---------- 5. 打标签 ---------- */
-let core = 0;
-let ext = 0;
-for (const c of cats) {
-  for (const w of c.words) {
-    const key = norm(w.en);
-    const p = FORCE_PLACE[key] || place.get(key) || place.get(PLURAL_ALIAS[key]);
-    if (p) {
-      w.grade = p.grade;
-      w.term = p.term;
-      w.unit = p.unit;
-      w.unitTitle = p.unitTitle;
-      w.level = 'core';
-      core += 1;
-    } else if (c.defaultGrade) {
-      w.grade = c.defaultGrade;
-      w.term = null;
-      w.unit = null;
-      w.unitTitle = null;
-      w.level = 'core';
-      core += 1;
-    } else {
-      w.grade = null;
-      w.term = null;
-      w.unit = null;
-      w.unitTitle = null;
-      w.level = 'extension';
-      ext += 1;
-    }
+/* ---------- 组装核心词 ---------- */
+const missingIpa = [];
+const missingIcon = [];
+const coreByBook = new Map();
+for (const key of textbookOrder) {
+  const tw = textbookWords.get(key);
+  const old = deck.get(key);
+  const ipa = (ipaOverride.has(key) ? normalizeIpa(ipaOverride.get(key)) : '')
+    || tw.pageIpa
+    || (old && old.ipa ? normalizeIpa(old.ipa) : '')
+    || (supplement.has(key) ? normalizeIpa(supplement.get(key)) : '');
+  if (!ipa) missingIpa.push(tw.en);
 
-    if (w.pos === 'n.' && w.countable === undefined) {
-      const k = norm(w.en);
-      if (UNCOUNTABLE.has(k)) w.countable = false;
-      else if (PLURAL_ONLY.has(k)) w.plural = true;
-      else if (!k.includes(' ') && !/s$/.test(k)) w.countable = true;
+  let icon = iconOverride.get(key) || iconMap.get(key) || iconMap.get(key.replace(/[.!?]+$/g, '')) || (old && old.icon) || '';
+  if (!icon) {
+    const parts = key.split(' ').filter(Boolean).reverse();
+    for (const p of parts) {
+      const pKey = norm(p);
+      if (iconMap.has(pKey)) { icon = iconMap.get(pKey); break; }
+      if (tokenIcon.has(pKey)) { icon = tokenIcon.get(pKey); break; }
     }
   }
+  if (!icon && !(old && old.swatch)) missingIcon.push(tw.en);
+
+  let zh = glossOverride.get(key) || (old && old.zh) || cleanGloss(tw.textbookZh, tw.en);
+  // 旧词库的释义可能带「（英文）」，与英文完全重复的去重后缀可以直接去掉
+  const suffixRe = new RegExp('\\s*（\\s*' + tw.en.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*）\\s*$', 'i');
+  zh = zh.replace(suffixRe, '').trim() || zh;
+  const word = {
+    en: tw.en,
+    ipa,
+    zh,
+    icon: icon || undefined,
+    swatch: old && old.swatch,
+    pos: posOverride.get(key) || (old && old.pos) || detectPos(tw.textbookZh, tw.en),
+    countable: old && old.countable,
+    plural: old && old.plural,
+    grade: tw.grade,
+    term: tw.term,
+    unit: tw.unit,
+    unitTitle: tw.unitTitle,
+    level: 'core',
+  };
+  const bookKey = `${tw.grade}-${tw.term}`;
+  if (!coreByBook.has(bookKey)) coreByBook.set(bookKey, []);
+  coreByBook.get(bookKey).push(word);
 }
 
-/* ---------- 6. 释义唯一性检查 ---------- */
+/* ---------- 拓展词：现有词库中未被教材收录的词 ---------- */
+const textKeys = new Set(textbookWords.keys());
+const extCats = [];
+const hiddenIds = new Set((overrides.hiddenCategories || []));
+const extSeen = new Set();
+for (const cat of currentCats) {
+  if (cat.hidden || cat.group === 'textbook' || /^book-g/.test(cat.id) || hiddenIds.has(cat.id)) continue;
+  const words = [];
+  for (const old of cat.words) {
+    const key = norm(old.en);
+    if (textKeys.has(key) || extSeen.has(key)) continue;
+    extSeen.add(key);
+    const icon = iconOverride.get(key) || iconMap.get(key) || old.icon;
+    let zhExt = glossOverride.get(key) || old.zh;
+    const suffixRe = new RegExp('\\s*（\\s*' + old.en.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*）\\s*$', 'i');
+    zhExt = zhExt.replace(suffixRe, '').trim() || zhExt;
+    words.push({
+      en: old.en,
+      ipa: ipaOverride.get(key) || normalizeIpa(old.ipa),
+      zh: zhExt,
+      icon,
+      swatch: old.swatch,
+      pos: old.pos,
+      countable: old.countable,
+      plural: old.plural,
+      level: 'extension',
+    });
+  }
+  if (words.length) extCats.push({ ...cat, words });
+}
+
+/* ---------- 组装分类 ---------- */
+const cats = [];
+for (const meta of BOOK_META) {
+  const bookKey = `${meta.grade}-${meta.term}`;
+  const words = coreByBook.get(bookKey) || [];
+  cats.push({
+    id: bookId(meta.grade, meta.term),
+    en: `Grade ${meta.grade} ${meta.term === 1 ? 'A' : 'B'}`,
+    zh: `${GRADE_CN[meta.grade]}年级${meta.term === 1 ? '上' : '下'}册`,
+    icon: meta.icon,
+    color: meta.color,
+    group: 'textbook',
+    words,
+  });
+}
+for (const cat of extCats) cats.push(cat);
+
+/* ---------- 释义唯一性检查 ---------- */
 const zhSeen = new Map();
+const dupZh = [];
 for (const c of cats) {
   for (const w of c.words) {
     const k = w.zh.trim();
@@ -260,31 +333,13 @@ for (const c of cats) {
       zhSeen.set(k, w.en);
       continue;
     }
-    const other = zhSeen.get(k);
-    console.warn(`duplicate zh "${k}": ${w.en} / ${other} -> disambiguate`);
-    w.zh = `${k}（${c.zh}）`;
+    dupZh.push(`${w.en} / ${zhSeen.get(k)} -> ${k}`);
+    w.zh = `${k}（${w.en}）`;
     zhSeen.set(w.zh, w.en);
   }
 }
 
-/* ---------- 7. 排序 ---------- */
-for (const c of cats) {
-  if (c.defaultGrade) {
-    c.words.sort((a, b) => {
-      const ga = a.grade ?? 99;
-      const gb = b.grade ?? 99;
-      if (ga !== gb) return ga - gb;
-      const ta = a.term ?? 9;
-      const tb = b.term ?? 9;
-      if (ta !== tb) return ta - tb;
-      const ua = a.unit ?? 99;
-      const ub = b.unit ?? 99;
-      return ua - ub;
-    });
-  }
-}
-
-/* ---------- 8. 序列化 ---------- */
+/* ---------- 序列化 ---------- */
 const fmtStr = (s) => `'${String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`;
 const fieldOrder = ['en', 'ipa', 'zh', 'icon', 'swatch', 'pos', 'countable', 'plural', 'grade', 'term', 'unit', 'unitTitle', 'level'];
 function fmtWord(w) {
@@ -301,8 +356,8 @@ const lines = [];
 lines.push('/**');
 lines.push(' * 单词数据源');
 lines.push(' * 结构：{ id, en, zh, icon, color, group, words: [{ en, ipa, zh, icon, pos, grade, term, unit, unitTitle, level }] }');
-lines.push(' * - grade/term/unit：沪教牛津版（深圳用）小学教材位置，1-6 年级');
-lines.push(' * - level：core = 教材核心词；extension = 拓展词（默认不在教材视图展示）');
+lines.push(' * - grade/term/unit：沪教牛津版小学教材位置，1-6 年级；按册分成 12 个教材分类');
+lines.push(' * - level：core = 教材词；extension = 拓展词（教材之外的常用词）');
 lines.push(' * - 音标统一英式；卡片默认不展示音标，点击后显示');
 lines.push(' * 纯静态脚本（非 ES Module），可直接用 file:// 打开。');
 lines.push(' */');
@@ -315,7 +370,6 @@ for (const c of cats) {
   lines.push(`    icon: ${fmtStr(c.icon)},`);
   lines.push(`    color: ${fmtStr(c.color)},`);
   lines.push(`    group: ${fmtStr(c.group)},`);
-  if (c.defaultGrade) lines.push(`    defaultGrade: ${c.defaultGrade},`);
   if (c.hidden) lines.push('    hidden: true,');
   lines.push('    words: [');
   for (const w of c.words) lines.push(fmtWord(w));
@@ -327,6 +381,10 @@ lines.push('');
 
 fs.writeFileSync(path.join(root, 'assets/words.js'), lines.join('\n'), 'utf8');
 
-console.log(`categories: ${cats.length}`);
-console.log(`words: ${cats.reduce((n, c) => n + c.words.length, 0)} (core ${core}, extension ${ext})`);
-console.log(`new words: ${addedWords.length}`);
+const coreCount = [...coreByBook.values()].reduce((n, list) => n + list.length, 0);
+const extCount = extCats.reduce((n, c) => n + c.words.length, 0);
+console.log(`textbook entries: ${textbookOrder.length}, words: ${coreCount} core + ${extCount} extension = ${coreCount + extCount}`);
+console.log(`categories: ${cats.length} (12 textbook + ${extCats.length} theme)`);
+if (missingIpa.length) console.log(`MISSING IPA (${missingIpa.length}): ${missingIpa.join(', ')}`);
+if (missingIcon.length) console.log(`MISSING ICON (${missingIcon.length}): ${missingIcon.join(', ')}`);
+if (dupZh.length) console.log(`DUPLICATE ZH (${dupZh.length}): ${dupZh.join(' | ')}`);

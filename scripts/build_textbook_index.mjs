@@ -1,9 +1,10 @@
 /**
- * 抓取沪教牛津版（深圳用）1-6 年级上下册公开词表，生成 data/textbook-index.json
- * 用途：给 assets/words.js 打「年级 / 学期 / 单元」标签。
+ * 抓取沪教牛津版 1-6 年级上下册公开词表，生成 data/textbook-index.json
+ * 用途：作为 assets/words.js 的教材词表底稿，并给词条打「年级 / 学期 / 单元」标签。
  *
- * 数据来源：英语朗读宝（yyld.51jiaoxi.com）公开页面，仅取单元名与词条中英文，
- * 作为教材对齐的参考底稿；正式使用前请以学校实际用书复核。
+ * 数据来源：英语朗读宝（yyld.51jiaoxi.com）公开页面，取单元名、词条中英文与页面音标；
+ * 页面没有音标时留空，由 scripts/build_words.mjs 从英式音标词典补齐。
+ * 正式使用前请以学校实际用书复核。
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -51,12 +52,18 @@ function parseBook(html) {
     const listStart = chunk.indexOf('dc-list');
     if (listStart === -1) return;
     const listChunk = chunk.slice(listStart);
-    const ens = [...listChunk.matchAll(/<p class="en"[^>]*>([\s\S]*?)<\/p>/gi)].map((m) => stripTags(m[1]));
-    const cns = [...listChunk.matchAll(/<p class="cn"[^>]*>([\s\S]*?)<\/p>/gi)].map((m) => stripTags(m[1]));
+    const items = [
+      ...listChunk.matchAll(
+        /<li class="dc-item"[\s\S]*?<p class="en"[^>]*>([\s\S]*?)<\/p>([\s\S]*?)<p class="cn"[^>]*>([\s\S]*?)<\/p>/gi,
+      ),
+    ];
     const words = [];
-    for (let i = 0; i < ens.length; i += 1) {
-      if (!ens[i]) continue;
-      words.push({ en: ens[i], zh: cns[i] || '' });
+    for (const m of items) {
+      const en = stripTags(m[1]);
+      if (!en) continue;
+      const ipaMatch = m[2].match(/<div class="phonetic"[^>]*>[\s\S]*?<p class="text"[^>]*>([\s\S]*?)<\/p>/i);
+      const ipa = ipaMatch ? stripTags(ipaMatch[1]) : '';
+      words.push({ en, ipa, zh: stripTags(m[3]) });
     }
     units.push({
       unit: Number(unitMatch[1]),
@@ -91,7 +98,11 @@ for (const book of BOOKS) {
     continue;
   }
   data.units.sort((a, b) => a.unit - b.unit);
-  console.log(`✓ ${book.grade}年级${book.term === 1 ? '上' : '下'}  ${data.units.length} 单元 / ${data.units.reduce((n, u) => n + u.words.length, 0)} 词`);
+  const totalWords = data.units.reduce((n, u) => n + u.words.length, 0);
+  const totalIpa = data.units.reduce((n, u) => n + u.words.filter((w) => w.ipa).length, 0);
+  console.log(
+    `✓ ${book.grade}年级${book.term === 1 ? '上' : '下'}  ${data.units.length} 单元 / ${totalWords} 词 / ${totalIpa} 条页面音标`,
+  );
   out.push({ grade: book.grade, term: book.term, source: data.url, units: data.units });
 }
 

@@ -163,3 +163,6 @@ Desktop.ini
 # Misc
 .coze-logs
 .codegraph/
+
+# 音标生成用的上游原始词典（仅本地辅助，不随仓库分发）
+data/ipa-en-UK.txt

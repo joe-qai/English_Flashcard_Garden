@@ -1,12 +1,12 @@
 # 英文闪卡园 · Flashcard Garden · 纯静态版
 
-按教材年级组织的常见英文单词闪卡，词表对齐**沪教牛津版（深圳用）小学 1–6 年级教材单元**：实物图 + 英文 + 中文释义，点击卡片即可听发音；音标默认隐藏，生词高亮，点开卡片才显示音标。另附 28 个场景对话、24 首英文歌曲、33 篇中外故事与互动小游戏。中文默认显示，右上角 `CN` 开关一键切换。
+按教材年级组织的常见英文单词闪卡，词表对齐**沪教牛津版小学 1–6 年级教材单元**：实物图 + 英文 + 中文释义，点击卡片即可听发音；音标默认隐藏，生词高亮，点开卡片才显示音标。另附 28 个场景对话、24 首英文歌曲、33 篇中外故事与互动小游戏。中文默认显示，右上角 `CN` 开关一键切换。
 
 **纯 HTML / CSS / JavaScript，无框架、无构建、无后端、无外部依赖**。双击 `index.html` 就能用，也可以直接托管到 GitHub Pages。
 
 ## 功能
 
-- **770 个单词，只按年级分类**：300 个教材核心词（标年级、学期、单元）+ 470 个拓展词；顶部只有「全部 / 一~六年级 / 拓展」一排筛选，不再显示主题分组或分类标签。词表内容覆盖家庭、情绪、校园、日常、中国节日，以及水果、颜色、食物、动物、文具、家具、厨具、侏罗纪、海洋生物、植物、二十四节气、四季、天气、穿着、身体部位、健康看病、购物付款、交通出行、职业工作、房间家居、工具维修、时间概念、爱好休闲、数字计量、运动综合、节日庆典；军事武器分类保留 23 个词在数据中但默认隐藏
+- **1577 个单词，只按年级分类**：1074 个教材核心词（标年级、学期、单元）+ 503 个拓展词；顶部只有「全部 / 一~六年级 / 拓展」一排筛选，不再显示主题分组或分类标签。教材词按 12 册组织（一年级上册 … 六年级下册），覆盖家庭、情绪、校园、日常、中国节日，以及水果、颜色、食物、动物、文具、家具、厨具、侏罗纪、海洋生物、植物、二十四节气、四季、天气、穿着、身体部位、健康看病、购物付款、交通出行、职业工作、房间家居、工具维修、时间概念、爱好休闲、数字计量、运动综合、节日庆典；军事武器等不适合小学场景的分类不进入词库
 - **教材单元对齐**：按「全部 / 一~六年级 / 拓展」筛选；卡片底部标注 `三年级上 · U5` 之类的教材位置，核心词与拓展词分层
 - **英式发音与拼写**：统一 `en-GB` 朗读，优先使用系统里的自然音/在线音，拼写采用英式（grey、pyjamas、trainers、biscuit、chips、underground、fridge、rubber、school bag 等）
 - **生词与音标**：没点开过的词右上角有小圆点；音标默认隐藏，点击卡片显示音标并朗读，已读状态记在 `localStorage`
@@ -38,10 +38,12 @@ assets/icons/*.svg      # 手绘实物图标（emoji 画不对或没有的词）
 assets/scenes.js        # 场景对话数据源
 assets/songs.js         # 歌曲数据源（24 首，歌词 + 音频路径）
 assets/stories.js       # 故事会数据源（33 篇：安徒生 5 + 伊索 10 + 格林 9 + 中国故事 9）
-data/words.base.js      # 648 词历史底稿（生成器的输入快照）
-data/textbook-index.json# 沪教牛津版（深圳用）1–6 年级单元词表索引
-data/word-additions.json# 新增分类、补词、英式拼写与释义修正
-scripts/build_words.mjs # 生成 assets/words.js，并校验英文 / 中文释义唯一
+data/words.base.js      # 历史底稿（仅作参考快照，生成器不再读取）
+data/textbook-index.json# 沪教牛津版 1–6 年级单元词表索引（含页面音标）
+data/word-overrides.json# 跳过词、英文名、人工音标与释义修正
+data/ipa-supplement.json# 缺失音标的英式补充
+data/word-icons.json    # 人工 emoji 图标映射
+scripts/build_words.mjs # 生成 assets/words.js，并校验音标 / 图标 / 释义
 scripts/build_textbook_index.mjs # 抓取公开词表生成 data/textbook-index.json
 music/*.mp3             # 24 首歌曲音频（文件名即曲目名）
 assets/app.js           # 页签 / 年级筛选 / 发音 / 播放 / 中文开关 / 游戏 / 主题
@@ -75,13 +77,15 @@ python -m http.server 8080
 
 ## 维护单词
 
-`assets/words.js` 是生成产物，**不要手改**。词库由三份输入合成：
+`assets/words.js` 是生成产物，**不要手改**。词库以教材词表为底稿，由几份输入合成：
 
 | 文件 | 作用 |
 |---|---|
-| `data/words.base.js` | 648 词历史底稿 |
-| `data/word-additions.json` | 新增分类、补词、英式拼写映射（`rename`）、释义修正（`glossFix`）、隐藏分类 |
-| `data/textbook-index.json` | 沪教牛津版（深圳用）1–6 年级单元词表，用于打 `grade / term / unit` 标签 |
+| `data/textbook-index.json` | 沪教牛津版 1–6 年级 12 册单元词表（含页面音标），生成核心词与 `grade / term / unit` 标签 |
+| `assets/words.js`（上一次产物） | 作为图标、音标、释义与拓展词的来源；重复运行是幂等的 |
+| `data/word-overrides.json` | 跳过词、英文名修正、人工音标、释义修正、隐藏分类 |
+| `data/ipa-supplement.json` | 页面音标缺失时的英式音标补充（词典 + eSpeak 生成后人工校正） |
+| `data/word-icons.json` | 人工 emoji 图标映射；功能词、抽象词保留首字母色块 |
 
 改完输入后运行：
 
@@ -89,17 +93,18 @@ python -m http.server 8080
 node scripts/build_words.mjs
 ```
 
-生成器会同步做两件校验：**英文单词不重复**、**中文释义不重复**；发现重复会打印告警并自动给释义加分类后缀。
+生成器会打印 **缺失音标 / 缺失图标 / 重复中文释义** 三类告警：音标应保持 0 缺失，释义重复会自动加英文后缀兜底。
 
 词条结构：
 
 ```js
-{ en: 'apple', ipa: '/ˈæpl/', zh: '苹果', icon: '🍎', pos: 'n.',
-  grade: 1, term: 1, unit: 3, unitTitle: 'What do you take to school?', level: 'core' }
+{ en: 'apple', ipa: '/ˈæpl/', zh: '苹果', icon: '🍎',
+  grade: 1, term: 2, unit: 5, unitTitle: 'What do you know about fruit?', level: 'core' }
 ```
 
-- `level: 'core'` 表示教材核心词，带 `grade / term / unit`；`extension` 表示拓展词，默认只在「拓展」筛选里出现
-- 分类级字段：`group`（school / life / fun，仅数据维护用，页面已不再展示）、`defaultGrade`（新增核心主题未匹配教材时落到的年级）、`hidden`（隐藏分类，如 military）
+- `level: 'core'` 表示教材词，带 `grade / term / unit`；`extension` 表示教材之外的拓展词，只在「拓展」筛选里出现
+- 12 个教材分类的 `id` 为 `book-g{年级}t{学期}`（如 `book-g3t1`），页面按教材位置排序
+- 分类级字段：`group`（`textbook` / 主题分组）、`hidden`（隐藏分类，如 military）
 - 音标统一英式；卡片默认不展示音标，点击后显示
 
 `icon` 的三种写法，按「图物一致」优先选：

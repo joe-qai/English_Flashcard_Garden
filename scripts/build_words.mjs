@@ -318,7 +318,7 @@ for (const cat of currentCats) {
   const words = [];
   for (const old of cat.words) {
     const key = norm(old.en);
-    if (textKeys.has(key) || extSeen.has(key)) continue;
+    if (textKeys.has(key) || extSeen.has(key) || overridesSkip.has(key)) continue;
     extSeen.add(key);
     const icon = iconOverride.get(key) || old.icon || iconMap.get(key);
     let zhExt = glossOverride.get(key) || old.zh;

@@ -1,6 +1,11 @@
 {
   "skip": [
     "Proper nouns",
+    "I",
+    "OK",
+    "PE",
+    "UK",
+    "PS",
     "How are you?",
     "Not so good.",
     "Let's close the window.",

@@ -632,25 +632,34 @@ export function resolveRequest(input, profile = { id: 'hjbsz', aliases: [] }) {
   const missing = [];
 
   let grade = null;
-  const gradeMatch =
-    text.match(/([1-6一二三四五六])\s*年级/) ||
-    text.match(/\bg\s*([1-6])\b/i) ||
-    text.match(/([1-6])\s*[上下]/);
-  if (gradeMatch) grade = CN_DIGITS[gradeMatch[1]] || Number(gradeMatch[1]);
-
   let term = null;
-  const termMatch = text.match(/([1-6])\s*([上下])/);
-  if (termMatch) term = termMatch[2] === '下' ? 2 : 1;
+
+  const compact = text.match(/\bg\s*([1-6])\s*t\s*([12])\b/i);
+  if (compact) {
+    grade = Number(compact[1]);
+    term = Number(compact[2]) === 1 ? 1 : 2;
+  }
+
+  if (!grade) {
+    const gradeMatch =
+      text.match(/([1-6一二三四五六])\s*年级/) ||
+      text.match(/([1-6一二三四五六])\s*[上下]/);
+    if (gradeMatch) grade = CN_DIGITS[gradeMatch[1]] || Number(gradeMatch[1]);
+  }
+
+  if (!term) {
+    const termMatch =
+      text.match(/(?:年级|[1-6一二三四五六])\s*([上下])/) ||
+      text.match(/([上下])\s*[册学]/);
+    if (termMatch) term = termMatch[1] === '下' ? 2 : 1;
+  }
   if (!term && /(下\s*册|下\s*学期|第二学期|\bt\s*2\b|\bterm\s*2\b)/i.test(text)) term = 2;
   if (!term && /(上\s*册|上\s*学期|第一学期|\bt\s*1\b|\bterm\s*1\b)/i.test(text)) term = 1;
 
   if (!grade) missing.push('grade');
   if (!term) missing.push('term');
 
-  const aliases = profile.aliases || [];
-  const matched = aliases.some((a) => text.includes(a));
-
-  return { ok: missing.length === 0, profile: matched ? profile.id : profile.id, grade, term, missing };
+  return { ok: missing.length === 0, profile: profile.id, grade, term, missing };
 }
 ```
 
@@ -738,7 +747,7 @@ export function diffBook(current, incoming) {
 
 - `--write` 才落盘；默认 dry-run
 - 预览输出 Markdown 表格，最多每类展示 20 条，其余折叠为「还有 N 条」
-- 存在 removed 时额外提示「删除会在用户确认后执行」，不自动删
+- 有删除项时，即使加了 `--write` 也要求再加 `--allow-remove`，否则拒绝写入
 - 写入时 `replaceBook`，并保留其他册原样
 - 写前打印 `将写入 data/textbook-index.json（仅 X 年级 X 册）`
 
@@ -761,7 +770,7 @@ feat(skill): 教材册合并与差异预览
 
 ### 9.1 规则实现
 
-`lib/audit-rules.mjs` 新增，导出 `auditBook({ units, words, grade, term })`，返回：
+`lib/audit-rules.mjs` 新增，导出 `auditBook({ units, words, allWords, skip })`，返回：
 
 ```js
 {
@@ -1067,7 +1076,7 @@ git status --short
 ### 14.2 单元测试全绿
 
 ```powershell
-node --test skills/english-textbook-flashcards/tests/
+node --test "skills/english-textbook-flashcards/tests/*.test.mjs"
 ```
 
 ### 14.3 导入 dry-run

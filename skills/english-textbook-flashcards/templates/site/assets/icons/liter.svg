@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64"><path d="M18 12h20v6l6 10v28a4 4 0 0 1-4 4H16a4 4 0 0 1-4-4V28l6-10z" fill="#EAF6FF" stroke="#93A0A9" stroke-width="2.2"/>
+<path d="M13 34h30v22a4 4 0 0 1-4 4H17a4 4 0 0 1-4-4z" fill="#6BB3F0" opacity=".55"/>
+<path d="M44 34h6a4 4 0 0 1 0 8h-6" fill="none" stroke="#93A0A9" stroke-width="2.6"/>
+<g stroke="#93A0A9" stroke-width="1.6" stroke-linecap="round">
+<path d="M36 28h-5M36 38h-5M36 48h-5"/>
+</g>
+<text x="24" y="46" font-family="Segoe UI, sans-serif" font-size="11" font-weight="700" fill="#2E6EAF" text-anchor="middle">1 L</text></svg>

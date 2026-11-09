@@ -1,0 +1,15 @@
+{
+  "skip": [
+    "I",
+    "OK",
+    "PE",
+    "UK",
+    "PS"
+  ],
+  "rename": {},
+  "hiddenCategories": [],
+  "ipa": {},
+  "gloss": {},
+  "icon": {},
+  "pos": {}
+}

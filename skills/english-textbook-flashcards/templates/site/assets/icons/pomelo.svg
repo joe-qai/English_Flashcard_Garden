@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64"><path d="M32 13c-11 0-20 9-20 21 0 13 9 21 20 21s20-8 20-21c0-12-9-21-20-21z" fill="#E7D98B"/>
+<path d="M32 13c-7 0-13 4-17 10 5 3 11 4 17 4s12-1 17-4c-4-6-10-10-17-10z" fill="#EFE6A9" opacity=".8"/>
+<path d="M32 13c-1-5 0-7 1-8 2 2 3 5 2 8z" fill="#6C9A4E"/>
+<path d="M35 12c3-4 7-5 10-4-1 3-4 5-8 6z" fill="#8FBF6E"/>
+<path d="M20 32c2 8 6 12 12 13" stroke="#F7F0C4" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64"><rect x="18" y="38" width="28" height="14" rx="3" fill="#F5EFE5" stroke="#C99A2E" stroke-width="2"/>
+<g stroke="#B07A2A" stroke-width="1.4">
+<path d="M24 38v7M29 38v5M34 38v7M39 38v5M44 38v7"/>
+</g>
+<text x="32" y="31" font-family="Segoe UI, sans-serif" font-size="12" font-weight="700" fill="#2A2A2E" text-anchor="middle">1 cm</text>
+<path d="M32 50v6M26 56h12" stroke="#93A0A9" stroke-width="2" stroke-linecap="round"/></svg>

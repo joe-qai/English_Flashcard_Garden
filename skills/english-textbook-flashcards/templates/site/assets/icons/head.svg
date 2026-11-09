@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64"><rect x="25.6" y="52" width="5.6" height="12" rx="2.8" fill="#DEE6EC"/>
+<rect x="32.8" y="52" width="5.6" height="12" rx="2.8" fill="#DEE6EC"/>
+<circle cx="28.4" cy="58" r="3.2" fill="#DEE6EC"/>
+<circle cx="35.6" cy="58" r="3.2" fill="#DEE6EC"/>
+<path d="M20 26h24v30a4 4 0 0 1-4 4H24a4 4 0 0 1-4-4z" fill="#DEE6EC"/>
+<path d="M15 28.5c0-1.6 1.3-2.9 2.9-2.9h3.4c1.6 0 2.9 1.3 2.9 2.9v14.2c0 1.6-1.3 2.9-2.9 2.9h-3.4a2.9 2.9 0 0 1-2.9-2.9z" fill="#DEE6EC"/>
+<path d="M39.8 28.5c0-1.6 1.3-2.9 2.9-2.9h3.4c1.6 0 2.9 1.3 2.9 2.9v14.2c0 1.6-1.3 2.9-2.9 2.9h-3.4a2.9 2.9 0 0 1-2.9-2.9z" fill="#DEE6EC"/>
+<rect x="28.6" y="20.6" width="6.8" height="6" fill="#F2C7A0"/>
+<circle cx="32" cy="13.4" r="8.6" fill="#F6A94D"/>
+<path d="M23.4 13.4a8.6 8.6 0 0 1 17.2 0c0 2.4-.8 3.8-1.8 5-.5-3.6-2.6-6.2-6.8-6.2s-6.3 2.6-6.8 6.2c-1-1.2-1.8-2.6-1.8-5z" fill="#5A4632"/>
+<path d="M20 26h24v30a4 4 0 0 1-4 4H24a4 4 0 0 1-4-4z" fill="none" stroke="#2A2A2E" stroke-opacity=".18" stroke-width="1.6"/></svg>

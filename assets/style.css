@@ -383,6 +383,18 @@ input { font-family: inherit; }
 .scene-meta { flex: 1; }
 .scene-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
 .scene-desc { font-size: 0.82rem; color: var(--text-muted); }
+.scene-unit {
+  display: inline-block;
+  margin-bottom: 6px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--cat) 68%, var(--text));
+  background: color-mix(in srgb, var(--cat) 14%, var(--bg-card));
+  border: 1px solid color-mix(in srgb, var(--cat) 34%, var(--border));
+}
+.scene-desc-with-unit { margin-top: 2px; }
 .scene-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
 .ghost-btn {
@@ -527,6 +539,7 @@ body.hide-zh .card-zh,
 body.hide-zh .line-zh,
 body.hide-zh .zh-aux,
 body.hide-zh .scene-desc,
+body.hide-zh .scene-unit,
 body.hide-zh .pill-zh,
 body.hide-zh .title-sep,
 body.hide-zh .sub-note { display: none; }

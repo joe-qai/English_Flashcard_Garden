@@ -28,10 +28,13 @@
   var supportsSpeech = !!synth && typeof window.SpeechSynthesisUtterance === 'function';
 
   /* ============ Scene context tags ============ */
-  var SCHOOL_SCENE_IDS = ['class','asking','identify','time','sports','weekend','bedtime'];
+  var SCHOOL_SCENE_IDS = ['class','asking','identify','time','sports','weekend','bedtime',
+                          'packing-bag','show-and-tell','five-senses','protect-earth','future-plans','art-class'];
   var LIFE_SCENE_IDS   = ['washup','morning','noon','evening','eating','toilet','feelings',
                           'transport-bus','restaurant','doctor','shopping-store','post-office','fix-thing',
-                          'directions','birthday'];
+                          'directions','birthday',
+                          'favourite-season','on-the-farm','sounds-around','childrens-day',
+                          'growing-sunflower','grandparents-day','safety-first'];
 
   function getSceneGroup(id) {
     if (SCHOOL_SCENE_IDS.indexOf(id) !== -1) return 'school';
@@ -1240,7 +1243,17 @@
       title.appendChild(titleZh); title.appendChild(sep); title.appendChild(titleEn);
       var desc = document.createElement('p'); desc.className = 'scene-desc zh-aux';
       desc.textContent = item.desc;
-      meta.appendChild(title); meta.appendChild(desc);
+      meta.appendChild(title);
+      // 教材配套场景显示「三年级上 · U8」这样的单元标签
+      if (item.unitTitle) {
+        var gradeCn = ['', '一', '二', '三', '四', '五', '六'][item.grade] || item.grade;
+        var unitTag = document.createElement('span');
+        unitTag.className = 'scene-unit';
+        unitTag.textContent = gradeCn + '年级' + (item.term === 2 ? '下' : '上') + ' · U' + item.unit;
+        meta.appendChild(unitTag);
+        desc.classList.add('scene-desc-with-unit');
+      }
+      meta.appendChild(desc);
       var actions = document.createElement('div'); actions.className = 'scene-actions';
       var playBtn = null;
       if (state2.lines.length) {

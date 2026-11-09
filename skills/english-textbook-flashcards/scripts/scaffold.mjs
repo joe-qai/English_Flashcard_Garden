@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
+import { isMain } from '../lib/main.mjs';
 import { parseArgs } from '../lib/args.mjs';
 
 const SKILL_ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -34,7 +35,7 @@ function main() {
   console.log('  # 或让 skill 导入一册：整理三年级上');
 }
 
-if (process.argv[1] && pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url) {
+if (isMain(import.meta.url)) {
   try {
     main();
   } catch (err) {

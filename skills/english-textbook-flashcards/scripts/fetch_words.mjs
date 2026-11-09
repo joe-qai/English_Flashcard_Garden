@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { isMain } from '../lib/main.mjs';
 import { parseArgs, requireNumber } from '../lib/args.mjs';
 import { assertWorkspace } from '../lib/workspace.mjs';
 import { parseBookHtml } from '../lib/textbook.mjs';
@@ -93,7 +93,7 @@ async function main() {
   console.log('\n下一步：npm 之外无需安装依赖，直接运行 merge_textbook.mjs 预览差异。');
 }
 
-if (process.argv[1] && pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url) {
+if (isMain(import.meta.url)) {
   main().catch((err) => {
     console.error(`\n✗ ${err.message}`);
     process.exitCode = 1;

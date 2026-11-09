@@ -2,7 +2,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
+import { isMain } from '../lib/main.mjs';
 import { parseArgs } from '../lib/args.mjs';
 import { assertWorkspace } from '../lib/workspace.mjs';
 
@@ -35,7 +36,7 @@ function main() {
   console.log('下一步：抽查页面 → 校对报告 → 用户明确说「发布」后再 commit/push');
 }
 
-if (process.argv[1] && pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url) {
+if (isMain(import.meta.url)) {
   try {
     main();
   } catch (err) {

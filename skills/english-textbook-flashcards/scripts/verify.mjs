@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { isMain } from '../lib/main.mjs';
 import { parseArgs } from '../lib/args.mjs';
 import { assertWorkspace, loadWordCategories, loadGlobal } from '../lib/workspace.mjs';
 
@@ -77,6 +77,6 @@ function main() {
   console.log('✓ 校验通过');
 }
 
-if (process.argv[1] && pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url) {
+if (isMain(import.meta.url)) {
   main();
 }

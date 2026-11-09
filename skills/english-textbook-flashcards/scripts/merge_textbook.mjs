@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import path from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { isMain } from '../lib/main.mjs';
 import { parseArgs, requireNumber } from '../lib/args.mjs';
 import { assertWorkspace, readJson, writeJson } from '../lib/workspace.mjs';
 import { findBook, flattenUnits, replaceBook } from '../lib/textbook.mjs';
@@ -139,7 +139,7 @@ async function main() {
   console.log('下一步：node scripts/build.mjs --root .');
 }
 
-if (process.argv[1] && pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url) {
+if (isMain(import.meta.url)) {
   main().catch((err) => {
     console.error(`\n✗ ${err.message}`);
     process.exitCode = 1;

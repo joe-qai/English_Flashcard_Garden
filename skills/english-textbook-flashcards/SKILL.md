@@ -94,6 +94,18 @@ node <skill>/scripts/scaffold.mjs --target <目录>
 5. **地区/年份只用于定位教材**，不写进站点文案、报告标题或提交信息。
 6. **不自动发布**：commit / push 必须由用户明确触发。
 
+## 安装（全局挂载）
+
+源码放在项目 `skills/english-textbook-flashcards/`，用 junction 挂到全局 skill 目录，兼顾版本管理与跨会话可用：
+
+```powershell
+New-Item -ItemType Junction `
+  -Path "$env:USERPROFILE\.config\opencode\skills\english-textbook-flashcards" `
+  -Target "D:\pythonworkspace\projects\skills\english-textbook-flashcards"
+```
+
+已验证：通过 junction 路径直接执行脚本时，`lib/main.mjs` 会用 realpath 识别入口，CLI 正常进入。
+
 ## 目录
 
 ```

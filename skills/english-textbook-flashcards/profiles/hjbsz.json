@@ -1,0 +1,57 @@
+{
+  "id": "hjbsz",
+  "name": "沪教牛津版小学英语",
+  "aliases": ["沪教牛津", "牛津上海版", "沪教版", "牛津小学英语"],
+  "terms": { "1": "上册", "2": "下册" },
+  "source": {
+    "type": "yyld",
+    "base": "https://yyld.51jiaoxi.com",
+    "files": ["hjbsz_danci.html", "hjbsq_danci.html"],
+    "slug": {
+      "1-1": "yishang",
+      "1-2": "yixia",
+      "2-1": "ershang",
+      "2-2": "erxia",
+      "3-1": "sanshang",
+      "3-2": "sanxia",
+      "4-1": "sishang",
+      "4-2": "sixia",
+      "5-1": "wushang",
+      "5-2": "wuxia",
+      "6-1": "liushang",
+      "6-2": "liuxia"
+    }
+  },
+  "ipaPolicy": ["override", "existing", "supplement", "page"],
+  "unitTitleFix": {
+    "1-1-1": "What is your family like?",
+    "1-1-2": "How are you today?",
+    "1-1-3": "What do you take to school?",
+    "1-1-4": "What can you do?",
+    "1-1-5": "What is your favourite animal?",
+    "1-1-6": "What colours can you see?",
+    "2-1-1": "What can you do with your five senses?",
+    "2-1-2": "What do you like about your family?",
+    "2-1-5": "What do you like about farms?",
+    "2-1-6": "How do people celebrate the Mid-Autumn Festival?",
+    "4-1-1": "Where do people live?",
+    "4-1-2": "Where do animals live?",
+    "4-1-3": "How do numbers help us?",
+    "4-1-4": "How do we go shopping?",
+    "4-1-5": "What are the four seasons?",
+    "4-1-6": "How do plants grow?",
+    "4-1-7": "How do we stay safe on the road?",
+    "4-1-8": "What do our grandparents do?",
+    "5-1-1": "What do we do at the weekend?",
+    "5-1-2": "How do we stay healthy?",
+    "5-1-3": "Which countries do you know?",
+    "5-1-4": "Where do we go on holiday?",
+    "5-1-5": "What are living things?",
+    "5-1-6": "How can we protect the Earth?",
+    "5-1-7": "What festivals do we have?",
+    "5-1-8": "How does music make us feel?"
+  },
+  "contentPolicy": {
+    "locatorOnly": "输入里的地区、年份仅用于定位教材，不写入站点内容、报告标题或提交信息。"
+  }
+}

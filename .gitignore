@@ -166,3 +166,7 @@ Desktop.ini
 
 # 音标生成用的上游原始词典（仅本地辅助，不随仓库分发）
 data/ipa-en-UK.txt
+
+# 英语教材闪卡 skill 的运行产物
+reports/
+data/sources/

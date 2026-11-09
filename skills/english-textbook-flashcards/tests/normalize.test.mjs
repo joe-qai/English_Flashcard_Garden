@@ -34,6 +34,7 @@ test('detectPos 识别短语与词性', () => {
 test('countSyllables 处理成音节 /l/、/n/', () => {
   assert.equal(countSyllables('ˈæpl'), 2);
   assert.equal(countSyllables('ˈteɪbl'), 2);
+  assert.equal(countSyllables('ɡɜːl'), 1);
   assert.equal(countSyllables('kæt'), 1);
 });
 

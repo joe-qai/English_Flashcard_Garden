@@ -71,7 +71,7 @@ export function countSyllables(ipa) {
     if (DIPHTHONGS.includes(ipa.slice(i, i + 2))) i += 1;
     n += 1;
   }
-  if (/[^aeiouɑɒɔəɜɪʊʌæ][ln]$/.test(ipa)) n += 1;
+  if (/[^aeiouɑɒɔəɜɪʊʌæː][ln]$/.test(ipa)) n += 1;
   return n;
 }
 

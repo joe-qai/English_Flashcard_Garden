@@ -928,7 +928,7 @@ templates/site/
 │   ├── songs.js          # 去掉 audio 字段，避免引用不存在的 music/
 │   ├── stories.js
 │   ├── icons/            # 276 个图标，约 0.2 MB
-│   └── words.js          # window.WORD_CATEGORIES = [];
+│   └── words.js          # 隐藏的种子词库：全部 category.hidden = true
 ├── scripts/
 │   ├── build_words.mjs
 │   └── verify_words.cjs
@@ -957,7 +957,7 @@ node scripts/build_words.mjs
 # 或让 skill 执行导入：整理三年级上
 ```
 
-**测试**：临时目录 scaffold → 断言关键文件存在、`words.js` 为空词库、`data/textbook-index.json` 为 `[]`；重复执行无 `--force` 时报错。
+**测试**：临时目录 scaffold → 断言关键文件存在、`words.js` 是全部 `hidden` 的种子词库、`data/textbook-index.json` 为 `[]`；重复执行无 `--force` 时报错。
 
 **Commit**
 

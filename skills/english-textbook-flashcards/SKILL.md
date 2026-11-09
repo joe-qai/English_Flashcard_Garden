@@ -78,7 +78,7 @@ node <skill>/scripts/scaffold.mjs --target <目录>
 生成：
 
 - `index.html` + `assets/`（app、样式、场景、歌曲、故事、图标）
-- `assets/words.js` 为空词库
+- `assets/words.js` 为隐藏的种子词库：只用于复用已知单词的音标/图标/释义，页面不显示；导入后会被正式词库覆盖
 - `data/` 输入骨架（`textbook-index.json` 为 `[]`，带音标补充与图标映射）
 - `scripts/build_words.mjs`、`scripts/verify_words.cjs`
 - `music/` 说明文件（模板不含 mp3）

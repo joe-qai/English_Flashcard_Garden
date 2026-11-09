@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import vm from 'node:vm';
 import { scaffold } from '../scripts/scaffold.mjs';
 
 test('scaffold 生成可用的空词库站点', () => {
@@ -14,7 +15,14 @@ test('scaffold 生成可用的空词库站点', () => {
   assert.ok(fs.existsSync(path.join(dir, 'assets/icons')));
   assert.ok(fs.existsSync(path.join(dir, 'scripts/build_words.mjs')));
   assert.equal(fs.readFileSync(path.join(dir, 'data/textbook-index.json'), 'utf8').trim(), '[]');
-  assert.match(fs.readFileSync(path.join(dir, 'assets/words.js'), 'utf8'), /WORD_CATEGORIES = \[\]/);
+  const seed = fs.readFileSync(path.join(dir, 'assets/words.js'), 'utf8');
+  const sandbox = { window: {} };
+  vm.createContext(sandbox);
+  vm.runInContext(seed, sandbox);
+  const cats = sandbox.window.WORD_CATEGORIES;
+  assert.ok(cats.length > 0);
+  assert.ok(cats.every((c) => c.hidden));
+  assert.equal(cats.filter((c) => !c.hidden).length, 0);
   assert.ok(fs.existsSync(path.join(dir, 'data/sources')));
   assert.ok(fs.existsSync(path.join(dir, 'music/README.md')));
 });

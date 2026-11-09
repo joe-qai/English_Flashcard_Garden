@@ -1,10 +1,26 @@
 {
   "skip": [
+    "Proper nouns",
     "I",
     "OK",
     "PE",
     "UK",
-    "PS"
+    "PS",
+    "How are you?",
+    "Not so good.",
+    "Let's close the window.",
+    "Fine, thank you.",
+    "You look great!",
+    "What a lovely picture!",
+    "Come and see!",
+    "Here they are.",
+    "What would you like?",
+    "What time is it?",
+    "Don't worry!",
+    "May I come in?",
+    "It sounds great.",
+    "I can't wait to go!",
+    "I'm so excited!"
   ],
   "rename": {},
   "hiddenCategories": [],
